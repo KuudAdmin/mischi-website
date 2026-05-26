@@ -6,7 +6,7 @@ const FRAME_W = 192
 const FRAME_H = 208
 const DISPLAY_SCALE = 1.75
 
-type AnimState = 'idle' | 'wave' | 'jump' | 'run' | 'sleep'
+type AnimState = 'idle' | 'runRight' | 'runLeft' | 'wave' | 'jump' | 'tired' | 'waiting' | 'dancing' | 'review'
 
 interface StateConfig {
   row: number
@@ -17,11 +17,15 @@ interface StateConfig {
 }
 
 const STATES: Record<AnimState, StateConfig> = {
-  idle:  { row: 0, frames: 8, fps: 8,  loop: true },
-  run:   { row: 1, frames: 8, fps: 12, loop: true },
-  wave:  { row: 2, frames: 8, fps: 10, loop: false, next: 'idle' },
-  jump:  { row: 3, frames: 8, fps: 12, loop: false, next: 'idle' },
-  sleep: { row: 4, frames: 8, fps: 6,  loop: true },
+  idle:     { row: 0, frames: 6, fps: 8,  loop: true },
+  runRight: { row: 1, frames: 8, fps: 12, loop: true },
+  runLeft:  { row: 2, frames: 8, fps: 12, loop: true },
+  wave:     { row: 3, frames: 4, fps: 10, loop: false, next: 'idle' },
+  jump:     { row: 4, frames: 5, fps: 12, loop: false, next: 'idle' },
+  tired:    { row: 5, frames: 8, fps: 6,  loop: true },
+  waiting:  { row: 6, frames: 6, fps: 7,  loop: true },
+  dancing:  { row: 7, frames: 6, fps: 10, loop: true },
+  review:   { row: 8, frames: 6, fps: 8,  loop: true },
 }
 
 const IDLE_TO_SLEEP_MS = 12000
@@ -79,7 +83,7 @@ export default function PetCanvas({
       if (stateRef.current === 'idle') applyState('wave')
     }, IDLE_AUTO_WAVE_MS)
     idleTimer.current = setTimeout(() => {
-      if (stateRef.current === 'idle') applyState('sleep')
+      if (stateRef.current === 'idle') applyState('tired')
     }, IDLE_TO_SLEEP_MS)
   }, [interactive, applyState])
 
@@ -148,7 +152,7 @@ export default function PetCanvas({
 
   const handleClick = useCallback(() => {
     if (!interactive) return
-    applyState(currentState === 'sleep' ? 'idle' : 'wave')
+    applyState(currentState === 'tired' ? 'idle' : 'wave')
     resetIdleTimers()
   }, [interactive, currentState, applyState, resetIdleTimers])
 
@@ -164,7 +168,7 @@ export default function PetCanvas({
       style={{ position: 'relative', width: displayW, height: displayH, cursor: interactive ? 'pointer' : 'default', ...style }}
       onClick={handleClick}
       onDoubleClick={handleDblClick}
-      onMouseEnter={() => { if (interactive && currentState === 'sleep') applyState('idle') }}
+      onMouseEnter={() => { if (interactive && currentState === 'tired') applyState('idle') }}
       role={interactive ? 'button' : undefined}
       aria-label={interactive ? 'Interactive pet — click to wave, double-click to jump' : undefined}
       tabIndex={interactive ? 0 : undefined}

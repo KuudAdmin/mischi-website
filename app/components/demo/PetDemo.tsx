@@ -4,14 +4,18 @@ import { useState, useCallback } from 'react'
 import PetCanvas from './PetCanvas'
 import MacWindow from '../hero/MacWindow'
 
-type AnimState = 'idle' | 'wave' | 'jump' | 'run' | 'sleep'
+type AnimState = 'idle' | 'runRight' | 'runLeft' | 'wave' | 'jump' | 'tired' | 'waiting' | 'dancing' | 'review'
 
 const STATES_LIST: { state: AnimState; label: string; hint: string }[] = [
-  { state: 'wave',  label: 'Wave',  hint: 'click on the pet' },
-  { state: 'jump',  label: 'Jump',  hint: 'double-click' },
-  { state: 'run',   label: 'Run',   hint: 'button' },
-  { state: 'sleep', label: 'Sleep', hint: 'button' },
-  { state: 'idle',  label: 'Wake',  hint: 'hover or click' },
+  { state: 'idle',     label: 'Idle',      hint: 'default' },
+  { state: 'wave',     label: 'Wave',      hint: 'click pet' },
+  { state: 'jump',     label: 'Jump',      hint: 'double-click' },
+  { state: 'runRight', label: 'Run →',     hint: 'button' },
+  { state: 'runLeft',  label: 'Run ←',     hint: 'button' },
+  { state: 'dancing',  label: 'Dance',     hint: 'button' },
+  { state: 'waiting',  label: 'Waiting',   hint: 'button' },
+  { state: 'tired',    label: 'Tired',     hint: 'auto after idle' },
+  { state: 'review',   label: 'Review',    hint: 'button' },
 ]
 
 export default function PetDemo() {
@@ -77,13 +81,13 @@ export default function PetDemo() {
                 <>
                   <span style={{
                     width: 6, height: 6, borderRadius: '50%', flexShrink: 0,
-                    background: petState === 'sleep' ? 'var(--color-text-dim)' : 'var(--color-mac-green)',
+                    background: petState === 'tired' ? 'var(--color-text-dim)' : 'var(--color-mac-green)',
                     display: 'inline-block',
                     transition: 'background 0.3s',
                   }} />
                   <span>Active</span>
                   <span style={{ marginLeft: 'auto', color: 'var(--color-text-dim)', fontFamily: 'var(--font-geist-mono)', fontSize: '0.6875rem' }}>
-                    {petState}
+                    {petState === 'runRight' ? 'run →' : petState === 'runLeft' ? 'run ←' : petState}
                   </span>
                 </>
               }
@@ -159,7 +163,7 @@ export default function PetDemo() {
             </div>
 
             <p style={{ fontSize: '0.75rem', color: 'var(--color-text-dim)', marginTop: '18px', lineHeight: 1.55 }}>
-              More states coming in v1.5 — drag, throw toys, and sound reactions.
+              More interactions coming — drag, throw toys, and sound reactions.
             </p>
           </div>
         </div>
