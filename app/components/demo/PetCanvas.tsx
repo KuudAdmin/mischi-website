@@ -20,8 +20,8 @@ const STATES: Record<AnimState, StateConfig> = {
   idle:     { row: 0, frames: 6, fps: 8,  loop: true },
   runRight: { row: 1, frames: 8, fps: 12, loop: true },
   runLeft:  { row: 2, frames: 8, fps: 12, loop: true },
-  wave:     { row: 3, frames: 4, fps: 10, loop: false, next: 'idle' },
-  jump:     { row: 4, frames: 5, fps: 12, loop: false, next: 'idle' },
+  wave:     { row: 3, frames: 4, fps: 8, loop: true },
+  jump:     { row: 4, frames: 5, fps: 12, loop: true },
   tired:    { row: 5, frames: 8, fps: 6,  loop: true },
   waiting:  { row: 6, frames: 6, fps: 7,  loop: true },
   dancing:  { row: 7, frames: 6, fps: 10, loop: true },
@@ -126,7 +126,6 @@ export default function PetCanvas({
         if (!cfg.loop && cfg.next) {
           stateRef.current = cfg.next
           setCurrentState(cfg.next)
-          onStateChange?.(cfg.next)
           frameRef.current = 0
           resetIdleTimers()
         } else {
