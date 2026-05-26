@@ -36,6 +36,7 @@ interface PetCanvasProps {
   onStateChange?: (s: AnimState) => void
   interactive?: boolean
   scale?: number
+  spritesheet?: string
   className?: string
   style?: React.CSSProperties
 }
@@ -45,6 +46,7 @@ export default function PetCanvas({
   onStateChange,
   interactive = true,
   scale = DISPLAY_SCALE,
+  spritesheet = '/spritesheet.webp',
   className,
   style,
 }: PetCanvasProps) {
@@ -95,14 +97,14 @@ export default function PetCanvas({
 
   useEffect(() => {
     const img = new window.Image()
-    img.src = '/spritesheet.webp'
+    img.src = spritesheet
     img.onload = () => {
       imgRef.current = img
       imgLoaded.current = true
       setLoaded(true)
       resetIdleTimers()
     }
-  }, [resetIdleTimers])
+  }, [spritesheet, resetIdleTimers])
 
   useEffect(() => {
     const canvas = canvasRef.current
