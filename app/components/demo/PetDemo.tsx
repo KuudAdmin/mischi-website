@@ -181,6 +181,7 @@ export default function PetDemo() {
                   interactive
                   scale={0.8}
                   spritesheet="/spritesheet_cat.webp"
+                  repeatShortAnims
                   style={{ position: "relative", zIndex: 1 }}
                 />
               </div>

@@ -37,6 +37,7 @@ interface PetCanvasProps {
   interactive?: boolean
   scale?: number
   spritesheet?: string
+  repeatShortAnims?: boolean
   className?: string
   style?: React.CSSProperties
 }
@@ -47,6 +48,7 @@ export default function PetCanvas({
   interactive = true,
   scale = DISPLAY_SCALE,
   spritesheet = '/spritesheet.webp',
+  repeatShortAnims = false,
   className,
   style,
 }: PetCanvasProps) {
@@ -57,8 +59,10 @@ export default function PetCanvas({
   const frameRef   = useRef(0)
   const lastTime   = useRef(0)
   const stateRef   = useRef<AnimState>('idle')
-  const idleTimer  = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const autoWaveT  = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const idleTimer          = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const autoWaveT          = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const repeatShortRef     = useRef(repeatShortAnims)
+  repeatShortRef.current = repeatShortAnims
 
   const [currentState, setCurrentState] = useState<AnimState>('idle')
   const [loaded, setLoaded]             = useState(false)
@@ -123,13 +127,13 @@ export default function PetCanvas({
 
       const next = frameRef.current + 1
       if (next >= cfg.frames) {
-        if (!cfg.loop && cfg.next) {
+        if (!cfg.loop && cfg.next && !repeatShortRef.current) {
           stateRef.current = cfg.next
           setCurrentState(cfg.next)
           frameRef.current = 0
           resetIdleTimers()
         } else {
-          frameRef.current = cfg.loop ? 0 : cfg.frames - 1
+          frameRef.current = (cfg.loop || repeatShortRef.current) ? 0 : cfg.frames - 1
         }
       } else {
         frameRef.current = next
