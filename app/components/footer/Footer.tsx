@@ -48,15 +48,19 @@ export default function Footer() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
               <Image
-                src="/mischi-icon-02.png"
+                src="/mischi-icon-03.png"
                 alt="Mischi icon"
                 width={28}
                 height={28}
                 style={{ borderRadius: '6px', imageRendering: 'pixelated' }}
               />
-              <span style={{ fontWeight: 600, fontSize: '1rem', color: 'var(--color-text)', letterSpacing: '-0.01em' }}>
-                Mischi
-              </span>
+              <Image
+                src="/mischi-typo-light.svg"
+                alt="Mischi"
+                width={72}
+                height={20}
+                style={{ height: '20px', width: 'auto' }}
+              />
             </div>
             <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', lineHeight: 1.6, maxWidth: '180px' }}>
               Animated desktop pets for macOS. Alive, interactive, offline-first.

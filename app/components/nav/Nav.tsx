@@ -61,9 +61,14 @@ export default function Nav() {
             style={{ borderRadius: '6px', imageRendering: 'pixelated' }}
             priority
           />
-          <span style={{ fontWeight: 600, fontSize: '1rem', color: 'var(--color-text)', letterSpacing: '-0.01em' }}>
-            Mischi
-          </span>
+          <Image
+            src="/mischi-typo-light.svg"
+            alt="Mischi"
+            width={72}
+            height={20}
+            style={{ height: '20px', width: 'auto' }}
+            priority
+          />
         </a>
 
         {/* Desktop links */}

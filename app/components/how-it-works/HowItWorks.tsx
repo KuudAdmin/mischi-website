@@ -7,21 +7,21 @@ const STEPS = [
     number: '01',
     title: 'Import your pet',
     body: 'Drop in a folder or .zip containing your spritesheet and pet.json. Any existing Codex pet works out of the box.',
-    icon: '/mischi-icon-01.png',
+    icon: '/feature-1.webp',
     iconAlt: 'Pet file icon',
   },
   {
     number: '02',
     title: 'Pet appears on desktop',
     body: 'Mischi renders your pet in a transparent, always-on-top window — right on your screen, without blocking your work.',
-    icon: '/icon-3d.png',
+    icon: '/feature-2.webp',
     iconAlt: '3D pet icon',
   },
   {
     number: '03',
     title: 'Customize & interact',
     body: 'Set behavior modes, tweak animation speed, pick what triggers reactions. Your pet adapts to your workflow.',
-    icon: '/mischi-icon-03.png',
+    icon: '/feature-3.webp',
     iconAlt: 'Settings icon',
   },
 ]
@@ -95,9 +95,9 @@ function StepCard({ number, title, body, icon, iconAlt }: typeof STEPS[number]) 
       <Image
         src={icon}
         alt={iconAlt}
-        width={44}
-        height={44}
-        style={{ borderRadius: 'var(--radius-md)', imageRendering: 'pixelated', marginBottom: '20px', display: 'block' }}
+        width={80}
+        height={100}
+        style={{ imageRendering: 'pixelated', marginBottom: '20px', display: 'block' }}
       />
       <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--color-text)', marginBottom: '10px', letterSpacing: '-0.01em' }}>
         {title}
