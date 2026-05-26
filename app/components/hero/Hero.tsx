@@ -1,8 +1,6 @@
 'use client'
 
 import Image from 'next/image'
-import MacWindow from './MacWindow'
-import PetCanvas from '../demo/PetCanvas'
 
 export default function Hero() {
   return (
@@ -126,41 +124,6 @@ export default function Hero() {
           Run animated desktop pets on macOS. Interactive, expressive, offline&#8209;first.
           No cloud. No setup. Just magic.
         </p>
-
-        {/* macOS window */}
-        <div style={{ position: 'relative', marginBottom: '40px' }}>
-          {/* Window glow */}
-          <div
-            aria-hidden="true"
-            style={{
-              position: 'absolute',
-              inset: '-50px -70px',
-              background: 'radial-gradient(ellipse 65% 55% at 50% 60%, oklch(74% 0.16 78 / 0.16) 0%, transparent 70%)',
-              pointerEvents: 'none',
-            }}
-          />
-
-          <div style={{ position: 'relative' }}>
-            <MacWindow
-              title="Mischi.app"
-              width={400}
-              statusBar={<StatusBar />}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '28px 40px',
-                  background: 'radial-gradient(ellipse 80% 70% at 50% 80%, oklch(74% 0.16 78 / 0.06) 0%, transparent 70%)',
-                  minHeight: '320px',
-                }}
-              >
-                <PetCanvas interactive scale={1.75} />
-              </div>
-            </MacWindow>
-          </div>
-        </div>
 
         {/* CTAs */}
         <div
@@ -287,18 +250,3 @@ export default function Hero() {
   )
 }
 
-function StatusBar() {
-  return (
-    <>
-      <span style={{
-        width: 6, height: 6, borderRadius: '50%',
-        background: 'var(--color-mac-green)',
-        display: 'inline-block',
-        boxShadow: '0 0 6px oklch(65% 0.2 145 / 0.8)',
-        flexShrink: 0,
-      }} />
-      <span>Mischi is running</span>
-      <span style={{ marginLeft: 'auto', color: 'var(--color-text-dim)' }}>idle</span>
-    </>
-  )
-}
