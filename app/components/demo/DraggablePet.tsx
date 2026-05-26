@@ -18,6 +18,11 @@ const SCALE = 0.5;
 const PET_W = Math.round(192 * SCALE);
 const PET_H = Math.round(208 * SCALE);
 
+const RANDOM_POOL: AnimState[] = [
+  "idle", "idle",
+  "wave", "jump", "dancing", "waiting", "tired", "review",
+];
+
 export default function DraggablePet() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [petState, setPetState] = useState<AnimState>("idle");
@@ -28,7 +33,7 @@ export default function DraggablePet() {
   const dragOffset = useRef({ x: 0, y: 0 });
   const lastClientX = useRef(0);
   const pointerDownPos = useRef({ x: 0, y: 0 });
-  const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const randomTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const startY = Math.max(window.innerHeight - PET_H - 60, 100);
@@ -39,10 +44,21 @@ export default function DraggablePet() {
     }
   }, []);
 
-  const scheduleIdle = useCallback(() => {
-    if (idleTimer.current) clearTimeout(idleTimer.current);
-    idleTimer.current = setTimeout(() => setPetState("idle"), 120);
+  const scheduleNextRandom = useCallback(() => {
+    if (randomTimerRef.current) clearTimeout(randomTimerRef.current);
+    randomTimerRef.current = setTimeout(() => {
+      if (dragging.current) return;
+      setPetState(RANDOM_POOL[Math.floor(Math.random() * RANDOM_POOL.length)]);
+      scheduleNextRandom();
+    }, 3000 + Math.random() * 4000);
   }, []);
+
+  useEffect(() => {
+    scheduleNextRandom();
+    return () => {
+      if (randomTimerRef.current) clearTimeout(randomTimerRef.current);
+    };
+  }, [scheduleNextRandom]);
 
   const handlePointerDown = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
@@ -56,7 +72,7 @@ export default function DraggablePet() {
         y: e.clientY - pos.current.y,
       };
       lastClientX.current = e.clientX;
-      if (idleTimer.current) clearTimeout(idleTimer.current);
+      if (randomTimerRef.current) clearTimeout(randomTimerRef.current);
     },
     [],
   );
@@ -99,11 +115,14 @@ export default function DraggablePet() {
       );
       if (moved < 6) {
         setPetState("wave");
+        // wave is a ~400ms one-shot; resume random cycling after it completes
+        randomTimerRef.current = setTimeout(scheduleNextRandom, 500);
       } else {
-        scheduleIdle();
+        setPetState("idle");
+        scheduleNextRandom();
       }
     },
-    [scheduleIdle],
+    [scheduleNextRandom],
   );
 
   return (
