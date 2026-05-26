@@ -182,6 +182,7 @@ export default function PetDemo() {
                   scale={0.8}
                   spritesheet="/spritesheet_cat.webp"
                   repeatShortAnims
+                  autoAnimate={false}
                   style={{ position: "relative", zIndex: 1 }}
                 />
               </div>

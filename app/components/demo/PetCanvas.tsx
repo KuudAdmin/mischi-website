@@ -35,6 +35,7 @@ interface PetCanvasProps {
   state?: AnimState
   onStateChange?: (s: AnimState) => void
   interactive?: boolean
+  autoAnimate?: boolean
   scale?: number
   spritesheet?: string
   repeatShortAnims?: boolean
@@ -46,6 +47,7 @@ export default function PetCanvas({
   state: externalState,
   onStateChange,
   interactive = true,
+  autoAnimate = true,
   scale = DISPLAY_SCALE,
   spritesheet = '/spritesheet.webp',
   repeatShortAnims = false,
@@ -84,14 +86,14 @@ export default function PetCanvas({
   const resetIdleTimers = useCallback(() => {
     if (idleTimer.current)  clearTimeout(idleTimer.current)
     if (autoWaveT.current)  clearTimeout(autoWaveT.current)
-    if (!interactive) return
+    if (!interactive || !autoAnimate) return
     autoWaveT.current = setTimeout(() => {
       if (stateRef.current === 'idle') applyState('wave')
     }, IDLE_AUTO_WAVE_MS)
     idleTimer.current = setTimeout(() => {
       if (stateRef.current === 'idle') applyState('tired')
     }, IDLE_TO_SLEEP_MS)
-  }, [interactive, applyState])
+  }, [interactive, autoAnimate, applyState])
 
   useEffect(() => {
     if (externalState && externalState !== stateRef.current) {

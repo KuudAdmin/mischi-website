@@ -11,14 +11,16 @@ interface Feature {
   row: string;
   variant: Variant;
   accent?: boolean;
+  badge?: string;
 }
 
-// 3-col × 5-row explicit bento layout
+// 3-col × 6-row explicit bento layout
 // Row 1: [offline    3×1    ]
 // Row 2: [transp 1×2][ontop ][menubar]
 // Row 3: [transp     ][modes 2×1    ]
 // Row 4: [import 2×1 ][notelemetry 1×2]
 // Row 5: [silicon 2×1][notelemetry  ]
+// Row 6: [ai-chat    3×1    ]
 const FEATURES: Feature[] = [
   {
     id: "offline",
@@ -28,6 +30,7 @@ const FEATURES: Feature[] = [
     col: "1 / 4",
     row: "1",
     variant: "banner",
+    badge: "No internet needed",
   },
   {
     id: "transparent",
@@ -93,6 +96,17 @@ const FEATURES: Feature[] = [
     col: "1 / 3",
     row: "5",
     variant: "wide",
+  },
+  {
+    id: "ai-chat",
+    title: "AI-Powered Chat",
+    body: "Ask your pet anything — it answers using the LLM of your choice. Press CMD+K to open chat instantly.",
+    icon: "⌘",
+    col: "1 / 4",
+    row: "6",
+    variant: "banner",
+    accent: true,
+    badge: "BYOK — bring your own key",
   },
 ];
 
@@ -188,6 +202,7 @@ function FeatureCard({
   row,
   variant,
   accent,
+  badge,
 }: Feature) {
   const isBanner = variant === "banner";
   const isTall = variant === "tall";
@@ -364,7 +379,7 @@ function FeatureCard({
       </div>
 
       {/* Badge for banner */}
-      {isBanner && (
+      {isBanner && badge && (
         <div
           style={{
             flexShrink: 0,
@@ -394,7 +409,7 @@ function FeatureCard({
               whiteSpace: "nowrap",
             }}
           >
-            No internet needed
+            {badge}
           </span>
         </div>
       )}
