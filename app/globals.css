@@ -1,26 +1,187 @@
 @import "tailwindcss";
 
+/* ── Design Tokens ─────────────────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Palette */
+  --color-bg:              oklch(7.5% 0.01 60);
+  --color-surface:         oklch(13% 0.012 60);
+  --color-surface-raised:  oklch(18% 0.012 60);
+  --color-border:          oklch(100% 0 0 / 0.07);
+  --color-border-strong:   oklch(100% 0 0 / 0.12);
+
+  --color-accent:          oklch(74% 0.16 78);
+  --color-accent-dim:      oklch(74% 0.16 78 / 0.14);
+  --color-accent-glow:     oklch(74% 0.16 78 / 0.22);
+
+  --color-text:            oklch(94% 0 0);
+  --color-text-muted:      oklch(60% 0 0);
+  --color-text-dim:        oklch(40% 0 0);
+
+  /* Mac traffic lights */
+  --color-mac-red:    #FF5F57;
+  --color-mac-yellow: #FFBD2E;
+  --color-mac-green:  #28C840;
+
+  /* Radii */
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  14px;
+  --radius-xl:  20px;
+  --radius-2xl: 28px;
+
+  /* Shadows */
+  --shadow-window:
+    0 0 0 0.5px oklch(100% 0 0 / 0.07),
+    0 2px 4px   oklch(0% 0 0 / 0.4),
+    0 8px 24px  oklch(0% 0 0 / 0.45),
+    0 24px 64px oklch(0% 0 0 / 0.35);
+  --shadow-card:
+    0 1px 2px oklch(0% 0 0 / 0.4),
+    0 4px 12px oklch(0% 0 0 / 0.3);
+
+  /* Typography */
+  --text-hero: clamp(2.8rem, 1.2rem + 5.5vw, 5.5rem);
+  --text-xl:   clamp(1.4rem, 0.9rem + 1.8vw, 2.2rem);
+  --text-lg:   clamp(1.05rem, 0.9rem + 0.4vw, 1.25rem);
+
+  /* Spacing */
+  --space-section: clamp(5rem, 3rem + 6vw, 9rem);
+
+  /* Animation */
+  --dur-fast:    130ms;
+  --dur-normal:  260ms;
+  --dur-slow:    500ms;
+  --ease-expo:   cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+/* ── Tailwind theme bridge ─────────────────────────────────────────────── */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: var(--color-bg);
+  --color-foreground: var(--color-text);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* ── Base ──────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ── Reusable utilities ────────────────────────────────────────────────── */
+
+.glass {
+  background: oklch(100% 0 0 / 0.04);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid var(--color-border);
+}
+
+.glass-strong {
+  background: oklch(100% 0 0 / 0.06);
+  backdrop-filter: blur(28px) saturate(200%);
+  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  border: 1px solid var(--color-border-strong);
+}
+
+.accent-glow {
+  box-shadow: 0 0 40px var(--color-accent-glow), 0 0 80px oklch(74% 0.16 78 / 0.1);
+}
+
+.section-pad {
+  padding-block: var(--space-section);
+}
+
+.gradient-text {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--color-accent) 0%, oklch(82% 0.13 65) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* ── macOS window chrome ───────────────────────────────────────────────── */
+.mac-window {
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-window);
+  border: 1px solid oklch(100% 0 0 / 0.1);
+}
+
+.mac-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: oklch(16% 0.012 60);
+  border-bottom: 1px solid var(--color-border);
+  position: relative;
+  user-select: none;
+}
+
+.mac-traffic-lights {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.mac-light {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.mac-light-red    { background: var(--color-mac-red);    box-shadow: 0 0 5px oklch(55% 0.2 25 / 0.5); }
+.mac-light-yellow { background: var(--color-mac-yellow); box-shadow: 0 0 5px oklch(70% 0.18 80 / 0.5); }
+.mac-light-green  { background: var(--color-mac-green);  box-shadow: 0 0 5px oklch(65% 0.2 145 / 0.5); }
+
+.mac-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+
+.mac-content {
+  background: oklch(10% 0.01 60);
+  position: relative;
+}
+
+/* ── Code block ────────────────────────────────────────────────────────── */
+.code-block {
+  background: oklch(10% 0.01 60);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  font-family: var(--font-geist-mono), 'Menlo', monospace;
+  font-size: 0.875rem;
+  letter-spacing: 0.02em;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+/* ── Scrollbar ─────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: oklch(28% 0 0); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: oklch(36% 0 0); }
+
+/* ── Selection ─────────────────────────────────────────────────────────── */
+::selection {
+  background: var(--color-accent-dim);
+  color: var(--color-text);
 }
