@@ -6,6 +6,7 @@ import Features from './components/features/Features'
 import Download from './components/download/Download'
 import FAQ from './components/faq/FAQ'
 import Footer from './components/footer/Footer'
+import DraggablePet from './components/demo/DraggablePet'
 
 export default function Page() {
   return (
@@ -20,6 +21,7 @@ export default function Page() {
         <FAQ />
       </main>
       <Footer />
+      <DraggablePet />
     </>
   )
 }
