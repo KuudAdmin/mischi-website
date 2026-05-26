@@ -48,11 +48,11 @@ export default function Footer() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
               <Image
-                src="/mischi-icon-03.png"
+                src="/mischi-icon-04.png"
                 alt="Mischi icon"
                 width={28}
                 height={28}
-                style={{ borderRadius: '6px', imageRendering: 'pixelated' }}
+                style={{ borderRadius: '6px', imageRendering: 'pixelated', scale: '1.2' }}
               />
               <Image
                 src="/mischi-typo-light.svg"
