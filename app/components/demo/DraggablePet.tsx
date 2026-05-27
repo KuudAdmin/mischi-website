@@ -34,6 +34,8 @@ export default function DraggablePet() {
   const lastClientX = useRef(0);
   const pointerDownPos = useRef({ x: 0, y: 0 });
   const randomTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const walkRafRef = useRef<number | null>(null);
+  const scheduleRef = useRef<() => void>(() => {});
 
   useEffect(() => {
     const startY = Math.max(window.innerHeight - PET_H - 60, 100);
@@ -44,19 +46,81 @@ export default function DraggablePet() {
     }
   }, []);
 
+  // Take a short stroll across the screen using the run animation, then settle.
+  const startWalk = useCallback(() => {
+    if (dragging.current || !containerRef.current) return;
+    const maxX = Math.max(0, window.innerWidth - PET_W);
+    const startX = pos.current.x;
+
+    // Pick a direction that keeps us on-screen, then a "few paces" distance.
+    let dir: 1 | -1;
+    if (startX < 48) dir = 1;
+    else if (startX > maxX - 48) dir = -1;
+    else dir = Math.random() < 0.5 ? 1 : -1;
+
+    const paces = 90 + Math.random() * 170;
+    const targetX = Math.max(0, Math.min(maxX, startX + dir * paces));
+    if (Math.abs(targetX - startX) < 8) {
+      scheduleRef.current();
+      return;
+    }
+
+    const finalDir = targetX > startX ? 1 : -1;
+    setPetState(finalDir > 0 ? "runLeft" : "runRight");
+
+    const SPEED = 85; // px/second — a relaxed pace
+    let last = 0;
+    const step = (now: number) => {
+      if (dragging.current || !containerRef.current) return; // drag takes over
+      if (!last) last = now;
+      const dt = (now - last) / 1000;
+      last = now;
+
+      // Re-check the edge each frame so a resize can't strand us off-screen.
+      const edge = Math.max(0, window.innerWidth - PET_W);
+      let nextX = pos.current.x + finalDir * SPEED * dt;
+      let arrived = finalDir > 0 ? nextX >= targetX : nextX <= targetX;
+      if (nextX <= 0) { nextX = 0; arrived = true; }
+      else if (nextX >= edge) { nextX = edge; arrived = true; }
+      else if (arrived) nextX = targetX;
+
+      pos.current.x = nextX;
+      containerRef.current.style.left = `${nextX}px`;
+
+      if (arrived) {
+        walkRafRef.current = null;
+        setPetState("idle");
+        scheduleRef.current();
+        return;
+      }
+      walkRafRef.current = requestAnimationFrame(step);
+    };
+    walkRafRef.current = requestAnimationFrame(step);
+  }, []);
+
   const scheduleNextRandom = useCallback(() => {
     if (randomTimerRef.current) clearTimeout(randomTimerRef.current);
     randomTimerRef.current = setTimeout(() => {
       if (dragging.current) return;
-      setPetState(RANDOM_POOL[Math.floor(Math.random() * RANDOM_POOL.length)]);
-      scheduleNextRandom();
+      // Every now and then, stroll a few paces instead of an in-place anim.
+      if (Math.random() < 0.4) {
+        startWalk();
+      } else {
+        setPetState(RANDOM_POOL[Math.floor(Math.random() * RANDOM_POOL.length)]);
+        scheduleNextRandom();
+      }
     }, 3000 + Math.random() * 4000);
-  }, []);
+  }, [startWalk]);
+
+  useEffect(() => {
+    scheduleRef.current = scheduleNextRandom;
+  }, [scheduleNextRandom]);
 
   useEffect(() => {
     scheduleNextRandom();
     return () => {
       if (randomTimerRef.current) clearTimeout(randomTimerRef.current);
+      if (walkRafRef.current) cancelAnimationFrame(walkRafRef.current);
     };
   }, [scheduleNextRandom]);
 
@@ -73,6 +137,10 @@ export default function DraggablePet() {
       };
       lastClientX.current = e.clientX;
       if (randomTimerRef.current) clearTimeout(randomTimerRef.current);
+      if (walkRafRef.current) {
+        cancelAnimationFrame(walkRafRef.current);
+        walkRafRef.current = null;
+      }
     },
     [],
   );
@@ -97,7 +165,7 @@ export default function DraggablePet() {
       const dx = e.clientX - lastClientX.current;
       lastClientX.current = e.clientX;
       if (Math.abs(dx) > 1) {
-        setPetState(dx > 0 ? "runRight" : "runLeft");
+        setPetState(dx > 0 ? "runLeft" : "runRight");
       }
     },
     [],

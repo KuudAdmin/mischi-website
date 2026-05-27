@@ -1,8 +1,37 @@
 'use client'
 
+import { useState, useCallback } from 'react'
 import Image from 'next/image'
+import PetCanvas from '../demo/PetCanvas'
+import MacWindow from './MacWindow'
+
+type AnimState =
+  | 'idle'
+  | 'runRight'
+  | 'runLeft'
+  | 'wave'
+  | 'jump'
+  | 'tired'
+  | 'waiting'
+  | 'dancing'
+  | 'review'
+
+const STATES_LIST: { state: AnimState; label: string }[] = [
+  { state: 'idle', label: 'Idle' },
+  { state: 'wave', label: 'Wave' },
+  { state: 'jump', label: 'Jump' },
+  { state: 'runRight', label: 'Run →' },
+  { state: 'runLeft', label: 'Run ←' },
+  { state: 'dancing', label: 'Dance' },
+  { state: 'waiting', label: 'Waiting' },
+  { state: 'tired', label: 'Tired' },
+  { state: 'review', label: 'Review' },
+]
 
 export default function Hero() {
+  const [petState, setPetState] = useState<AnimState>('idle')
+  const trigger = useCallback((s: AnimState) => setPetState(s), [])
+
   return (
     <section
       id="hero"
@@ -11,11 +40,10 @@ export default function Hero() {
         minHeight: '100dvh',
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
         justifyContent: 'center',
         position: 'relative',
         overflow: 'hidden',
-        paddingTop: '80px',
+        paddingTop: '100px',
         paddingBottom: '60px',
         paddingInline: '24px',
       }}
@@ -27,11 +55,13 @@ export default function Hero() {
           position: 'absolute',
           inset: 0,
           background: `
-            radial-gradient(ellipse 70% 55% at 50% 62%,
-              oklch(74% 0.16 78 / 0.10) 0%, transparent 70%),
-            radial-gradient(ellipse 100% 60% at 50% 100%,
-              oklch(74% 0.16 78 / 0.06) 0%, transparent 60%)
+            radial-gradient(ellipse 70% 55% at 50% 55%,
+              rgba(81, 139, 112, 0.10) 0%, transparent 70%),
+            radial-gradient(ellipse 100% 50% at 50% 75%,
+              rgba(81, 139, 112, 0.05) 0%, transparent 70%)
           `,
+          maskImage: 'linear-gradient(to bottom, black 0%, black 80%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 80%, transparent 100%)',
           pointerEvents: 'none',
         }}
       />
@@ -42,211 +72,375 @@ export default function Hero() {
         style={{
           position: 'absolute',
           inset: 0,
-          backgroundImage: 'radial-gradient(oklch(100% 0 0 / 0.04) 1px, transparent 1px)',
-          backgroundSize: '32px 32px',
-          maskImage: 'radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 80%)',
-          WebkitMaskImage: 'radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 80%)',
+          backgroundImage: 'radial-gradient(oklch(100% 0 0 / 0.035) 0.5px, transparent 0.5px)',
+          backgroundSize: '34px 34px',
+          maskImage: 'radial-gradient(ellipse 92% 88% at 50% 50%, transparent 30%, black 64%, transparent 96%)',
+          WebkitMaskImage: 'radial-gradient(ellipse 92% 88% at 50% 50%, transparent 30%, black 64%, transparent 96%)',
           pointerEvents: 'none',
         }}
       />
 
       <div
+        className="hero-grid"
         style={{
           position: 'relative',
           zIndex: 1,
-          maxWidth: '760px',
           width: '100%',
-          display: 'flex',
-          flexDirection: 'column',
+          maxWidth: '1180px',
+          margin: '0 auto',
+          display: 'grid',
+          gridTemplateColumns: 'minmax(0, 1.05fr) minmax(0, 1fr)',
+          gap: '56px',
           alignItems: 'center',
         }}
       >
-        {/* Eyebrow */}
+        {/* ── Left: copy ─────────────────────────────────────── */}
         <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '5px 14px',
-            borderRadius: '9999px',
-            background: 'var(--color-accent-dim)',
-            border: '1px solid oklch(74% 0.16 78 / 0.25)',
-            marginBottom: '28px',
-          }}
-        >
-          <span style={{
-            fontSize: '0.71875rem',
-            color: 'var(--color-accent)',
-            fontWeight: 600,
-            letterSpacing: '0.05em',
-            textTransform: 'uppercase',
-          }}>
-            Now available for macOS
-          </span>
-        </div>
-
-        {/* Headline */}
-        <h1
-          id="hero-heading"
-          style={{
-            fontSize: 'var(--text-hero)',
-            fontWeight: 700,
-            lineHeight: 1.05,
-            letterSpacing: '-0.03em',
-            textAlign: 'center',
-            color: 'var(--color-text)',
-            marginBottom: '20px',
-          }}
-        >
-          Your Mac{' '}
-          <span style={{
-            display: 'inline-block',
-            background: 'linear-gradient(135deg, oklch(74% 0.16 78) 0%, oklch(82% 0.13 65) 100%)',
-            WebkitBackgroundClip: 'text',
-            backgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            color: 'transparent',
-          }}>deserves</span>{' '}
-          a companion.
-        </h1>
-
-        {/* Subtitle */}
-        <p
-          style={{
-            fontSize: 'var(--text-lg)',
-            color: 'var(--color-text-muted)',
-            textAlign: 'center',
-            maxWidth: '480px',
-            lineHeight: 1.65,
-            marginBottom: '44px',
-          }}
-        >
-          Run animated desktop pets on macOS. Interactive, expressive, offline&#8209;first.
-          No cloud. No setup. Just magic.
-        </p>
-
-        {/* CTAs */}
-        <div
+          className="hero-copy"
           style={{
             display: 'flex',
-            flexWrap: 'wrap',
-            gap: '12px',
-            justifyContent: 'center',
-            marginBottom: '28px',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            textAlign: 'left',
           }}
         >
-          <a
-            href="#download"
+          <h1
+            id="hero-heading"
+            className="hero-headline"
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '10px',
-              padding: '13px 28px',
-              borderRadius: '9999px',
-              background: 'var(--color-accent)',
-              color: 'oklch(12% 0.01 60)',
-              fontWeight: 600,
-              fontSize: '0.9375rem',
-              textDecoration: 'none',
-              letterSpacing: '-0.01em',
-              transition: 'opacity var(--dur-fast), transform var(--dur-fast)',
-              boxShadow: '0 0 28px oklch(74% 0.16 78 / 0.28)',
-            }}
-            onMouseEnter={(e) => {
-              const el = e.currentTarget as HTMLAnchorElement
-              el.style.opacity = '0.88'; el.style.transform = 'translateY(-2px)'
-            }}
-            onMouseLeave={(e) => {
-              const el = e.currentTarget as HTMLAnchorElement
-              el.style.opacity = '1'; el.style.transform = 'translateY(0)'
-            }}
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M8 1.5v9M4.5 7 8 10.5 11.5 7M2 14.5h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            Download for macOS
-            <Image src="/app-icon.png" alt="" width={20} height={20} style={{ borderRadius: '4px' }} />
-          </a>
-
-          <a
-            href="#demo"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '13px 28px',
-              borderRadius: '9999px',
-              background: 'oklch(100% 0 0 / 0.05)',
-              border: '1px solid var(--color-border-strong)',
+              fontSize: 'clamp(2.4rem, 1rem + 4vw, 4.2rem)',
+              fontWeight: 700,
+              lineHeight: 1.05,
+              letterSpacing: '-0.03em',
               color: 'var(--color-text)',
-              fontWeight: 500,
-              fontSize: '0.9375rem',
-              textDecoration: 'none',
-              letterSpacing: '-0.01em',
-              transition: 'background var(--dur-fast), transform var(--dur-fast)',
-              backdropFilter: 'blur(12px)',
-            }}
-            onMouseEnter={(e) => {
-              const el = e.currentTarget as HTMLAnchorElement
-              el.style.background = 'oklch(100% 0 0 / 0.08)'; el.style.transform = 'translateY(-2px)'
-            }}
-            onMouseLeave={(e) => {
-              const el = e.currentTarget as HTMLAnchorElement
-              el.style.background = 'oklch(100% 0 0 / 0.05)'; el.style.transform = 'translateY(0)'
+              marginBottom: '22px',
             }}
           >
-            Try Live Demo
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-              <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </a>
+            Your Mac{' '}
+            <span style={{ color: 'var(--color-accent)' }}>deserves</span>{' '}
+            a companion.
+          </h1>
+
+          <p
+            style={{
+              fontSize: 'var(--text-lg)',
+              color: 'var(--color-text-muted)',
+              maxWidth: '480px',
+              lineHeight: 1.65,
+              marginBottom: '36px',
+            }}
+          >
+            Run animated desktop pets on macOS. Interactive, expressive, offline&#8209;first.
+            No cloud. No setup. Just magic.
+          </p>
+
+          {/* CTAs */}
+          <div
+            className="hero-ctas"
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '12px',
+              marginBottom: '28px',
+            }}
+          >
+            <a
+              href="#download"
+              className="hero-cta"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+                padding: '13px 26px',
+                borderRadius: '9999px',
+                background: 'var(--color-accent)',
+                color: 'oklch(98% 0 0)',
+                fontWeight: 600,
+                fontSize: '0.9375rem',
+                textDecoration: 'none',
+                letterSpacing: '-0.01em',
+                transition: 'opacity var(--dur-fast), transform var(--dur-fast)',
+                boxShadow: '0 0 28px rgba(81, 139, 112, 0.28)',
+              }}
+              onMouseEnter={(e) => {
+                const el = e.currentTarget as HTMLAnchorElement
+                el.style.opacity = '0.88'; el.style.transform = 'translateY(-2px)'
+              }}
+              onMouseLeave={(e) => {
+                const el = e.currentTarget as HTMLAnchorElement
+                el.style.opacity = '1'; el.style.transform = 'translateY(0)'
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M8 1.5v9M4.5 7 8 10.5 11.5 7M2 14.5h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              Download for macOS
+              <Image src="/app-icon.png" alt="" width={20} height={20} style={{ borderRadius: '4px' }} />
+            </a>
+
+            <a
+              href="https://www.buymeacoffee.com/ajjuism"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hero-cta"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+                padding: '11px 24px',
+                borderRadius: '9999px',
+                background: '#FFDD00',
+                border: '1px solid #000000',
+                color: '#000000',
+                textDecoration: 'none',
+                letterSpacing: '0.01em',
+                transition: 'opacity var(--dur-fast), transform var(--dur-fast)',
+              }}
+              onMouseEnter={(e) => {
+                const el = e.currentTarget as HTMLAnchorElement
+                el.style.opacity = '0.9'
+                el.style.transform = 'translateY(-2px)'
+              }}
+              onMouseLeave={(e) => {
+                const el = e.currentTarget as HTMLAnchorElement
+                el.style.opacity = '1'
+                el.style.transform = 'translateY(0)'
+              }}
+            >
+              <svg
+                aria-hidden="true"
+                width="22"
+                height="22"
+                viewBox="0 0 512 512"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                style={{ flexShrink: 0 }}
+              >
+                <g clipPath="url(#bmc-clip)">
+                  <path d="M267.821 145.08c-18.397 7.873-39.275 16.8-66.334 16.8A125.636 125.636 0 01168 157.265l18.714 192.072a32.091 32.091 0 0031.999 29.451s26.535 1.377 35.389 1.377c9.529 0 38.104-1.377 38.104-1.377a32.105 32.105 0 0031.992-29.451l20.044-212.247c-8.958-3.058-17.998-5.09-28.189-5.09-17.625-.007-31.826 6.062-48.232 13.08z" fill="#FFDD00"/>
+                  <path d="M431.225 136.847l-2.818-14.21c-2.529-12.75-8.269-24.797-21.36-29.405-4.197-1.474-8.958-2.108-12.176-5.16-3.217-3.05-4.168-7.79-4.912-12.184-1.379-8.066-2.674-16.139-4.087-24.19-1.219-6.923-2.184-14.7-5.36-21.05-4.134-8.527-12.713-13.514-21.243-16.814a122.376 122.376 0 00-13.361-4.132c-21.312-5.62-43.719-7.687-65.644-8.865a551.323 551.323 0 00-78.957 1.309c-19.541 1.777-40.123 3.926-58.692 10.683-6.787 2.473-13.781 5.441-18.941 10.683-6.333 6.44-8.4 16.4-3.777 24.431 3.287 5.704 8.855 9.733 14.76 12.399a119.721 119.721 0 0023.965 7.797c22.944 5.07 46.709 7.06 70.15 7.908a534.377 534.377 0 0077.861-2.542 443.547 443.547 0 0019.149-2.528c7.503-1.15 12.32-10.959 10.108-17.792-2.646-8.169-9.757-11.337-17.798-10.104-1.185.186-2.363.358-3.549.53l-.854.124c-2.724.345-5.448.666-8.172.964a433.757 433.757 0 01-16.923 1.488c-12.664.882-25.363 1.288-38.055 1.309-12.472 0-24.95-.352-37.394-1.171a475.738 475.738 0 01-16.992-1.42c-2.57-.268-5.133-.55-7.696-.867l-2.44-.31-.53-.075-2.529-.366c-5.168-.778-10.335-1.673-15.448-2.755a2.322 2.322 0 010-4.532h.097a250.82 250.82 0 0113.373-2.452c1.494-.235 2.991-.464 4.493-.689h.041c2.805-.186 5.623-.689 8.413-1.02a535.287 535.287 0 0173.101-2.576c11.844.345 23.682 1.04 35.471 2.239a391.9 391.9 0 017.579.847c.965.117 1.936.255 2.908.372l1.957.283c5.705.85 11.38 1.88 17.026 3.092 8.365 1.819 19.107 2.411 22.828 11.572 1.185 2.907 1.723 6.137 2.377 9.188l.834 3.892c.022.07.038.142.048.214 1.971 9.184 3.944 18.368 5.919 27.551a5.048 5.048 0 01-4.245 6.055h-.055l-1.206.166-1.191.158c-3.777.491-7.557.95-11.342 1.378a732.517 732.517 0 01-22.4 2.204 784.148 784.148 0 01-44.671 2.431 802.63 802.63 0 01-22.8.282 791.297 791.297 0 01-90.498-5.262 944.156 944.156 0 01-9.757-1.219c2.522.324-1.833-.248-2.715-.372-2.067-.29-4.134-.59-6.201-.902-6.939-1.04-13.836-2.322-20.761-3.445-8.371-1.377-16.378-.688-23.951 3.445a34.831 34.831 0 00-14.421 14.947c-3.266 6.75-4.238 14.099-5.698 21.352-1.461 7.253-3.735 15.057-2.874 22.503 1.854 16.07 13.092 29.129 29.257 32.05 15.207 2.755 30.497 4.987 45.827 6.888a847.199 847.199 0 00196.217 1.129 10.338 10.338 0 0111.411 11.324l-1.53 14.864-9.247 90.102a70942.686 70942.686 0 01-9.708 94.604l-2.756 26.637c-.882 8.743-1.006 17.758-2.667 26.396-2.618 13.583-11.817 21.926-25.239 24.976a175.929 175.929 0 01-37.47 4.379c-13.981.076-27.954-.544-41.935-.468-14.925.084-33.204-1.293-44.725-12.398-10.122-9.751-11.521-25.023-12.899-38.23a29492.896 29492.896 0 01-5.464-52.436l-10.129-97.182-6.552-62.88c-.111-1.04-.221-2.067-.324-3.114-.786-7.501-6.098-14.843-14.47-14.464-7.166.316-15.31 6.405-14.47 14.464l4.858 46.618 10.046 96.431c2.862 27.391 5.717 54.786 8.565 82.187.551 5.248 1.068 10.512 1.646 15.76 3.149 28.683 25.061 44.139 52.195 48.49 15.848 2.55 32.081 3.075 48.164 3.335 20.616.332 41.438 1.125 61.716-2.61 30.05-5.513 52.595-25.568 55.812-56.681l2.757-26.953c3.054-29.719 6.105-59.441 9.15-89.165l9.964-97.12 4.568-44.51a10.336 10.336 0 018.323-9.085c8.593-1.674 16.806-4.533 22.918-11.069 9.729-10.408 11.665-23.977 8.227-37.656zM108.825 152.479c.131-.062-.11 1.061-.214 1.584-.02-.792.021-1.494.214-1.584zm.834 6.447c.068-.048.275.228.489.558-.324-.303-.531-.53-.496-.558h.007zm.82 1.082c.454.82.296.502 0 0zm1.646 1.336h.042c0 .048.075.096.103.145a1.043 1.043 0 00-.152-.145h.007zm288.376-1.998c-3.087 2.935-7.738 4.299-12.334 4.981-51.54 7.645-103.831 11.516-155.936 9.808-37.291-1.274-74.188-5.414-111.107-10.628-3.617-.51-7.538-1.171-10.025-3.837-4.686-5.028-2.384-15.153-1.165-21.228 1.116-5.566 3.252-12.984 9.874-13.776 10.336-1.212 22.338 3.147 32.564 4.697a616.948 616.948 0 0037.07 4.512c52.932 4.822 106.752 4.071 159.45-2.982a666.195 666.195 0 0028.712-4.498c8.496-1.523 17.915-4.381 23.049 4.415 3.52 5.992 3.989 14.01 3.445 20.781a11.585 11.585 0 01-3.604 7.755h.007z" fill="#0D0C22"/>
+                </g>
+                <defs>
+                  <clipPath id="bmc-clip">
+                    <path fill="#fff" d="M0 0h512v512H0z"/>
+                  </clipPath>
+                </defs>
+              </svg>
+              <span
+                style={{
+                  fontFamily: 'var(--font-cookie), cursive',
+                  fontSize: '1.375rem',
+                  lineHeight: 1,
+                  paddingTop: '4px',
+                }}
+              >
+                Buy me a coffee
+              </span>
+            </a>
+          </div>
+
+          {/* Platform badges */}
+          <div style={{ display: 'flex', gap: '14px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+                <path d="M5 1L1.5 3v4L5 9l3.5-2V3L5 1z" stroke="currentColor" strokeWidth="1" strokeLinejoin="round"/>
+              </svg>
+              Apple Silicon
+            </span>
+            <span style={{ color: 'var(--color-text-dim)', fontSize: '0.75rem' }}>·</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+                <path d="M5 1L1.5 3v4L5 9l3.5-2V3L5 1z" stroke="currentColor" strokeWidth="1" strokeLinejoin="round"/>
+              </svg>
+              Intel Mac
+            </span>
+            <span style={{ color: 'var(--color-text-dim)', fontSize: '0.75rem' }}>·</span>
+            <span style={{ fontSize: '0.75rem', color: 'var(--color-text-dim)' }}>macOS 13+</span>
+          </div>
         </div>
 
-        {/* Platform badges */}
-        <div style={{ display: 'flex', gap: '16px', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-              <path d="M5 1L1.5 3v4L5 9l3.5-2V3L5 1z" stroke="currentColor" strokeWidth="1" strokeLinejoin="round"/>
-            </svg>
-            Apple Silicon
-          </span>
-          <span style={{ color: 'var(--color-text-dim)', fontSize: '0.75rem' }}>·</span>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-              <path d="M5 1L1.5 3v4L5 9l3.5-2V3L5 1z" stroke="currentColor" strokeWidth="1" strokeLinejoin="round"/>
-            </svg>
-            Intel Mac
-          </span>
-          <span style={{ color: 'var(--color-text-dim)', fontSize: '0.75rem' }}>·</span>
-          <span style={{ fontSize: '0.75rem', color: 'var(--color-text-dim)' }}>macOS 13+</span>
+        {/* ── Right: live demo ───────────────────────────────── */}
+        <div
+          id="demo"
+          className="hero-demo"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '20px',
+            width: '100%',
+          }}
+        >
+          <MacWindow
+            title="Mischi.app"
+            width={380}
+            statusBar={
+              <>
+                <span
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: '50%',
+                    flexShrink: 0,
+                    background:
+                      petState === 'tired'
+                        ? 'var(--color-text-dim)'
+                        : 'var(--color-mac-green)',
+                    display: 'inline-block',
+                    transition: 'background 0.3s',
+                  }}
+                />
+                <span>Active</span>
+                <span
+                  style={{
+                    marginLeft: 'auto',
+                    color: 'var(--color-text-dim)',
+                    fontFamily: 'var(--font-geist-mono)',
+                    fontSize: '0.6875rem',
+                  }}
+                >
+                  {petState === 'runRight'
+                    ? 'run →'
+                    : petState === 'runLeft'
+                      ? 'run ←'
+                      : petState}
+                </span>
+              </>
+            }
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: '320px',
+                padding: '20px',
+                background:
+                  'radial-gradient(ellipse 70% 60% at 50% 75%, rgba(81, 139, 112, 0.07) 0%, transparent 70%)',
+                position: 'relative',
+              }}
+            >
+              <div
+                aria-hidden="true"
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  opacity: 0.08,
+                  background: `
+                    repeating-linear-gradient(0deg, transparent, transparent 47px, oklch(100% 0 0 / 0.1) 47px, oklch(100% 0 0 / 0.1) 48px),
+                    repeating-linear-gradient(90deg, transparent, transparent 47px, oklch(100% 0 0 / 0.1) 47px, oklch(100% 0 0 / 0.1) 48px)
+                  `,
+                }}
+              />
+              <PetCanvas
+                state={petState}
+                onStateChange={(s) => setPetState(s as AnimState)}
+                interactive
+                scale={0.7}
+                spritesheet="/spritesheet_cat.webp"
+                repeatShortAnims
+                autoAnimate={false}
+                style={{ position: 'relative', zIndex: 1 }}
+              />
+            </div>
+          </MacWindow>
+
+          {/* Trigger grid — below preview */}
+          <div style={{ width: '100%', maxWidth: '420px' }}>
+            <p
+              style={{
+                fontSize: '0.6875rem',
+                fontWeight: 600,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                color: 'var(--color-text-muted)',
+                marginBottom: '10px',
+                textAlign: 'center',
+              }}
+            >
+              Trigger states
+            </p>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: '6px',
+              }}
+            >
+              {STATES_LIST.map(({ state, label }) => {
+                const active = petState === state
+                return (
+                  <button
+                    key={state}
+                    onClick={() => trigger(state)}
+                    style={{
+                      padding: '8px 10px',
+                      borderRadius: 'var(--radius-md)',
+                      background: active
+                        ? 'var(--color-accent-dim)'
+                        : 'oklch(100% 0 0 / 0.03)',
+                      border: `1px solid ${active ? 'rgba(81, 139, 112, 0.35)' : 'var(--color-border)'}`,
+                      cursor: 'pointer',
+                      transition: 'all var(--dur-fast)',
+                      fontWeight: 600,
+                      fontSize: '0.8125rem',
+                      color: active ? 'var(--color-accent)' : 'var(--color-text)',
+                      letterSpacing: '-0.01em',
+                    }}
+                  >
+                    {label}
+                  </button>
+                )
+              })}
+            </div>
+            <p
+              style={{
+                fontSize: '0.6875rem',
+                color: 'var(--color-text-dim)',
+                marginTop: '10px',
+                textAlign: 'center',
+              }}
+            >
+              Click the pet · double-click to jump
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Scroll hint */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          bottom: '28px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '6px',
-          opacity: 0.3,
-        }}
-      >
-        <svg width="16" height="22" viewBox="0 0 16 22" fill="none">
-          <rect x="1" y="1" width="14" height="20" rx="7" stroke="currentColor" strokeWidth="1.2"/>
-          <circle cx="8" cy="6" r="2" fill="currentColor">
-            <animate attributeName="cy" from="6" to="14" dur="1.4s" repeatCount="indefinite" calcMode="ease-in-out"/>
-            <animate attributeName="opacity" from="1" to="0" dur="1.4s" repeatCount="indefinite"/>
-          </circle>
-        </svg>
-        <style>{``}</style>
-      </div>
+      <style>{`
+        @media (max-width: 960px) {
+          .hero-grid {
+            grid-template-columns: 1fr !important;
+            gap: 48px !important;
+          }
+          .hero-copy {
+            align-items: center !important;
+            text-align: center !important;
+          }
+          .hero-copy > p { text-align: center; }
+          .hero-headline { text-align: center; }
+          .hero-ctas {
+            justify-content: center !important;
+            width: 100% !important;
+          }
+        }
+        @media (max-width: 520px) {
+          .hero-ctas {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            max-width: 360px !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            gap: 10px !important;
+          }
+          .hero-cta {
+            width: 100% !important;
+            padding: 14px 22px !important;
+          }
+        }
+      `}</style>
     </section>
   )
 }
-

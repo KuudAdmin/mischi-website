@@ -76,7 +76,7 @@ function StepCard({ number, title, body, icon, iconAlt }: typeof STEPS[number]) 
       }}
       onMouseEnter={(e) => {
         const el = e.currentTarget as HTMLDivElement
-        el.style.borderColor = 'oklch(74% 0.16 78 / 0.25)'
+        el.style.borderColor = 'rgba(81, 139, 112, 0.25)'
         el.style.background = 'oklch(100% 0 0 / 0.04)'
       }}
       onMouseLeave={(e) => {

@@ -15,7 +15,7 @@ export default function Download() {
         style={{
           position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
           width: '700px', height: '500px',
-          background: 'radial-gradient(ellipse, oklch(74% 0.16 78 / 0.08) 0%, transparent 65%)',
+          background: 'radial-gradient(ellipse, rgba(81, 139, 112, 0.08) 0%, transparent 65%)',
           pointerEvents: 'none',
         }}
       />
@@ -27,7 +27,7 @@ export default function Download() {
             alt="Mischi app icon"
             width={88}
             height={88}
-            style={{ borderRadius: '20px', boxShadow: '0 8px 32px oklch(74% 0.16 78 / 0.2), 0 2px 8px oklch(0% 0 0 / 0.4)', marginBottom: '24px', display: 'inline-block' }}
+            style={{ borderRadius: '20px', boxShadow: '0 8px 32px rgba(81, 139, 112, 0.2), 0 2px 8px oklch(0% 0 0 / 0.4)', marginBottom: '24px', display: 'inline-block' }}
             priority
           />
           <p style={{ fontSize: '0.71875rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-accent)', marginBottom: '12px' }}>
@@ -45,7 +45,7 @@ export default function Download() {
         </div>
 
         {/* Download card */}
-        <div style={{ background: 'oklch(13% 0.012 60)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xl)', overflow: 'hidden' }}>
+        <div style={{ background: 'oklch(13% 0.012 164)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xl)', overflow: 'hidden' }}>
           {/* Direct download row */}
           <div style={{ padding: '24px 28px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
@@ -58,11 +58,11 @@ export default function Download() {
                 style={{
                   display: 'inline-flex', alignItems: 'center', gap: '8px',
                   padding: '10px 22px', borderRadius: '9999px',
-                  background: 'var(--color-accent)', color: 'oklch(12% 0.01 60)',
+                  background: 'var(--color-accent)', color: 'oklch(98% 0 0)',
                   fontWeight: 600, fontSize: '0.875rem', textDecoration: 'none',
                   whiteSpace: 'nowrap',
                   transition: 'opacity var(--dur-fast), transform var(--dur-fast)',
-                  boxShadow: '0 0 20px oklch(74% 0.16 78 / 0.25)',
+                  boxShadow: '0 0 20px rgba(81, 139, 112, 0.25)',
                 }}
                 onMouseEnter={(e) => {
                   const el = e.currentTarget as HTMLAnchorElement
@@ -83,25 +83,6 @@ export default function Download() {
 
           <div style={{ height: '1px', background: 'var(--color-border)' }} />
 
-          {/* Homebrew */}
-          <div style={{ padding: '20px 28px' }}>
-            <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '10px', fontWeight: 500 }}>
-              Or install with Homebrew:
-            </p>
-            <div style={{ position: 'relative' }}>
-              <div className="code-block" style={{ paddingRight: '56px' }}>
-                <span style={{ color: 'var(--color-text-muted)' }}>$</span>
-                {' '}
-                <span style={{ color: 'var(--color-accent)' }}>brew</span>
-                {' '}
-                <span style={{ color: 'var(--color-text)' }}>install --cask mischi</span>
-              </div>
-              <BrewCopyButton />
-            </div>
-          </div>
-
-          <div style={{ height: '1px', background: 'var(--color-border)' }} />
-
           {/* Meta */}
           <div style={{ padding: '16px 28px', display: 'flex', gap: '28px', flexWrap: 'wrap' }}>
             {[
@@ -114,50 +95,9 @@ export default function Download() {
                 <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', fontFamily: 'var(--font-geist-mono)' }}>{value}</p>
               </div>
             ))}
-            <div>
-              <p style={{ fontSize: '0.6875rem', color: 'var(--color-text-dim)', marginBottom: '2px' }}>Notarized</p>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.8125rem', color: '#28C840' }}>
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-                  <path d="M1.5 5.5l2.5 2.5 4.5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                Apple verified
-              </span>
-            </div>
           </div>
         </div>
       </div>
     </section>
-  )
-}
-
-function BrewCopyButton() {
-  return (
-    <button
-      onClick={() => navigator.clipboard?.writeText('brew install --cask mischi')}
-      aria-label="Copy Homebrew install command"
-      style={{
-        position: 'absolute', top: '50%', right: '10px', transform: 'translateY(-50%)',
-        background: 'oklch(100% 0 0 / 0.06)',
-        border: '1px solid var(--color-border)',
-        borderRadius: 'var(--radius-sm)',
-        padding: '3px 8px',
-        cursor: 'pointer',
-        color: 'var(--color-text-muted)',
-        fontSize: '0.6875rem',
-        fontWeight: 500,
-        transition: 'background var(--dur-fast), color var(--dur-fast)',
-        fontFamily: 'inherit',
-      }}
-      onMouseEnter={(e) => {
-        const el = e.currentTarget as HTMLButtonElement
-        el.style.background = 'oklch(100% 0 0 / 0.1)'; el.style.color = 'var(--color-text)'
-      }}
-      onMouseLeave={(e) => {
-        const el = e.currentTarget as HTMLButtonElement
-        el.style.background = 'oklch(100% 0 0 / 0.06)'; el.style.color = 'var(--color-text-muted)'
-      }}
-    >
-      copy
-    </button>
   )
 }
