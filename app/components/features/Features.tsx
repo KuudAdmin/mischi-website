@@ -168,11 +168,31 @@ export default function Features() {
           .bento-grid {
             grid-template-columns: repeat(2, 1fr) !important;
             grid-auto-rows: minmax(140px, auto) !important;
+            gap: 12px !important;
           }
           .bento-grid > * {
             grid-column: auto !important;
             grid-row: auto !important;
           }
+          .feature-card {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            justify-content: flex-start !important;
+            gap: 14px !important;
+            padding: 20px !important;
+          }
+          .feature-icon {
+            width: 38px !important;
+            height: 38px !important;
+            font-size: 1.125rem !important;
+            margin-bottom: 0 !important;
+          }
+          .feature-text { margin-top: 0 !important; }
+          .feature-badge {
+            align-self: flex-start !important;
+            max-width: 100% !important;
+          }
+          .feature-badge > span:last-child { white-space: normal !important; }
         }
         @media (max-width: 440px) {
           .bento-grid { grid-template-columns: 1fr !important; }
@@ -184,13 +204,13 @@ export default function Features() {
 
 function getBg(variant: Variant, accent?: boolean): string {
   if (variant === "banner")
-    return "linear-gradient(130deg, oklch(12% 0.018 65) 0%, oklch(8% 0.01 50) 100%)";
+    return "linear-gradient(130deg, oklch(12% 0.018 164) 0%, oklch(8% 0.01 164) 100%)";
   if (variant === "tall" && accent)
-    return "linear-gradient(160deg, oklch(13% 0.016 78) 0%, oklch(9% 0.01 60) 100%)";
+    return "linear-gradient(160deg, oklch(13% 0.016 164) 0%, oklch(9% 0.01 164) 100%)";
   if (variant === "tall")
     return "linear-gradient(160deg, oklch(11% 0.006 240) 0%, oklch(8% 0.004 220) 100%)";
   if (variant === "wide" && accent)
-    return "linear-gradient(105deg, oklch(14% 0.016 78) 0%, oklch(11% 0.01 60) 100%)";
+    return "linear-gradient(105deg, oklch(14% 0.016 164) 0%, oklch(11% 0.01 164) 100%)";
   return "oklch(100% 0 0 / 0.025)";
 }
 
@@ -213,18 +233,18 @@ function FeatureCard({
   const borderColor = isCool
     ? "oklch(60% 0.08 240 / 0.18)"
     : isDark
-      ? "oklch(74% 0.16 78 / 0.15)"
+      ? "rgba(81, 139, 112, 0.15)"
       : "var(--color-border)";
 
   const borderHover = isCool
     ? "oklch(60% 0.08 240 / 0.35)"
     : isDark
-      ? "oklch(74% 0.16 78 / 0.32)"
-      : "oklch(74% 0.16 78 / 0.2)";
+      ? "rgba(81, 139, 112, 0.32)"
+      : "rgba(81, 139, 112, 0.2)";
 
   const glowColor = isCool
     ? "oklch(60% 0.12 240 / 0.12)"
-    : "oklch(74% 0.16 78 / 0.14)";
+    : "rgba(81, 139, 112, 0.14)";
 
   const iconColor = isCool
     ? "oklch(72% 0.08 240)"
@@ -235,19 +255,19 @@ function FeatureCard({
   const iconBorder = isCool
     ? "oklch(60% 0.08 240 / 0.25)"
     : isDark
-      ? "oklch(74% 0.16 78 / 0.24)"
+      ? "rgba(81, 139, 112, 0.24)"
       : "var(--color-border)";
 
   const titleColor = isCool
     ? "oklch(92% 0.005 220)"
     : isDark
-      ? "oklch(94% 0.012 78)"
+      ? "oklch(94% 0.012 164)"
       : "var(--color-text)";
 
   const bodyColor = isCool
     ? "oklch(62% 0.01 220)"
     : isDark
-      ? "oklch(66% 0.02 78)"
+      ? "oklch(66% 0.02 164)"
       : "var(--color-text-muted)";
 
   const iconSize = isBanner
@@ -261,6 +281,7 @@ function FeatureCard({
 
   return (
     <div
+      className={`feature-card feature-${variant}${accent ? " feature-accent" : ""}`}
       style={{
         gridColumn: col,
         gridRow: row,
@@ -321,10 +342,12 @@ function FeatureCard({
             left: 0,
             right: 0,
             height: "120px",
-            opacity: 0.05,
+            opacity: 0.14,
             backgroundImage:
-              "radial-gradient(circle, oklch(100% 0 0) 1.5px, transparent 1.5px)",
-            backgroundSize: "16px 16px",
+              "radial-gradient(circle, oklch(100% 0 0) 1px, transparent 1px)",
+            backgroundSize: "18px 18px",
+            maskImage: "linear-gradient(to top, black 0%, transparent 100%)",
+            WebkitMaskImage: "linear-gradient(to top, black 0%, transparent 100%)",
             pointerEvents: "none",
           }}
         />
@@ -332,6 +355,7 @@ function FeatureCard({
 
       {/* Icon */}
       <span
+        className="feature-icon"
         style={{
           display: "inline-flex",
           alignItems: "center",
@@ -340,7 +364,7 @@ function FeatureCard({
           height: boxSize,
           borderRadius: "var(--radius-md)",
           background: isDark
-            ? `oklch(74% 0.16 78 / ${isCool ? "0.05" : "0.13"})`
+            ? `rgba(81, 139, 112, ${isCool ? "0.05" : "0.13"})`
             : "oklch(100% 0 0 / 0.05)",
           border: `1px solid ${iconBorder}`,
           fontSize: iconSize,
@@ -354,7 +378,7 @@ function FeatureCard({
       </span>
 
       {/* Text group */}
-      <div style={{ flex: 1, marginTop: isTall ? "12px" : 0 }}>
+      <div className="feature-text" style={{ flex: 1, marginTop: isTall ? "12px" : 0 }}>
         <h3
           style={{
             fontSize: isBanner ? "1.0625rem" : "0.9375rem",
@@ -381,6 +405,7 @@ function FeatureCard({
       {/* Badge for banner */}
       {isBanner && badge && (
         <div
+          className="feature-badge"
           style={{
             flexShrink: 0,
             display: "inline-flex",
@@ -388,8 +413,8 @@ function FeatureCard({
             gap: "6px",
             padding: "5px 12px",
             borderRadius: "999px",
-            background: "oklch(74% 0.16 78 / 0.1)",
-            border: "1px solid oklch(74% 0.16 78 / 0.2)",
+            background: "rgba(81, 139, 112, 0.1)",
+            border: "1px solid rgba(81, 139, 112, 0.2)",
           }}
         >
           <span

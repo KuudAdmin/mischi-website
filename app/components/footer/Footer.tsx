@@ -27,7 +27,8 @@ const LINKS = [
       { label: 'FAQ', href: '#faq' },
       { label: 'GitHub', href: '#' },
       { label: 'Issue tracker', href: '#' },
-      { label: 'Privacy', href: '#' },
+      { label: 'Privacy', href: '/privacy' },
+      { label: 'Terms', href: '/terms' },
     ],
   },
 ]
@@ -92,7 +93,7 @@ export default function Footer() {
 
         <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
           <p style={{ fontSize: '0.75rem', color: 'var(--color-text-dim)' }}>
-            © 2025 Mischi. Made with care for Mac users everywhere.
+            © 2026 Mischi. A tiny desktop companion with an opinion.
           </p>
           <div style={{ display: 'flex', gap: '16px' }}>
             <SocialLink href="#" label="Mischi on GitHub">

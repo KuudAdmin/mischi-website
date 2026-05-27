@@ -3,15 +3,15 @@
 /* ── Design Tokens ─────────────────────────────────────────────────────── */
 :root {
   /* Palette */
-  --color-bg:              oklch(7.5% 0.01 60);
-  --color-surface:         oklch(13% 0.012 60);
-  --color-surface-raised:  oklch(18% 0.012 60);
+  --color-bg:              oklch(7.5% 0.01 164);
+  --color-surface:         oklch(13% 0.012 164);
+  --color-surface-raised:  oklch(18% 0.012 164);
   --color-border:          oklch(100% 0 0 / 0.07);
   --color-border-strong:   oklch(100% 0 0 / 0.12);
 
-  --color-accent:          oklch(74% 0.16 78);
-  --color-accent-dim:      oklch(74% 0.16 78 / 0.14);
-  --color-accent-glow:     oklch(74% 0.16 78 / 0.22);
+  --color-accent:          #518B70;
+  --color-accent-dim:      rgba(81, 139, 112, 0.14);
+  --color-accent-glow:     rgba(81, 139, 112, 0.22);
 
   --color-text:            oklch(94% 0 0);
   --color-text-muted:      oklch(60% 0 0);
@@ -93,7 +93,7 @@ body {
 }
 
 .accent-glow {
-  box-shadow: 0 0 40px var(--color-accent-glow), 0 0 80px oklch(74% 0.16 78 / 0.1);
+  box-shadow: 0 0 40px var(--color-accent-glow), 0 0 80px rgba(81, 139, 112, 0.1);
 }
 
 .section-pad {
@@ -102,7 +102,7 @@ body {
 
 .gradient-text {
   display: inline-block;
-  background: linear-gradient(135deg, var(--color-accent) 0%, oklch(82% 0.13 65) 100%);
+  background: linear-gradient(135deg, var(--color-accent) 0%, #518B70 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -122,7 +122,7 @@ body {
   align-items: center;
   gap: 8px;
   padding: 10px 14px;
-  background: oklch(16% 0.012 60);
+  background: oklch(16% 0.012 164);
   border-bottom: 1px solid var(--color-border);
   position: relative;
   user-select: none;
@@ -157,13 +157,13 @@ body {
 }
 
 .mac-content {
-  background: oklch(10% 0.01 60);
+  background: oklch(10% 0.01 164);
   position: relative;
 }
 
 /* ── Code block ────────────────────────────────────────────────────────── */
 .code-block {
-  background: oklch(10% 0.01 60);
+  background: oklch(10% 0.01 164);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: 14px 18px;
