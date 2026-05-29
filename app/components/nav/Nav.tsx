@@ -100,7 +100,7 @@ export default function Nav() {
 
         {/* Desktop links */}
         <div className="nav-desktop-links" style={{ display: 'flex', alignItems: 'center', gap: '32px', flex: 1, justifyContent: 'center' }}>
-          {['Features', 'Demo', 'Download'].map((label) => (
+          {['Features', 'Download'].map((label) => (
             <Link
               key={label}
               href={`/#${label.toLowerCase()}`}
