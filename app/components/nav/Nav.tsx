@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 
 const NAV_LINKS = ['Features', 'Demo']
 
@@ -67,8 +68,8 @@ export default function Nav() {
         aria-label="Main navigation"
       >
         {/* Logo */}
-        <a
-          href="#"
+        <Link
+          href="/"
           onClick={closeMenu}
           style={{
             display: 'flex',
@@ -80,11 +81,11 @@ export default function Nav() {
           aria-label="Mischi — home"
         >
           <Image
-            src="/mischi-icon-02.png"
+            src="/mischi-icon-04.png"
             alt="Mischi icon"
             width={28}
             height={28}
-            style={{ borderRadius: '6px', imageRendering: 'pixelated' }}
+            style={{ borderRadius: '6px', imageRendering: 'pixelated', scale: '1.2' }}
             priority
           />
           <Image
@@ -95,14 +96,14 @@ export default function Nav() {
             style={{ height: '20px', width: 'auto' }}
             priority
           />
-        </a>
+        </Link>
 
         {/* Desktop links */}
         <div className="nav-desktop-links" style={{ display: 'flex', alignItems: 'center', gap: '32px', flex: 1, justifyContent: 'center' }}>
           {['Features', 'Demo', 'Download'].map((label) => (
-            <a
+            <Link
               key={label}
-              href={`#${label.toLowerCase()}`}
+              href={`/#${label.toLowerCase()}`}
               style={{
                 fontSize: '0.875rem',
                 fontWeight: 500,
@@ -114,14 +115,14 @@ export default function Nav() {
               onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-text-muted)' }}
             >
               {label}
-            </a>
+            </Link>
           ))}
         </div>
 
         {/* CTA + hamburger */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-          <a
-            href="#download"
+          <Link
+            href="/#download"
             className="nav-cta-desktop"
             style={{
               display: 'inline-flex',
@@ -148,7 +149,7 @@ export default function Nav() {
             }}
           >
             Download
-          </a>
+          </Link>
 
           {/* Hamburger — mobile only */}
           <button
@@ -222,9 +223,9 @@ export default function Nav() {
             }}
           >
             {NAV_LINKS.map((label) => (
-              <a
+              <Link
                 key={label}
-                href={`#${label.toLowerCase()}`}
+                href={`/#${label.toLowerCase()}`}
                 onClick={closeMenu}
                 className="nav-drawer-link"
                 style={{
@@ -243,13 +244,13 @@ export default function Nav() {
                 }}
               >
                 {label}
-              </a>
+              </Link>
             ))}
 
             <div style={{ width: '100%', maxWidth: '320px', height: '1px', background: 'var(--color-border)', margin: '14px 0 18px' }} />
 
-            <a
-              href="#download"
+            <Link
+              href="/#download"
               onClick={closeMenu}
               style={{
                 display: 'inline-flex',
@@ -273,7 +274,7 @@ export default function Nav() {
                 <path d="M8 1.5v9M4.5 7 8 10.5 11.5 7M2 14.5h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
               Download for macOS
-            </a>
+            </Link>
 
             <p
               style={{
