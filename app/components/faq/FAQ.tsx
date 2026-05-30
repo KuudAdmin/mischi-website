@@ -103,7 +103,7 @@ export default function FAQ() {
             padding: '24px 28px',
             borderRadius: 'var(--radius-lg)',
             border: '1px solid var(--color-border)',
-            background: 'oklch(100% 0 0 / 0.025)',
+            background: 'var(--color-surface)',
             display: 'flex',
             flexWrap: 'wrap',
             alignItems: 'center',
@@ -134,7 +134,7 @@ export default function FAQ() {
               gap: '8px',
               padding: '10px 18px',
               borderRadius: '9999px',
-              background: 'oklch(100% 0 0 / 0.05)',
+              background: 'var(--color-surface)',
               border: '1px solid var(--color-border-strong)',
               color: 'var(--color-text)',
               fontWeight: 500,
@@ -145,12 +145,12 @@ export default function FAQ() {
             }}
             onMouseEnter={(e) => {
               const el = e.currentTarget as HTMLAnchorElement
-              el.style.background = 'oklch(100% 0 0 / 0.08)'
+              el.style.background = 'var(--color-surface-sunken)'
               el.style.transform = 'translateY(-1px)'
             }}
             onMouseLeave={(e) => {
               const el = e.currentTarget as HTMLAnchorElement
-              el.style.background = 'oklch(100% 0 0 / 0.05)'
+              el.style.background = 'var(--color-surface)'
               el.style.transform = 'translateY(0)'
             }}
           >
@@ -180,8 +180,8 @@ function FAQItem({
     <div
       style={{
         borderRadius: 'var(--radius-md)',
-        border: `1px solid ${isOpen ? 'rgba(81, 139, 112, 0.22)' : 'var(--color-border)'}`,
-        background: isOpen ? 'rgba(81, 139, 112, 0.04)' : 'oklch(100% 0 0 / 0.02)',
+        border: `1px solid ${isOpen ? 'rgba(81, 139, 112, 0.15)' : 'var(--color-border)'}`,
+        background: isOpen ? 'rgba(81, 139, 112, 0.03)' : 'var(--color-surface)',
         overflow: 'hidden',
         transition:
           'border-color var(--dur-normal), background var(--dur-normal)',
@@ -225,7 +225,7 @@ function FAQItem({
             width: '24px',
             height: '24px',
             borderRadius: '50%',
-            background: isOpen ? 'var(--color-accent-dim)' : 'oklch(100% 0 0 / 0.05)',
+            background: isOpen ? 'var(--color-accent-dim)' : 'var(--color-surface-sunken)',
             border: `1px solid ${isOpen ? 'rgba(81, 139, 112, 0.3)' : 'var(--color-border)'}`,
             transition:
               'transform var(--dur-normal) var(--ease-expo), background var(--dur-normal), border-color var(--dur-normal)',

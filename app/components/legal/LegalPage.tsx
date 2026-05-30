@@ -127,7 +127,7 @@ export default function LegalPage({ title, updated, intro, children }: LegalPage
             font-family: var(--font-geist-mono), monospace;
             font-size: 0.875em;
             padding: 2px 6px;
-            background: oklch(100% 0 0 / 0.05);
+            background: var(--color-surface-sunken);
             border: 1px solid var(--color-border);
             border-radius: 4px;
             color: var(--color-text);

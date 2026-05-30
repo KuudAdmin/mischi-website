@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 
-const NAV_LINKS = ['Features', 'Demo']
+const NAV_LINKS = ['How it works', 'Features', 'FAQ']
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false)
@@ -48,7 +48,7 @@ export default function Nav() {
         right: 0,
         zIndex: 100,
         transition: 'background var(--dur-normal) var(--ease-expo), border-color var(--dur-normal)',
-        background: scrolled || menuOpen ? 'oklch(10% 0.01 164 / 0.85)' : 'transparent',
+        background: scrolled || menuOpen ? 'rgba(244, 239, 230, 0.8)' : 'transparent',
         backdropFilter: scrolled || menuOpen ? 'blur(20px) saturate(160%)' : 'none',
         WebkitBackdropFilter: scrolled || menuOpen ? 'blur(20px) saturate(160%)' : 'none',
         borderBottom: scrolled || menuOpen ? '1px solid var(--color-border)' : '1px solid transparent',
@@ -81,15 +81,15 @@ export default function Nav() {
           aria-label="Mischi — home"
         >
           <Image
-            src="/mischi-icon-04.png"
+            src="/mischi-icon-02.svg"
             alt="Mischi icon"
             width={28}
             height={28}
-            style={{ borderRadius: '6px', imageRendering: 'pixelated', scale: '1.2' }}
+            style={{ scale: '1.2' }}
             priority
           />
           <Image
-            src="/mischi-typo-light.svg"
+            src="/mischi-typo-dark.svg"
             alt="Mischi"
             width={72}
             height={20}
@@ -100,10 +100,10 @@ export default function Nav() {
 
         {/* Desktop links */}
         <div className="nav-desktop-links" style={{ display: 'flex', alignItems: 'center', gap: '32px', flex: 1, justifyContent: 'center' }}>
-          {['Features', 'Download'].map((label) => (
+          {['How it works', 'Features', 'FAQ'].map((label) => (
             <Link
               key={label}
-              href={`/#${label.toLowerCase()}`}
+              href={`/#${label.toLowerCase().replace(/\s+/g, '-')}`}
               style={{
                 fontSize: '0.875rem',
                 fontWeight: 500,
@@ -130,8 +130,8 @@ export default function Nav() {
               gap: '8px',
               padding: '7px 16px',
               borderRadius: '9999px',
-              background: 'var(--color-accent)',
-              color: 'oklch(98% 0 0)',
+              background: 'var(--cta)',
+              color: 'var(--cta-ink)',
               fontWeight: 600,
               fontSize: '0.8125rem',
               textDecoration: 'none',
@@ -158,7 +158,7 @@ export default function Nav() {
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
             style={{
-              background: menuOpen ? 'oklch(100% 0 0 / 0.06)' : 'transparent',
+              background: menuOpen ? 'rgba(27, 33, 29, 0.05)' : 'transparent',
               border: '1px solid',
               borderColor: menuOpen ? 'var(--color-border-strong)' : 'transparent',
               borderRadius: 'var(--radius-md)',
@@ -195,7 +195,7 @@ export default function Nav() {
               left: 0,
               right: 0,
               bottom: 0,
-              background: 'oklch(7.5% 0.01 164 / 0.55)',
+              background: 'rgba(27, 33, 29, 0.25)',
               backdropFilter: 'blur(2px)',
               WebkitBackdropFilter: 'blur(2px)',
               animation: 'nav-backdrop-in var(--dur-normal) var(--ease-expo)',
@@ -210,7 +210,7 @@ export default function Nav() {
             style={{
               position: 'relative',
               zIndex: 95,
-              background: 'oklch(8% 0.01 164 / 0.98)',
+              background: 'rgba(251, 248, 241, 0.98)',
               backdropFilter: 'blur(24px) saturate(160%)',
               WebkitBackdropFilter: 'blur(24px) saturate(160%)',
               borderTop: '1px solid var(--color-border)',
@@ -225,7 +225,7 @@ export default function Nav() {
             {NAV_LINKS.map((label) => (
               <Link
                 key={label}
-                href={`/#${label.toLowerCase()}`}
+                href={`/#${label.toLowerCase().replace(/\s+/g, '-')}`}
                 onClick={closeMenu}
                 className="nav-drawer-link"
                 style={{
@@ -261,13 +261,13 @@ export default function Nav() {
                 maxWidth: '320px',
                 padding: '14px 22px',
                 borderRadius: '9999px',
-                background: 'var(--color-accent)',
-                color: 'oklch(98% 0 0)',
+                background: 'var(--cta)',
+                color: 'var(--cta-ink)',
                 fontWeight: 600,
                 fontSize: '0.9375rem',
                 textDecoration: 'none',
                 letterSpacing: '-0.01em',
-                boxShadow: '0 0 24px rgba(81, 139, 112, 0.28)',
+                boxShadow: 'var(--shadow-card)',
               }}
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -298,11 +298,11 @@ export default function Nav() {
         }
         .nav-drawer-link:hover,
         .nav-drawer-link:focus-visible {
-          background: oklch(100% 0 0 / 0.05);
+          background: rgba(27, 33, 29, 0.04);
           color: var(--color-accent);
           outline: none;
         }
-        .nav-drawer-link:active { background: oklch(100% 0 0 / 0.08); }
+        .nav-drawer-link:active { background: rgba(27, 33, 29, 0.06); }
         @keyframes nav-drawer-in {
           from { opacity: 0; transform: translateY(-8px); }
           to   { opacity: 1; transform: translateY(0); }

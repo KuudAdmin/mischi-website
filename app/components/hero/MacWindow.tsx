@@ -24,7 +24,7 @@ export default function MacWindow({ title = 'Mischi.app', children, width = 400,
       {statusBar && (
         <div
           style={{
-            background: 'oklch(14% 0.012 164)',
+            background: 'var(--color-surface-raised)',
             borderTop: '1px solid var(--color-border)',
             padding: '7px 14px',
             fontSize: '0.7rem',

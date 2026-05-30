@@ -2,8 +2,15 @@ import type { Metadata } from 'next'
 import LegalPage from '../components/legal/LegalPage'
 
 export const metadata: Metadata = {
-  title: 'Terms of Use — Mischi',
+  title: 'Terms of Use',
   description: 'Terms governing your use of the Mischi macOS application and website.',
+  alternates: { canonical: '/terms' },
+  openGraph: {
+    title: 'Terms of Use — Mischi',
+    description: 'Terms governing your use of the Mischi macOS application and website.',
+    url: '/terms',
+    type: 'article',
+  },
 }
 
 export default function TermsPage() {

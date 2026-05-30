@@ -2,20 +2,48 @@
 
 /* ── Design Tokens ─────────────────────────────────────────────────────── */
 :root {
-  /* Palette */
-  --color-bg:              oklch(7.5% 0.01 164);
-  --color-surface:         oklch(13% 0.012 164);
-  --color-surface-raised:  oklch(18% 0.012 164);
-  --color-border:          oklch(100% 0 0 / 0.07);
-  --color-border-strong:   oklch(100% 0 0 / 0.12);
+  /* Warm paper grounds */
+  --color-bg:              #F4EFE6;            /* paper — page background */
+  --color-surface:         #FBF8F1;            /* cards / panels (lighter than paper) */
+  --color-surface-raised:  #FFFFFF;            /* elevated / hover panels */
+  --color-surface-sunken:  #EDE6D9;            /* insets, code blocks, wells */
+  --color-border:          #E3DACB;            /* subtle borders (line) */
+  --color-border-strong:   #D6CCBA;            /* emphasised borders (line-strong) */
 
-  --color-accent:          #518B70;
-  --color-accent-dim:      rgba(81, 139, 112, 0.14);
-  --color-accent-glow:     rgba(81, 139, 112, 0.22);
+  /* Brand sage ramp — 600 = anchor (exact app value) */
+  --sage-50:  #EDF4F0;
+  --sage-100: #D8E9E0;
+  --sage-200: #B6D5C5;
+  --sage-300: #8DBCA4;
+  --sage-400: #66A285;
+  --sage-500: #56947A;
+  --sage-600: #518B70;                         /* ANCHOR — headline, CTA, ambient */
+  --sage-700: #467A62;                         /* hover (darkens on light) */
+  --sage-800: #3D6A56;                         /* active / safe small-text green on cream */
+  --sage-900: #2D4F41;
+  --sage-950: #1C3328;
 
-  --color-text:            oklch(94% 0 0);
-  --color-text-muted:      oklch(60% 0 0);
-  --color-text-dim:        oklch(40% 0 0);
+  --color-accent:          #518B70;            /* sage-600 anchor */
+  --color-accent-dim:      rgba(81, 139, 112, 0.10);
+  --color-accent-glow:     rgba(81, 139, 112, 0.30);
+
+  /* Primary CTA — sage fill, cream text, darkens on interaction */
+  --cta:        #518B70;
+  --cta-hover:  #467A62;
+  --cta-active: #3D6A56;
+  --cta-ink:    #F7F3EA;                        /* cream text on sage fills */
+
+  /* Optional warmth — soft clay for the "Buy me a coffee" secondary */
+  --clay:      #B57A52;
+  --clay-ink:  #9A6340;                         /* clay text on cream */
+  --clay-tint: #F6EBE0;
+  --clay-line: #E3CDB8;
+  --clay-400:  #C58A66;
+
+  /* Warm-cool near-black text, slightly green-tinted to agree with the sage */
+  --color-text:       #1B211D;                 /* ink — primary */
+  --color-text-muted: #6B675B;                 /* secondary text / labels */
+  --color-text-dim:   #8A877C;                 /* hints / disabled */
 
   /* Mac traffic lights */
   --color-mac-red:    #FF5F57;
@@ -29,15 +57,18 @@
   --radius-xl:  20px;
   --radius-2xl: 28px;
 
-  /* Shadows */
-  --shadow-window:
-    0 0 0 0.5px oklch(100% 0 0 / 0.07),
-    0 2px 4px   oklch(0% 0 0 / 0.4),
-    0 8px 24px  oklch(0% 0 0 / 0.45),
-    0 24px 64px oklch(0% 0 0 / 0.35);
+  /* Soft warm elevation for light surfaces (replaces the dark "glow") */
+  --shadow-soft:
+    0 1px 2px rgba(43, 38, 28, 0.04),
+    0 4px 16px -4px rgba(43, 38, 28, 0.08);
   --shadow-card:
-    0 1px 2px oklch(0% 0 0 / 0.4),
-    0 4px 12px oklch(0% 0 0 / 0.3);
+    0 1px 3px rgba(43, 38, 28, 0.06),
+    0 10px 28px -10px rgba(43, 38, 28, 0.12);
+  --shadow-window:
+    0 1px 3px rgba(43, 38, 28, 0.06),
+    0 12px 32px -8px rgba(43, 38, 28, 0.14),
+    0 32px 64px -24px rgba(43, 38, 28, 0.12);
+  --sage-ring: 0 0 0 1px rgba(81, 139, 112, 0.30);
 
   /* Typography */
   --text-hero: clamp(2.8rem, 1.2rem + 5.5vw, 5.5rem);
@@ -59,8 +90,37 @@
 @theme inline {
   --color-background: var(--color-bg);
   --color-foreground: var(--color-text);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-inter-tight);
   --font-mono: var(--font-geist-mono);
+
+  /* Expose the palette as Tailwind utilities (bg-paper, text-ink, bg-sage-600, …) */
+  --color-paper:          var(--color-bg);
+  --color-ink:            var(--color-text);
+  --color-ink-muted:      var(--color-text-muted);
+  --color-ink-faint:      var(--color-text-dim);
+  --color-line:           var(--color-border);
+  --color-line-strong:    var(--color-border-strong);
+
+  --color-sage-50:  var(--sage-50);
+  --color-sage-100: var(--sage-100);
+  --color-sage-200: var(--sage-200);
+  --color-sage-300: var(--sage-300);
+  --color-sage-400: var(--sage-400);
+  --color-sage-500: var(--sage-500);
+  --color-sage-600: var(--sage-600);
+  --color-sage-700: var(--sage-700);
+  --color-sage-800: var(--sage-800);
+  --color-sage-900: var(--sage-900);
+  --color-sage-950: var(--sage-950);
+
+  --color-cta:        var(--cta);
+  --color-cta-hover:  var(--cta-hover);
+  --color-cta-active: var(--cta-active);
+  --color-cta-ink:    var(--cta-ink);
+
+  --color-clay:      var(--clay);
+  --color-clay-ink:  var(--clay-ink);
 }
 
 /* ── Base ──────────────────────────────────────────────────────────────── */
@@ -71,29 +131,34 @@ html { scroll-behavior: smooth; }
 body {
   background: var(--color-bg);
   color: var(--color-text);
-  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+}
+
+/* Headlines — Inter Tight */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-inter-tight), -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 /* ── Reusable utilities ────────────────────────────────────────────────── */
 
 .glass {
-  background: oklch(100% 0 0 / 0.04);
+  background: rgba(251, 248, 241, 0.72);
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
   border: 1px solid var(--color-border);
 }
 
 .glass-strong {
-  background: oklch(100% 0 0 / 0.06);
-  backdrop-filter: blur(28px) saturate(200%);
-  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  background: rgba(251, 248, 241, 0.85);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
   border: 1px solid var(--color-border-strong);
 }
 
 .accent-glow {
-  box-shadow: 0 0 40px var(--color-accent-glow), 0 0 80px rgba(81, 139, 112, 0.1);
+  box-shadow: var(--shadow-card), var(--sage-ring);
 }
 
 .section-pad {
@@ -102,19 +167,92 @@ body {
 
 .gradient-text {
   display: inline-block;
-  background: linear-gradient(135deg, var(--color-accent) 0%, #518B70 100%);
+  background: linear-gradient(135deg, var(--sage-600) 0%, var(--sage-800) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
 }
 
+/* ── Component classes ─────────────────────────────────────────────────── */
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: var(--radius-md);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: var(--cta);
+  color: var(--cta-ink);
+  box-shadow: var(--shadow-soft);
+  transition: background var(--dur-fast) ease, transform var(--dur-fast) ease;
+}
+.btn-primary:hover  { background: var(--cta-hover); }
+.btn-primary:active { background: var(--cta-active); transform: scale(0.98); }
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: var(--radius-md);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  transition: color var(--dur-fast) ease, border-color var(--dur-fast) ease, background var(--dur-fast) ease;
+}
+.btn-ghost:hover { color: var(--color-text); border-color: var(--sage-700); }
+
+.btn-coffee {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: var(--radius-md);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  color: var(--clay-ink);
+  background: var(--color-surface);
+  border: 1px solid var(--clay-line);
+  transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease;
+}
+.btn-coffee:hover { background: var(--clay-tint); border-color: var(--clay-400); }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-sm);
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  transition: border-color var(--dur-fast) ease, background var(--dur-fast) ease;
+}
+.chip:hover { border-color: var(--sage-700); background: var(--color-surface-sunken); }
+.chip[data-active='true'] {
+  color: var(--cta-ink);
+  background: var(--sage-600);
+  border-color: transparent;
+}
+
+.card {
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-soft);
+}
+.card--accent { box-shadow: var(--shadow-card), var(--sage-ring); }
+
 /* ── macOS window chrome ───────────────────────────────────────────────── */
 .mac-window {
   border-radius: var(--radius-xl);
   overflow: hidden;
   box-shadow: var(--shadow-window);
-  border: 1px solid oklch(100% 0 0 / 0.1);
+  border: 1px solid var(--color-border-strong);
 }
 
 .mac-titlebar {
@@ -122,7 +260,7 @@ body {
   align-items: center;
   gap: 8px;
   padding: 10px 14px;
-  background: oklch(16% 0.012 164);
+  background: var(--color-surface-sunken);
   border-bottom: 1px solid var(--color-border);
   position: relative;
   user-select: none;
@@ -141,9 +279,9 @@ body {
   flex-shrink: 0;
 }
 
-.mac-light-red    { background: var(--color-mac-red);    box-shadow: 0 0 5px oklch(55% 0.2 25 / 0.5); }
-.mac-light-yellow { background: var(--color-mac-yellow); box-shadow: 0 0 5px oklch(70% 0.18 80 / 0.5); }
-.mac-light-green  { background: var(--color-mac-green);  box-shadow: 0 0 5px oklch(65% 0.2 145 / 0.5); }
+.mac-light-red    { background: var(--color-mac-red); }
+.mac-light-yellow { background: var(--color-mac-yellow); }
+.mac-light-green  { background: var(--color-mac-green); }
 
 .mac-title {
   position: absolute;
@@ -157,19 +295,20 @@ body {
 }
 
 .mac-content {
-  background: oklch(10% 0.01 164);
+  background: var(--color-surface);
   position: relative;
 }
 
 /* ── Code block ────────────────────────────────────────────────────────── */
 .code-block {
-  background: oklch(10% 0.01 164);
+  background: var(--color-surface-sunken);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: 14px 18px;
   font-family: var(--font-geist-mono), 'Menlo', monospace;
   font-size: 0.875rem;
   letter-spacing: 0.02em;
+  color: var(--color-text);
   overflow-x: auto;
   white-space: nowrap;
 }
@@ -177,8 +316,8 @@ body {
 /* ── Scrollbar ─────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: oklch(28% 0 0); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: oklch(36% 0 0); }
+::-webkit-scrollbar-thumb { background: var(--color-border-strong); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--sage-700); }
 
 /* ── Selection ─────────────────────────────────────────────────────────── */
 ::selection {

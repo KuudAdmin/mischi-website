@@ -2,9 +2,17 @@ import type { Metadata } from 'next'
 import LegalPage from '../components/legal/LegalPage'
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy — Mischi',
+  title: 'Privacy Policy',
   description:
     'Mischi is offline-first and does not collect, transmit, or store any personal data.',
+  alternates: { canonical: '/privacy' },
+  openGraph: {
+    title: 'Privacy Policy — Mischi',
+    description:
+      'Mischi is offline-first and does not collect, transmit, or store any personal data.',
+    url: '/privacy',
+    type: 'article',
+  },
 }
 
 export default function PrivacyPage() {
