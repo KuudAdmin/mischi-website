@@ -72,7 +72,7 @@ export default function Hero() {
         style={{
           position: 'absolute',
           inset: 0,
-          backgroundImage: 'radial-gradient(oklch(100% 0 0 / 0.035) 0.5px, transparent 0.5px)',
+          backgroundImage: 'radial-gradient(rgba(27, 33, 29, 0.07) 0.5px, transparent 0.5px)',
           backgroundSize: '34px 34px',
           maskImage: 'radial-gradient(ellipse 92% 88% at 50% 50%, transparent 30%, black 64%, transparent 96%)',
           WebkitMaskImage: 'radial-gradient(ellipse 92% 88% at 50% 50%, transparent 30%, black 64%, transparent 96%)',
@@ -117,7 +117,7 @@ export default function Hero() {
             }}
           >
             Your Mac{' '}
-            <span style={{ color: 'var(--color-accent)' }}>deserves</span>{' '}
+            <span style={{ color: 'var(--sage-700)' }}>deserves</span>{' '}
             a companion.
           </h1>
 
@@ -154,14 +154,14 @@ export default function Hero() {
                 gap: '10px',
                 padding: '13px 26px',
                 borderRadius: '9999px',
-                background: 'var(--color-accent)',
-                color: 'oklch(98% 0 0)',
+                background: 'var(--cta)',
+                color: 'var(--cta-ink)',
                 fontWeight: 600,
                 fontSize: '0.9375rem',
                 textDecoration: 'none',
                 letterSpacing: '-0.01em',
                 transition: 'opacity var(--dur-fast), transform var(--dur-fast)',
-                boxShadow: '0 0 28px rgba(81, 139, 112, 0.28)',
+                boxShadow: 'var(--shadow-card)',
               }}
               onMouseEnter={(e) => {
                 const el = e.currentTarget as HTMLAnchorElement
@@ -191,21 +191,23 @@ export default function Hero() {
                 gap: '10px',
                 padding: '11px 24px',
                 borderRadius: '9999px',
-                background: '#FFDD00',
-                border: '1px solid #000000',
-                color: '#000000',
+                background: 'var(--color-surface)',
+                border: '1px solid var(--clay-line)',
+                color: 'var(--clay-ink)',
                 textDecoration: 'none',
                 letterSpacing: '0.01em',
-                transition: 'opacity var(--dur-fast), transform var(--dur-fast)',
+                transition: 'color var(--dur-fast), border-color var(--dur-fast), background var(--dur-fast), transform var(--dur-fast)',
               }}
               onMouseEnter={(e) => {
                 const el = e.currentTarget as HTMLAnchorElement
-                el.style.opacity = '0.9'
+                el.style.background = 'var(--clay-tint)'
+                el.style.borderColor = 'var(--clay-400)'
                 el.style.transform = 'translateY(-2px)'
               }}
               onMouseLeave={(e) => {
                 const el = e.currentTarget as HTMLAnchorElement
-                el.style.opacity = '1'
+                el.style.background = 'var(--color-surface)'
+                el.style.borderColor = 'var(--clay-line)'
                 el.style.transform = 'translateY(0)'
               }}
             >
@@ -329,8 +331,8 @@ export default function Hero() {
                   inset: 0,
                   opacity: 0.08,
                   background: `
-                    repeating-linear-gradient(0deg, transparent, transparent 47px, oklch(100% 0 0 / 0.1) 47px, oklch(100% 0 0 / 0.1) 48px),
-                    repeating-linear-gradient(90deg, transparent, transparent 47px, oklch(100% 0 0 / 0.1) 47px, oklch(100% 0 0 / 0.1) 48px)
+                    repeating-linear-gradient(0deg, transparent, transparent 47px, rgba(27, 33, 29, 0.12) 47px, rgba(27, 33, 29, 0.12) 48px),
+                    repeating-linear-gradient(90deg, transparent, transparent 47px, rgba(27, 33, 29, 0.12) 47px, rgba(27, 33, 29, 0.12) 48px)
                   `,
                 }}
               />
@@ -380,13 +382,13 @@ export default function Hero() {
                       borderRadius: 'var(--radius-md)',
                       background: active
                         ? 'var(--color-accent-dim)'
-                        : 'oklch(100% 0 0 / 0.03)',
+                        : 'var(--color-surface)',
                       border: `1px solid ${active ? 'rgba(81, 139, 112, 0.35)' : 'var(--color-border)'}`,
                       cursor: 'pointer',
                       transition: 'all var(--dur-fast)',
-                      fontWeight: 600,
+                      fontWeight: active ? 500 : 400,
                       fontSize: '0.8125rem',
-                      color: active ? 'var(--color-accent)' : 'var(--color-text)',
+                      color: active ? 'var(--color-accent)' : 'var(--color-text-muted)',
                       letterSpacing: '-0.01em',
                     }}
                   >

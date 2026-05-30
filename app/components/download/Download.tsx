@@ -27,7 +27,7 @@ export default function Download() {
             alt="Mischi app icon"
             width={88}
             height={88}
-            style={{ borderRadius: '20px', boxShadow: '0 8px 32px rgba(81, 139, 112, 0.2), 0 2px 8px oklch(0% 0 0 / 0.4)', marginBottom: '24px', display: 'inline-block' }}
+            style={{ borderRadius: '20px', boxShadow: '0 8px 24px rgba(81, 139, 112, 0.18), 0 2px 8px rgba(43, 38, 28, 0.12)', marginBottom: '24px', display: 'inline-block' }}
             priority
           />
           <p style={{ fontSize: '0.71875rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-accent)', marginBottom: '12px' }}>
@@ -45,7 +45,7 @@ export default function Download() {
         </div>
 
         {/* Download card */}
-        <div style={{ background: 'oklch(13% 0.012 164)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xl)', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-xl)', overflow: 'hidden' }}>
           {/* Direct download row */}
           <div style={{ padding: '24px 28px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
@@ -58,11 +58,11 @@ export default function Download() {
                 style={{
                   display: 'inline-flex', alignItems: 'center', gap: '8px',
                   padding: '10px 22px', borderRadius: '9999px',
-                  background: 'var(--color-accent)', color: 'oklch(98% 0 0)',
+                  background: 'var(--cta)', color: 'var(--cta-ink)',
                   fontWeight: 600, fontSize: '0.875rem', textDecoration: 'none',
                   whiteSpace: 'nowrap',
                   transition: 'opacity var(--dur-fast), transform var(--dur-fast)',
-                  boxShadow: '0 0 20px rgba(81, 139, 112, 0.25)',
+                  boxShadow: 'var(--shadow-soft)',
                 }}
                 onMouseEnter={(e) => {
                   const el = e.currentTarget as HTMLAnchorElement

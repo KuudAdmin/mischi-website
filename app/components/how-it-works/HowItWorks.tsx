@@ -70,19 +70,19 @@ function StepCard({ number, title, body, icon, iconAlt }: typeof STEPS[number]) 
       style={{
         padding: '32px 28px',
         borderRadius: 'var(--radius-lg)',
-        background: 'oklch(100% 0 0 / 0.025)',
+        background: 'var(--color-surface)',
         border: '1px solid var(--color-border)',
         transition: 'border-color var(--dur-normal), background var(--dur-normal)',
       }}
       onMouseEnter={(e) => {
         const el = e.currentTarget as HTMLDivElement
-        el.style.borderColor = 'rgba(81, 139, 112, 0.25)'
-        el.style.background = 'oklch(100% 0 0 / 0.04)'
+        el.style.borderColor = 'rgba(81, 139, 112, 0.35)'
+        el.style.background = 'var(--color-surface-raised)'
       }}
       onMouseLeave={(e) => {
         const el = e.currentTarget as HTMLDivElement
         el.style.borderColor = 'var(--color-border)'
-        el.style.background = 'oklch(100% 0 0 / 0.025)'
+        el.style.background = 'var(--color-surface)'
       }}
     >
       <span style={{

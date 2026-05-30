@@ -202,16 +202,8 @@ export default function Features() {
   );
 }
 
-function getBg(variant: Variant, accent?: boolean): string {
-  if (variant === "banner")
-    return "linear-gradient(130deg, oklch(12% 0.018 164) 0%, oklch(8% 0.01 164) 100%)";
-  if (variant === "tall" && accent)
-    return "linear-gradient(160deg, oklch(13% 0.016 164) 0%, oklch(9% 0.01 164) 100%)";
-  if (variant === "tall")
-    return "linear-gradient(160deg, oklch(11% 0.006 240) 0%, oklch(8% 0.004 220) 100%)";
-  if (variant === "wide" && accent)
-    return "linear-gradient(105deg, oklch(14% 0.016 164) 0%, oklch(11% 0.01 164) 100%)";
-  return "oklch(100% 0 0 / 0.025)";
+function getBg(): string {
+  return "var(--color-surface)";
 }
 
 function FeatureCard({
@@ -227,48 +219,27 @@ function FeatureCard({
   const isBanner = variant === "banner";
   const isTall = variant === "tall";
   const isWide = variant === "wide";
-  const isDark = isBanner || isTall || (isWide && accent);
-  const isCool = isTall && !accent;
+  // Featured cards (banner + accented tall/wide) get a slightly stronger
+  // elevation + sage-accented icon; everything else is a plain light surface.
+  const isDark = isBanner || (isTall && accent) || (isWide && accent);
 
-  const borderColor = isCool
-    ? "oklch(60% 0.08 240 / 0.18)"
-    : isDark
-      ? "rgba(81, 139, 112, 0.15)"
-      : "var(--color-border)";
+  const borderColor = isDark
+    ? "var(--color-border-strong)"
+    : "var(--color-border)";
 
-  const borderHover = isCool
-    ? "oklch(60% 0.08 240 / 0.35)"
-    : isDark
-      ? "rgba(81, 139, 112, 0.32)"
-      : "rgba(81, 139, 112, 0.2)";
+  const borderHover = "rgba(81, 139, 112, 0.15)";
 
-  const glowColor = isCool
-    ? "oklch(60% 0.12 240 / 0.12)"
-    : "rgba(81, 139, 112, 0.14)";
+  const iconColor = isDark
+    ? "var(--color-accent)"
+    : "var(--color-text-muted)";
 
-  const iconColor = isCool
-    ? "oklch(72% 0.08 240)"
-    : isDark
-      ? "var(--color-accent)"
-      : "var(--color-text-muted)";
+  const iconBorder = isDark
+    ? "rgba(81, 139, 112, 0.30)"
+    : "var(--color-border)";
 
-  const iconBorder = isCool
-    ? "oklch(60% 0.08 240 / 0.25)"
-    : isDark
-      ? "rgba(81, 139, 112, 0.24)"
-      : "var(--color-border)";
+  const titleColor = "var(--color-text)";
 
-  const titleColor = isCool
-    ? "oklch(92% 0.005 220)"
-    : isDark
-      ? "oklch(94% 0.012 164)"
-      : "var(--color-text)";
-
-  const bodyColor = isCool
-    ? "oklch(62% 0.01 220)"
-    : isDark
-      ? "oklch(66% 0.02 164)"
-      : "var(--color-text-muted)";
+  const bodyColor = "var(--color-text-muted)";
 
   const iconSize = isBanner
     ? "1.625rem"
@@ -293,7 +264,7 @@ function FeatureCard({
               ? "24px 28px"
               : "22px",
         borderRadius: "var(--radius-lg)",
-        background: getBg(variant, accent),
+        background: getBg(),
         border: `1px solid ${borderColor}`,
         position: "relative",
         overflow: "hidden",
@@ -303,35 +274,19 @@ function FeatureCard({
         justifyContent: isTall ? "space-between" : "flex-start",
         gap: isBanner ? "24px" : isWide ? "20px" : "0",
         transition:
-          "border-color var(--dur-normal), transform var(--dur-normal)",
+          "border-color var(--dur-normal), background var(--dur-normal)",
       }}
       onMouseEnter={(e) => {
         const el = e.currentTarget as HTMLDivElement;
         el.style.borderColor = borderHover;
-        el.style.transform = "translateY(-2px)";
+        el.style.background = "rgba(81, 139, 112, 0.03)";
       }}
       onMouseLeave={(e) => {
         const el = e.currentTarget as HTMLDivElement;
         el.style.borderColor = borderColor;
-        el.style.transform = "translateY(0)";
+        el.style.background = "var(--color-surface)";
       }}
     >
-      {/* Ambient glow */}
-      {isDark && (
-        <div
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            top: isBanner ? "-30px" : isTall ? "0" : "-30px",
-            right: "-30px",
-            width: isBanner ? "260px" : "180px",
-            height: isBanner ? "180px" : "180px",
-            background: `radial-gradient(circle, ${glowColor} 0%, transparent 70%)`,
-            pointerEvents: "none",
-          }}
-        />
-      )}
-
       {/* Dot-grid for tall cards */}
       {isTall && (
         <div
@@ -344,7 +299,7 @@ function FeatureCard({
             height: "120px",
             opacity: 0.14,
             backgroundImage:
-              "radial-gradient(circle, oklch(100% 0 0) 1px, transparent 1px)",
+              "radial-gradient(circle, var(--color-text) 1px, transparent 1px)",
             backgroundSize: "18px 18px",
             maskImage: "linear-gradient(to top, black 0%, transparent 100%)",
             WebkitMaskImage: "linear-gradient(to top, black 0%, transparent 100%)",
@@ -364,8 +319,8 @@ function FeatureCard({
           height: boxSize,
           borderRadius: "var(--radius-md)",
           background: isDark
-            ? `rgba(81, 139, 112, ${isCool ? "0.05" : "0.13"})`
-            : "oklch(100% 0 0 / 0.05)",
+            ? "rgba(81, 139, 112, 0.12)"
+            : "var(--color-surface-sunken)",
           border: `1px solid ${iconBorder}`,
           fontSize: iconSize,
           flexShrink: 0,

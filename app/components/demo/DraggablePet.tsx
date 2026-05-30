@@ -224,9 +224,6 @@ export default function DraggablePet() {
         cursor: isDragging ? "grabbing" : "grab",
         touchAction: "none",
         userSelect: "none",
-        filter: isDragging
-          ? "drop-shadow(0 12px 24px oklch(0% 0 0 / 0.5))"
-          : "drop-shadow(0 4px 12px oklch(0% 0 0 / 0.35))",
         transition: isDragging ? "none" : "filter 0.2s",
       }}
       onPointerDown={handlePointerDown}

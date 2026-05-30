@@ -44,7 +44,7 @@ export default function NotFound() {
         style={{
           position: 'absolute',
           inset: 0,
-          backgroundImage: 'radial-gradient(oklch(100% 0 0 / 0.035) 0.5px, transparent 0.5px)',
+          backgroundImage: 'radial-gradient(rgba(27, 33, 29, 0.07) 0.5px, transparent 0.5px)',
           backgroundSize: '34px 34px',
           maskImage: 'radial-gradient(ellipse 88% 88% at 50% 50%, transparent 24%, black 56%, transparent 92%)',
           WebkitMaskImage: 'radial-gradient(ellipse 88% 88% at 50% 50%, transparent 24%, black 56%, transparent 92%)',
@@ -107,14 +107,13 @@ export default function NotFound() {
                 }}
               />
               <Image
-                src="/mischi-icon-02.png"
+                src="/icon-3d.png"
                 alt=""
                 width={72}
                 height={72}
                 style={{
                   position: 'relative',
-                  borderRadius: '12px',
-                  imageRendering: 'pixelated',
+                  borderRadius: '16px',
                   animation: 'mischi-float 3.6s ease-in-out infinite',
                 }}
                 priority
@@ -129,7 +128,7 @@ export default function NotFound() {
                 lineHeight: 1,
                 letterSpacing: '-0.04em',
                 margin: 0,
-                background: 'linear-gradient(135deg, #518B70 0%, #518B70 100%)',
+                background: 'linear-gradient(135deg, var(--sage-400) 0%, var(--sage-600) 100%)',
                 WebkitBackgroundClip: 'text',
                 backgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
@@ -204,13 +203,13 @@ export default function NotFound() {
               gap: '10px',
               padding: '13px 28px',
               borderRadius: '9999px',
-              background: 'var(--color-accent)',
-              color: 'oklch(98% 0 0)',
+              background: 'var(--cta)',
+              color: 'var(--cta-ink)',
               fontWeight: 600,
               fontSize: '0.9375rem',
               textDecoration: 'none',
               letterSpacing: '-0.01em',
-              boxShadow: '0 0 28px rgba(81, 139, 112, 0.28)',
+              boxShadow: 'var(--shadow-card)',
             }}
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -228,7 +227,7 @@ export default function NotFound() {
               gap: '8px',
               padding: '13px 28px',
               borderRadius: '9999px',
-              background: 'oklch(100% 0 0 / 0.05)',
+              background: 'var(--color-surface)',
               border: '1px solid var(--color-border-strong)',
               color: 'var(--color-text)',
               fontWeight: 500,
@@ -255,7 +254,7 @@ export default function NotFound() {
           transition: opacity var(--dur-fast), transform var(--dur-fast), background var(--dur-fast);
         }
         .nf-cta-primary:hover { opacity: 0.88; transform: translateY(-2px); }
-        .nf-cta-ghost:hover   { background: oklch(100% 0 0 / 0.08); transform: translateY(-2px); }
+        .nf-cta-ghost:hover   { background: var(--color-surface-sunken); transform: translateY(-2px); }
         @media (prefers-reduced-motion: reduce) {
           .nf-cta-primary:hover, .nf-cta-ghost:hover { transform: none; }
           [style*="mischi-float"] { animation: none !important; }
