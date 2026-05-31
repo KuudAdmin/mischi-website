@@ -134,7 +134,7 @@ export default function Hero() {
             }}
           >
             Run animated desktop pets on macOS. Interactive, expressive, offline&#8209;first.
-            No cloud. No setup. Just magic.
+            No cloud. No setup.
           </p>
 
           {/* CTAs */}
