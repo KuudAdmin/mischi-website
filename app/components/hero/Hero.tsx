@@ -106,7 +106,7 @@ export default function Hero() {
         >
           <h1
             id="hero-heading"
-            className="hero-headline"
+            className="hero-headline hero-reveal"
             style={{
               fontSize: 'clamp(2.4rem, 1rem + 4vw, 4.2rem)',
               fontWeight: 700,
@@ -114,6 +114,7 @@ export default function Hero() {
               letterSpacing: '-0.03em',
               color: 'var(--color-text)',
               marginBottom: '22px',
+              animationDelay: '0.05s',
             }}
           >
             Your Mac{' '}
@@ -122,12 +123,14 @@ export default function Hero() {
           </h1>
 
           <p
+            className="hero-reveal"
             style={{
               fontSize: 'var(--text-lg)',
               color: 'var(--color-text-muted)',
               maxWidth: '480px',
               lineHeight: 1.65,
               marginBottom: '36px',
+              animationDelay: '0.15s',
             }}
           >
             Run animated desktop pets on macOS. Interactive, expressive, offline&#8209;first.
@@ -136,12 +139,13 @@ export default function Hero() {
 
           {/* CTAs */}
           <div
-            className="hero-ctas"
+            className="hero-ctas hero-reveal"
             style={{
               display: 'flex',
               flexWrap: 'wrap',
               gap: '12px',
               marginBottom: '28px',
+              animationDelay: '0.25s',
             }}
           >
             <a
@@ -245,7 +249,7 @@ export default function Hero() {
           </div>
 
           {/* Platform badges */}
-          <div style={{ display: 'flex', gap: '14px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div className="hero-reveal" style={{ display: 'flex', gap: '14px', alignItems: 'center', flexWrap: 'wrap', animationDelay: '0.35s' }}>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
               <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
                 <path d="M5 1L1.5 3v4L5 9l3.5-2V3L5 1z" stroke="currentColor" strokeWidth="1" strokeLinejoin="round"/>
@@ -267,13 +271,14 @@ export default function Hero() {
         {/* ── Right: live demo ───────────────────────────────── */}
         <div
           id="demo"
-          className="hero-demo"
+          className="hero-demo hero-reveal"
           style={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             gap: '20px',
             width: '100%',
+            animationDelay: '0.2s',
           }}
         >
           <MacWindow
@@ -413,7 +418,18 @@ export default function Hero() {
       </div>
 
       <style>{`
+        @keyframes hero-fade-up {
+          from { opacity: 0; transform: translateY(16px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .hero-reveal { animation: hero-fade-up 0.7s var(--ease-expo) both; }
+        @media (prefers-reduced-motion: reduce) {
+          .hero-reveal { animation: none; opacity: 1; }
+        }
         @media (max-width: 960px) {
+          /* On mobile, show the copy as one focused first fold; the preview and
+             controls scroll into view below it. */
+          #hero { justify-content: flex-start !important; }
           .hero-grid {
             grid-template-columns: minmax(0, 1fr) !important;
             gap: 48px !important;
@@ -421,6 +437,8 @@ export default function Hero() {
           .hero-copy {
             align-items: center !important;
             text-align: center !important;
+            min-height: calc(100dvh - 150px);
+            justify-content: center !important;
           }
           .hero-copy > p { text-align: center; }
           .hero-headline { text-align: center; }

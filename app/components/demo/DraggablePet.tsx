@@ -147,6 +147,11 @@ export default function DraggablePet() {
     return () => clearTimeout(t);
   }, [positionBubble]);
 
+  // Re-measure the bubble after it resizes with the breakpoint.
+  useEffect(() => {
+    positionBubble(true);
+  }, [scale, positionBubble]);
+
   // Take a short stroll across the screen using the run animation, then settle.
   const startWalk = useCallback(() => {
     if (dragging.current || !containerRef.current) return;
@@ -314,6 +319,9 @@ export default function DraggablePet() {
     [handlePointerUp, positionBubble],
   );
 
+  // The bubble shrinks on phones (where the pet itself is smaller).
+  const compact = scale < DESKTOP_SCALE;
+
   return (
     <div
       ref={containerRef}
@@ -358,14 +366,14 @@ export default function DraggablePet() {
             position: "relative",
             display: "block",
             width: "max-content",
-            maxWidth: "190px",
-            padding: "9px 13px",
-            borderRadius: "14px",
+            maxWidth: compact ? "150px" : "190px",
+            padding: compact ? "7px 11px" : "9px 13px",
+            borderRadius: compact ? "12px" : "14px",
             background: "var(--color-surface-raised)",
             border: "1px solid var(--color-border-strong)",
             boxShadow: "var(--shadow-card)",
             color: "var(--color-text)",
-            fontSize: "0.75rem",
+            fontSize: compact ? "0.6875rem" : "0.75rem",
             lineHeight: 1.4,
             fontWeight: 500,
             textAlign: "center",
