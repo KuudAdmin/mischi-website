@@ -14,9 +14,14 @@ type AnimState =
   | "dancing"
   | "review";
 
-const SCALE = 0.5;
-const PET_W = Math.round(192 * SCALE);
-const PET_H = Math.round(208 * SCALE);
+// Sprite frame is 192×208. We render it smaller on phones so the pet isn't
+// oversized on a narrow screen; desktop is unchanged.
+const SPRITE_W = 192;
+const SPRITE_H = 208;
+const DESKTOP_SCALE = 0.5;
+const MOBILE_SCALE = 0.34;
+const MOBILE_BREAKPOINT = 768;
+const pickScale = (w: number) => (w < MOBILE_BREAKPOINT ? MOBILE_SCALE : DESKTOP_SCALE);
 
 const RANDOM_POOL: AnimState[] = [
   "idle", "idle",
@@ -32,7 +37,13 @@ export default function DraggablePet() {
   const [petState, setPetState] = useState<AnimState>("idle");
   const [isDragging, setIsDragging] = useState(false);
   const [bubbleVisible, setBubbleVisible] = useState(false);
+  const [scale, setScale] = useState(DESKTOP_SCALE);
 
+  const scaleRef = useRef(DESKTOP_SCALE);
+  const dimsRef = useRef({
+    w: Math.round(SPRITE_W * DESKTOP_SCALE),
+    h: Math.round(SPRITE_H * DESKTOP_SCALE),
+  });
   const dragging = useRef(false);
   const pos = useRef({ ...INITIAL_POS });
   const dragOffset = useRef({ x: 0, y: 0 });
@@ -63,7 +74,7 @@ export default function DraggablePet() {
     const half = bw / 2;
 
     // Horizontal: clamp the bubble centre to the viewport.
-    const petCenterX = pos.current.x + PET_W / 2;
+    const petCenterX = pos.current.x + dimsRef.current.w / 2;
     const clampedCenter = Math.max(
       MARGIN + half,
       Math.min(window.innerWidth - MARGIN - half, petCenterX),
@@ -97,14 +108,34 @@ export default function DraggablePet() {
     tail.style.left = `calc(50% + ${tailOffset.toFixed(1)}px)`;
   }, []);
 
+  // Pick the scale for the current viewport, keep the pet on-screen at its new
+  // size, and re-clamp the bubble. Runs on mount and whenever the window resizes
+  // (covering phone⇄desktop rotation and breakpoint crossings).
   useEffect(() => {
-    const startY = Math.max(window.innerHeight - PET_H - 60, 100);
-    pos.current = { x: 80, y: startY };
-    if (containerRef.current) {
-      containerRef.current.style.left = `${pos.current.x}px`;
-      containerRef.current.style.top = `${pos.current.y}px`;
-    }
-    positionBubble(true);
+    const apply = (initial: boolean) => {
+      const s = pickScale(window.innerWidth);
+      scaleRef.current = s;
+      const w = Math.round(SPRITE_W * s);
+      const h = Math.round(SPRITE_H * s);
+      dimsRef.current = { w, h };
+      setScale(s);
+
+      if (initial) {
+        pos.current = { x: 80, y: Math.max(window.innerHeight - h - 60, 100) };
+      } else {
+        pos.current.x = Math.max(0, Math.min(window.innerWidth - w, pos.current.x));
+        pos.current.y = Math.max(0, Math.min(window.innerHeight - h, pos.current.y));
+      }
+      if (containerRef.current) {
+        containerRef.current.style.left = `${pos.current.x}px`;
+        containerRef.current.style.top = `${pos.current.y}px`;
+      }
+      positionBubble(true);
+    };
+    apply(true);
+    const onResize = () => apply(false);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, [positionBubble]);
 
   // Pop the waitlist bubble in a beat after the pet settles.
@@ -116,17 +147,10 @@ export default function DraggablePet() {
     return () => clearTimeout(t);
   }, [positionBubble]);
 
-  // Re-clamp the bubble when the viewport changes.
-  useEffect(() => {
-    const onResize = () => positionBubble(true);
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, [positionBubble]);
-
   // Take a short stroll across the screen using the run animation, then settle.
   const startWalk = useCallback(() => {
     if (dragging.current || !containerRef.current) return;
-    const maxX = Math.max(0, window.innerWidth - PET_W);
+    const maxX = Math.max(0, window.innerWidth - dimsRef.current.w);
     const startX = pos.current.x;
 
     // Pick a direction that keeps us on-screen, then a "few paces" distance.
@@ -159,7 +183,7 @@ export default function DraggablePet() {
       // Only the edge we're walking *toward* counts as an arrival — otherwise a
       // walk that starts exactly on an edge (e.g. a corner) would "arrive" on
       // the first, zero-distance frame and never get going.
-      const edge = Math.max(0, window.innerWidth - PET_W);
+      const edge = Math.max(0, window.innerWidth - dimsRef.current.w);
       let nextX = pos.current.x + finalDir * SPEED * dt;
       let arrived = finalDir > 0 ? nextX >= targetX : nextX <= targetX;
       if (finalDir < 0 && nextX <= 0) { nextX = 0; arrived = true; }
@@ -192,7 +216,7 @@ export default function DraggablePet() {
         if (dragging.current || walkRafRef.current) return; // busy — skip beat
         // If we're parked exactly on an edge, always stroll off it rather than
         // risk idling there for several beats; otherwise walk now and then.
-        const maxX = Math.max(0, window.innerWidth - PET_W);
+        const maxX = Math.max(0, window.innerWidth - dimsRef.current.w);
         const onEdge = pos.current.x <= 0 || pos.current.x >= maxX;
         if (onEdge || Math.random() < 0.4) {
           startWalk();
@@ -269,11 +293,11 @@ export default function DraggablePet() {
 
       const newX = Math.max(
         0,
-        Math.min(window.innerWidth - PET_W, e.clientX - dragOffset.current.x),
+        Math.min(window.innerWidth - dimsRef.current.w, e.clientX - dragOffset.current.x),
       );
       const newY = Math.max(
         0,
-        Math.min(window.innerHeight - PET_H, e.clientY - dragOffset.current.y),
+        Math.min(window.innerHeight - dimsRef.current.h, e.clientY - dragOffset.current.y),
       );
 
       pos.current = { x: newX, y: newY };
@@ -382,7 +406,7 @@ export default function DraggablePet() {
         state={petState}
         onStateChange={(s) => setPetState(s as AnimState)}
         interactive={false}
-        scale={SCALE}
+        scale={scale}
       />
 
       <style>{`

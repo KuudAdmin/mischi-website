@@ -3,7 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: '404 — Page Not Found | Mischi',
+  title: '404: Page Not Found | Mischi',
   description: 'This page wandered off. Let’s get you back to your Mac companion.',
 }
 
@@ -71,7 +71,7 @@ export default function NotFound() {
               <span className="mac-light mac-light-yellow" />
               <span className="mac-light mac-light-green" />
             </div>
-            <span className="mac-title">Mischi — Not Found</span>
+            <span className="mac-title">Mischi: Not Found</span>
           </div>
 
           <div

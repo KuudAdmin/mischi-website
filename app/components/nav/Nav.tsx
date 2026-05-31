@@ -78,7 +78,7 @@ export default function Nav() {
             textDecoration: 'none',
             flexShrink: 0,
           }}
-          aria-label="Mischi — home"
+          aria-label="Mischi home"
         >
           <Image
             src="/mischi-icon-02.svg"
