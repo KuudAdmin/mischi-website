@@ -122,7 +122,7 @@ export default function Nav() {
         {/* CTA + hamburger */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
           <Link
-            href="/#download"
+            href="/#waitlist"
             className="nav-cta-desktop"
             style={{
               display: 'inline-flex',
@@ -148,7 +148,7 @@ export default function Nav() {
               el.style.transform = 'translateY(0)'
             }}
           >
-            Download
+            Join waitlist
           </Link>
 
           {/* Hamburger — mobile only */}
@@ -250,7 +250,7 @@ export default function Nav() {
             <div style={{ width: '100%', maxWidth: '320px', height: '1px', background: 'var(--color-border)', margin: '14px 0 18px' }} />
 
             <Link
-              href="/#download"
+              href="/#waitlist"
               onClick={closeMenu}
               style={{
                 display: 'inline-flex',
@@ -271,9 +271,10 @@ export default function Nav() {
               }}
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <path d="M8 1.5v9M4.5 7 8 10.5 11.5 7M2 14.5h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2 4.5h12v8H2v-8Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
+                <path d="m2.5 5 5.5 4 5.5-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-              Download for macOS
+              Join the waitlist
             </Link>
 
             <p
@@ -284,7 +285,7 @@ export default function Nav() {
                 letterSpacing: '0.04em',
               }}
             >
-              Apple Silicon · Intel · macOS 13+
+              Coming soon · Apple Silicon · Intel · macOS 13+
             </p>
           </div>
         </>
