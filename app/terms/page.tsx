@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: 'Terms governing your use of the Mischi macOS application and website.',
   alternates: { canonical: '/terms' },
   openGraph: {
-    title: 'Terms of Use — Mischi',
+    title: 'Terms of Use | Mischi',
     description: 'Terms governing your use of the Mischi macOS application and website.',
     url: '/terms',
     type: 'article',
@@ -18,7 +18,7 @@ export default function TermsPage() {
     <LegalPage
       title="Terms of Use"
       updated="May 27, 2026"
-      intro="By installing or using Mischi, you agree to the terms below. They’re short on purpose — Mischi is a small desktop utility, not a service."
+      intro="By installing or using Mischi, you agree to the terms below. They’re short on purpose. Mischi is a small desktop utility, not a service."
     >
       <h2>The software</h2>
       <p>
@@ -40,20 +40,20 @@ export default function TermsPage() {
 
       <h2>Limitation of liability</h2>
       <p>
-        To the maximum extent permitted by law, the authors of Mischi will not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of (or inability to use) the application — including but not limited to lost productivity, hurt feelings from a sleepy desktop pet, or anything else.
+        To the maximum extent permitted by law, the authors of Mischi will not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of (or inability to use) the application, including but not limited to lost productivity, hurt feelings from a sleepy desktop pet, or anything else.
       </p>
 
       <h2>AI chat features (BYOK)</h2>
       <p>
-        If you enable AI chat, you provide your own API key for the model of your choice. You are responsible for:
+        If you enable AI chat, you provide your own Groq API key and choose from the models Groq offers. You are responsible for:
       </p>
       <ul>
-        <li>Complying with the terms and acceptable use policy of the LLM provider you use.</li>
+        <li>Complying with Groq’s terms and acceptable use policy.</li>
         <li>Any usage charges incurred against your API key.</li>
         <li>The content of the prompts you send and the responses you receive.</li>
       </ul>
       <p>
-        Mischi does not relay, log, or modify these requests. They go directly from your Mac to the provider you chose.
+        Mischi does not relay, log, or modify these requests. They go directly from your Mac to Groq.
       </p>
 
       <h2>Acceptable use</h2>
@@ -78,7 +78,7 @@ export default function TermsPage() {
 
       <h2>Contact</h2>
       <p>
-        Questions or concerns about these terms? Reach out via the project’s GitHub issue tracker.
+        Questions or concerns about these terms? Email us at <a href="mailto:kuudstudio@gmail.com">kuudstudio@gmail.com</a>.
       </p>
     </LegalPage>
   )

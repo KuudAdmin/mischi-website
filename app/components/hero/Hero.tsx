@@ -415,7 +415,7 @@ export default function Hero() {
       <style>{`
         @media (max-width: 960px) {
           .hero-grid {
-            grid-template-columns: 1fr !important;
+            grid-template-columns: minmax(0, 1fr) !important;
             gap: 48px !important;
           }
           .hero-copy {

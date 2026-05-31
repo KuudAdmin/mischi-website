@@ -13,7 +13,7 @@ const STEPS = [
   {
     number: '02',
     title: 'Pet appears on desktop',
-    body: 'Mischi renders your pet in a transparent, always-on-top window — right on your screen, without blocking your work.',
+    body: 'Mischi renders your pet in a transparent, always-on-top window, right on your screen, without blocking your work.',
     icon: '/feature-2.webp',
     iconAlt: '3D pet icon',
   },

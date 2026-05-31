@@ -12,10 +12,10 @@ export const SITE_URL = (
 
 export const SITE_NAME = 'Mischi'
 
-export const SITE_TITLE = 'Mischi — Your Mac Companion'
+export const SITE_TITLE = 'Mischi: Your Mac Companion'
 
 export const SITE_DESCRIPTION =
-  'Run animated desktop pets on macOS. Interactive, offline-first, no cloud and no account — your pet lives on your actual desktop, not inside a window.'
+  'Run animated desktop pets on macOS. Interactive, offline-first, no cloud and no account. Your pet lives on your actual desktop, not inside a window.'
 
 export const SITE_TAGLINE = 'Your Mac deserves a companion.'
 

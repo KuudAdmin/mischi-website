@@ -1,50 +1,52 @@
 "use client";
 
-// Pixels to crop from the top of each 1080-tall gif to hide the macOS menu bar.
-const GIF_CROP_TOP = 64;
+import { useEffect, useRef } from "react";
+
+// Pixels to crop from the top of each 1080-tall clip to hide the macOS menu bar.
+const VIDEO_CROP_TOP = 64;
 
 interface Showcase {
   id: string;
   eyebrow: string;
   title: string;
   body: string;
-  gif: string;
+  video: string;
   points: string[];
 }
 
-// Four alternating media ↔ text rows. Each gif is a looping screen
+// Four alternating media ↔ text rows. Each clip is a looping, muted screen
 // recording of Mischi, framed like a captured recording.
 const SHOWCASES: Showcase[] = [
   {
     id: "conversational",
     eyebrow: "Conversational",
-    title: "Talk to it — it talks back",
-    body: "Mischi isn't just decoration. Strike up a conversation and your pet answers in its own voice, right there on your desktop. No window to open, no tab to find.",
-    gif: "/features/conversational.gif",
+    title: "Talk to it, it talks back",
+    body: "Mischi isn't just decoration. Strike up a conversation and your pet replies in its own chat bubble, right there on your desktop. No window to open, no tab to find.",
+    video: "/features/conversational.mp4",
     points: ["Lives on your desktop", "Responds in context", "Always within reach"],
   },
   {
     id: "ai",
-    eyebrow: "AI-powered · BYOK",
-    title: "Bring your own model",
-    body: "Plug in any LLM. Drop in your API key, pick a model, and Mischi runs entirely on your terms. Press ⌘K to open chat from anywhere, anytime.",
-    gif: "/features/ai-chat.gif",
-    points: ["Any provider, your key", "Pick your model", "⌘K to open chat"],
+    eyebrow: "AI-powered · Groq · BYOK",
+    title: "Bring your own key",
+    body: "Mischi ships with Groq, so chat is bring-your-own-key. Drop in your Groq API key, pick from the available models in settings, and everything runs on your terms. Press ⌘K to open chat anytime.",
+    video: "/features/ai-chat.mp4",
+    points: ["Bring your own Groq key", "Pick from Groq's models", "⌘K to open chat"],
   },
   {
     id: "animations",
     eyebrow: "Animations",
     title: "Every move, yours to script",
-    body: "Idle, walk, wave, jump — map each animation to behaviors and chat lines. Tune how your pet reacts until it has a personality that feels genuinely alive.",
-    gif: "/features/chatlines.gif",
+    body: "Idle, walk, wave, jump: map each animation to behaviors and chat lines. Tune how your pet reacts until it has a personality that feels genuinely alive.",
+    video: "/features/chatlines.mp4",
     points: ["Idle, walk, wave, jump", "Map your own chat lines", "Reactions that fit you"],
   },
   {
     id: "change-pet",
     eyebrow: "Your collection",
     title: "Swap pets whenever",
-    body: "Switch between any pet you've imported in a single click. Build a roster and change the vibe of your desktop on a whim — a focused cat now, a playful blob later.",
-    gif: "/features/change-pet.gif",
+    body: "Switch between any pet you've imported in a single click. Build a roster and change the vibe of your desktop on a whim. A focused cat now, a playful blob later.",
+    video: "/features/change-pet.mp4",
     points: ["One-click switching", "Unlimited roster", "Import any format"],
   },
 ];
@@ -65,7 +67,7 @@ const CAPABILITIES: Capability[] = [
   {
     icon: "✦",
     title: "Transparent rendering",
-    body: "Pets render on a transparent layer — they live on your desktop, not in a box.",
+    body: "Pets render on a transparent layer. They live on your desktop, not in a box.",
   },
   {
     icon: "◈",
@@ -173,7 +175,15 @@ export default function Features() {
 
       <style>{`
         @media (max-width: 860px) {
-          .showcase-row { flex-direction: column !important; gap: 28px !important; }
+          .showcase-row {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 28px !important;
+          }
+          /* In a column the media must take full width and size its own height
+             from the aspect ratio; without this reset, flex-basis:0 collapses
+             it to nothing. */
+          .showcase-media, .showcase-text { flex: 0 0 auto !important; width: 100% !important; }
           .showcase-text { text-align: left !important; }
         }
         @media (max-width: 720px) {
@@ -191,7 +201,7 @@ function ShowcaseRow({
   eyebrow,
   title,
   body,
-  gif,
+  video,
   points,
   reverse,
   index,
@@ -207,13 +217,13 @@ function ShowcaseRow({
       }}
     >
       {/* Media — looping recording. The frame is a touch shorter than the
-          gif (1664×1080) and the image is bottom-anchored with object-fit
+          clip (1664×1080) and the video is bottom-anchored with object-fit
           cover, so the macOS menu bar strip at the top is cropped out. */}
       <div className="showcase-media" style={{ flex: "1.18 1 0", minWidth: 0 }}>
         <div
           style={{
             position: "relative",
-            aspectRatio: `1664 / ${1080 - GIF_CROP_TOP}`,
+            aspectRatio: `1664 / ${1080 - VIDEO_CROP_TOP}`,
             borderRadius: "var(--radius-xl)",
             overflow: "hidden",
             border: "1px solid var(--color-border-strong)",
@@ -221,25 +231,7 @@ function ShowcaseRow({
             background: "var(--color-surface-sunken)",
           }}
         >
-          {/* Looping screen recording */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={gif}
-            alt={`${title} — screen recording of Mischi`}
-            loading={index === 0 ? "eager" : "lazy"}
-            decoding="async"
-            width={1664}
-            height={1080}
-            style={{
-              position: "absolute",
-              inset: 0,
-              display: "block",
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              objectPosition: "center bottom",
-            }}
-          />
+          <ShowcaseVideo src={video} title={title} eager={index === 0} />
         </div>
       </div>
 
@@ -325,6 +317,64 @@ function ShowcaseRow({
         </ul>
       </div>
     </div>
+  );
+}
+
+function ShowcaseVideo({
+  src,
+  title,
+  eager,
+}: {
+  src: string;
+  title: string;
+  eager: boolean;
+}) {
+  const ref = useRef<HTMLVideoElement>(null);
+  const poster = src.replace(/\.mp4$/, ".jpg");
+
+  // Pause when off-screen (saves CPU/battery), resume when back. The poster
+  // below means that even if a browser blocks autoplay (Brave Shields, iOS Low
+  // Power / Data Saver), the recording's first frame is always shown rather
+  // than a blank box.
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.muted = true; // guarantee autoplay eligibility regardless of SSR markup
+    const io = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (!entry) return;
+        if (entry.isIntersecting) el.play().catch(() => {});
+        else el.pause();
+      },
+      { threshold: 0.2 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <video
+      ref={ref}
+      autoPlay
+      muted
+      loop
+      playsInline
+      preload={eager ? "auto" : "none"}
+      poster={poster}
+      aria-label={`${title}, screen recording of Mischi`}
+      style={{
+        position: "absolute",
+        inset: 0,
+        display: "block",
+        width: "100%",
+        height: "100%",
+        objectFit: "cover",
+        objectPosition: "center bottom",
+      }}
+    >
+      <source src={src} type="video/mp4" />
+    </video>
   );
 }
 

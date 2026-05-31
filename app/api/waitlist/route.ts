@@ -90,7 +90,7 @@ export async function POST(request: Request) {
     'unknown'
   if (rateLimited(ip)) {
     return NextResponse.json(
-      { ok: false, error: 'Too many attempts — please try again in a minute.' },
+      { ok: false, error: 'Too many attempts. Please try again in a minute.' },
       { status: 429 },
     )
   }
@@ -117,7 +117,7 @@ export async function POST(request: Request) {
 
   if (!accepted) {
     return NextResponse.json(
-      { ok: false, error: 'Could not join right now — please try again.' },
+      { ok: false, error: 'Could not join right now. Please try again.' },
       { status: 502 },
     )
   }

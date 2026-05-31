@@ -35,10 +35,10 @@ export default function Download() {
         return
       }
       const data = (await res.json().catch(() => null)) as { error?: string } | null
-      setError(data?.error || 'Something went wrong — please try again.')
+      setError(data?.error || 'Something went wrong. Please try again.')
       setStatus('error')
     } catch {
-      setError('Network error — please check your connection and try again.')
+      setError('Network error. Please check your connection and try again.')
       setStatus('error')
     }
   }
@@ -178,7 +178,7 @@ export default function Download() {
 
               <p style={{ fontSize: '0.75rem', color: status === 'error' ? 'var(--clay-ink)' : 'var(--color-text-dim)', marginTop: '12px', paddingInline: '4px' }}>
                 {status === 'error'
-                  ? error || 'Something went wrong — please try again in a moment.'
+                  ? error || 'Something went wrong. Please try again in a moment.'
                   : 'No spam, ever. Just one email when Mischi is ready.'}
               </p>
             </div>

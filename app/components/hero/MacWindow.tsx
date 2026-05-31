@@ -9,7 +9,7 @@ interface MacWindowProps {
 
 export default function MacWindow({ title = 'Mischi.app', children, width = 400, statusBar }: MacWindowProps) {
   return (
-    <div className="mac-window" style={{ width, position: 'relative' }}>
+    <div className="mac-window" style={{ width: '100%', maxWidth: width, position: 'relative' }}>
       <div className="mac-titlebar">
         <div className="mac-traffic-lights" aria-hidden="true">
           <span className="mac-light mac-light-red" />

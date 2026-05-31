@@ -177,7 +177,7 @@ export default function PetCanvas({
       onDoubleClick={handleDblClick}
       onMouseEnter={() => { if (interactive && currentState === 'tired') applyState('idle') }}
       role={interactive ? 'button' : undefined}
-      aria-label={interactive ? 'Interactive pet — click to wave, double-click to jump' : undefined}
+      aria-label={interactive ? 'Interactive pet: click to wave, double-click to jump' : undefined}
       tabIndex={interactive ? 0 : undefined}
       onKeyDown={(e) => { if (interactive && (e.key === 'Enter' || e.key === ' ')) handleClick() }}
     >

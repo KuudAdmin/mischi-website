@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { SITE_TAGLINE } from '@/lib/seo'
 
-export const alt = 'Mischi — Your Mac Companion'
+export const alt = 'Mischi: Your Mac Companion'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 

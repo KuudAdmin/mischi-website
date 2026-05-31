@@ -5,11 +5,11 @@ import { useState } from 'react'
 const QUESTIONS: { q: string; a: string }[] = [
   {
     q: 'Is Mischi free?',
-    a: 'Yes — Mischi is free to download and use. There are no accounts, no subscriptions, and no paid tier. If you enable AI chat with your own API key, the only cost is whatever your LLM provider charges for usage.',
+    a: 'Yes. Mischi is free to download and use. There are no accounts, no subscriptions, and no paid tier. If you enable AI chat with your own Groq API key, the only cost is whatever Groq charges for usage.',
   },
   {
     q: 'Does Mischi need internet or a cloud account?',
-    a: 'No. Mischi runs entirely on your Mac — no accounts, no servers, no telemetry. The only network activity happens if you opt in to AI chat, and even then requests go directly from your Mac to the LLM provider whose key you supplied.',
+    a: 'No. Mischi runs entirely on your Mac. No accounts, no servers, no telemetry. The only network activity happens if you opt in to AI chat, and even then requests go directly from your Mac to Groq, using the API key you supplied.',
   },
   {
     q: 'What Macs does it run on?',
@@ -17,11 +17,11 @@ const QUESTIONS: { q: string; a: string }[] = [
   },
   {
     q: 'How does the AI chat work?',
-    a: 'Mischi uses a bring-your-own-key model. Paste in an API key for the LLM of your choice — Anthropic Claude, OpenAI GPT, or a local model — and requests go directly from your Mac to that provider. Mischi doesn’t sit in the middle, doesn’t bundle a model, and doesn’t sell credits. Press ⌘+K to open chat.',
+    a: 'Mischi ships with Groq and is bring-your-own-key. Paste in your Groq API key, choose from the available Groq models in settings, and requests go directly from your Mac to Groq. Mischi doesn’t sit in the middle, doesn’t bundle a model, and doesn’t sell credits. Press ⌘+K to open chat.',
   },
   {
     q: 'Where are my pets and settings stored?',
-    a: 'Everything lives locally in ~/Library/Application Support/Mischi/ — pet packs, preferences, and (if you enable it) your AI chat history. Delete that folder to fully reset Mischi. Each pet is a self-contained directory you can copy, back up, or share.',
+    a: 'Everything lives locally in ~/Library/Application Support/Mischi/: pet packs, preferences, and (if you enable it) your AI chat history. Delete that folder to fully reset Mischi. Each pet is a self-contained directory you can copy, back up, or share.',
   },
   {
     q: 'Can I make my own pet?',
@@ -29,11 +29,11 @@ const QUESTIONS: { q: string; a: string }[] = [
   },
   {
     q: 'Is it available on Windows, Linux, or iOS?',
-    a: 'Not today. Mischi relies on macOS-specific window behavior — transparent always-on-top overlays that work across Spaces and full-screen apps. A Windows port is something we’re exploring. iOS isn’t on the roadmap, since the sandbox model doesn’t allow desktop pets.',
+    a: 'Not today. Mischi relies on macOS-specific window behavior: transparent always-on-top overlays that work across Spaces and full-screen apps. A Windows port is something we’re exploring. iOS isn’t on the roadmap, since the sandbox model doesn’t allow desktop pets.',
   },
   {
     q: 'Does Mischi collect any data about me?',
-    a: 'No. There’s no analytics, no crash reporting, and no usage telemetry. The app does not phone home. See the Privacy Policy for the full picture.',
+    a: 'No. The app has no analytics, no crash reporting, and no usage telemetry, and it never phones home. The only thing we ever collect is your email, and only if you opt in to the launch waitlist. See the Privacy Policy for the full picture.',
   },
 ]
 
@@ -105,13 +105,13 @@ export default function FAQ() {
             border: '1px solid var(--color-border)',
             background: 'var(--color-surface)',
             display: 'flex',
-            flexWrap: 'wrap',
+            flexWrap: 'nowrap',
             alignItems: 'center',
             justifyContent: 'space-between',
             gap: '16px',
           }}
         >
-          <div>
+          <div style={{ flex: '1 1 auto', minWidth: 0 }}>
             <p
               style={{
                 fontSize: '0.9375rem',
@@ -123,13 +123,14 @@ export default function FAQ() {
               Still have a question?
             </p>
             <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
-              Open an issue on GitHub — we read every one.
+              Email us and we read every one.
             </p>
           </div>
           <a
-            href="#"
+            href="mailto:kuudstudio@gmail.com"
             style={{
               display: 'inline-flex',
+              flexShrink: 0,
               alignItems: 'center',
               gap: '8px',
               padding: '10px 18px',
@@ -154,10 +155,11 @@ export default function FAQ() {
               el.style.transform = 'translateY(0)'
             }}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <rect x="3" y="5" width="18" height="14" rx="2" />
+              <path d="m4 7 8 6 8-6" />
             </svg>
-            Ask on GitHub
+            Email us
           </a>
         </div>
       </div>
