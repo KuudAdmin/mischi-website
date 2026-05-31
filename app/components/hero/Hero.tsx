@@ -145,7 +145,7 @@ export default function Hero() {
             }}
           >
             <a
-              href="#download"
+              href="#waitlist"
               className="hero-cta"
               style={{
                 display: 'inline-flex',
@@ -173,9 +173,10 @@ export default function Hero() {
               }}
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <path d="M8 1.5v9M4.5 7 8 10.5 11.5 7M2 14.5h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2 4.5h12v8H2v-8Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
+                <path d="m2.5 5 5.5 4 5.5-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-              Download for macOS
+              Join the waitlist
               <Image src="/app-icon.png" alt="" width={20} height={20} style={{ borderRadius: '4px' }} />
             </a>
 

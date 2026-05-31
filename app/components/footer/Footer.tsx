@@ -6,7 +6,7 @@ const LINKS = [
   {
     group: 'Product',
     items: [
-      { label: 'Download', href: '#download' },
+      { label: 'Join waitlist', href: '#waitlist' },
       { label: 'Features', href: '#features' },
       { label: 'Changelog', href: '#' },
       { label: 'Roadmap', href: '#' },

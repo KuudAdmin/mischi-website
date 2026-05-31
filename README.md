@@ -16,6 +16,12 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Waitlist
+
+The “Join the waitlist” form posts to a server route (`app/api/waitlist/route.ts`)
+that forwards signups to Kit and/or a Google Sheet. Setup, environment variables,
+deployment, and troubleshooting are documented in **[WAITLIST_SETUP.md](./WAITLIST_SETUP.md)**.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

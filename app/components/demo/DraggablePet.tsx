@@ -31,6 +31,7 @@ export default function DraggablePet() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [petState, setPetState] = useState<AnimState>("idle");
   const [isDragging, setIsDragging] = useState(false);
+  const [bubbleVisible, setBubbleVisible] = useState(false);
 
   const dragging = useRef(false);
   const pos = useRef({ ...INITIAL_POS });
@@ -39,6 +40,62 @@ export default function DraggablePet() {
   const pointerDownPos = useRef({ x: 0, y: 0 });
   const heartbeatRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const walkRafRef = useRef<number | null>(null);
+  const bubbleWrapRef = useRef<HTMLDivElement>(null);
+  const bubbleRef = useRef<HTMLAnchorElement>(null);
+  const tailRef = useRef<HTMLSpanElement>(null);
+  const bubbleSize = useRef({ w: 0, h: 0 });
+
+  // Keep the bubble fully on-screen: clamp it horizontally against the viewport
+  // (sliding the tail back so it keeps pointing at the pet) and flip it below
+  // the pet when there's no room above. Driven imperatively so it tracks the
+  // pet mid-walk and mid-drag without a React re-render per frame.
+  const positionBubble = useCallback((remeasure = false) => {
+    const wrap = bubbleWrapRef.current;
+    const tail = tailRef.current;
+    const bubble = bubbleRef.current;
+    if (!wrap || !tail || !bubble) return;
+
+    if (remeasure || bubbleSize.current.w === 0) {
+      bubbleSize.current = { w: bubble.offsetWidth, h: bubble.offsetHeight };
+    }
+    const { w: bw, h: bh } = bubbleSize.current;
+    const MARGIN = 10;
+    const half = bw / 2;
+
+    // Horizontal: clamp the bubble centre to the viewport.
+    const petCenterX = pos.current.x + PET_W / 2;
+    const clampedCenter = Math.max(
+      MARGIN + half,
+      Math.min(window.innerWidth - MARGIN - half, petCenterX),
+    );
+    const shift = clampedCenter - petCenterX;
+    wrap.style.transform = `translateX(calc(-50% + ${shift.toFixed(1)}px))`;
+
+    // Vertical: flip below the pet when it sits too close to the top.
+    const flip = pos.current.y < bh + 18;
+    if (flip) {
+      wrap.style.top = "100%";
+      wrap.style.bottom = "auto";
+      wrap.style.marginTop = "12px";
+      wrap.style.marginBottom = "0";
+      tail.style.top = "-5px";
+      tail.style.bottom = "auto";
+      tail.style.transform = "translateX(-50%) rotate(225deg)";
+    } else {
+      wrap.style.top = "auto";
+      wrap.style.bottom = "100%";
+      wrap.style.marginTop = "0";
+      wrap.style.marginBottom = "12px";
+      tail.style.top = "auto";
+      tail.style.bottom = "-5px";
+      tail.style.transform = "translateX(-50%) rotate(45deg)";
+    }
+
+    // Tail follows the pet, but never slides past the bubble's edges.
+    const tailMax = Math.max(0, half - 14);
+    const tailOffset = Math.max(-tailMax, Math.min(tailMax, -shift));
+    tail.style.left = `calc(50% + ${tailOffset.toFixed(1)}px)`;
+  }, []);
 
   useEffect(() => {
     const startY = Math.max(window.innerHeight - PET_H - 60, 100);
@@ -47,7 +104,24 @@ export default function DraggablePet() {
       containerRef.current.style.left = `${pos.current.x}px`;
       containerRef.current.style.top = `${pos.current.y}px`;
     }
-  }, []);
+    positionBubble(true);
+  }, [positionBubble]);
+
+  // Pop the waitlist bubble in a beat after the pet settles.
+  useEffect(() => {
+    const t = setTimeout(() => {
+      positionBubble(true);
+      setBubbleVisible(true);
+    }, 900);
+    return () => clearTimeout(t);
+  }, [positionBubble]);
+
+  // Re-clamp the bubble when the viewport changes.
+  useEffect(() => {
+    const onResize = () => positionBubble(true);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [positionBubble]);
 
   // Take a short stroll across the screen using the run animation, then settle.
   const startWalk = useCallback(() => {
@@ -94,6 +168,7 @@ export default function DraggablePet() {
 
       pos.current.x = nextX;
       containerRef.current.style.left = `${nextX}px`;
+      positionBubble();
 
       if (arrived) {
         walkRafRef.current = null;
@@ -103,7 +178,7 @@ export default function DraggablePet() {
       walkRafRef.current = requestAnimationFrame(step);
     };
     walkRafRef.current = requestAnimationFrame(step);
-  }, []);
+  }, [positionBubble]);
 
   // A single always-on heartbeat drives the autonomous behaviour. It is never
   // torn down by a drag — it just skips a beat while the pet is being held (or
@@ -174,8 +249,9 @@ export default function DraggablePet() {
       // A tap waves (PetCanvas returns it to idle); a drag just settles. Either
       // way the always-on heartbeat resumes the autonomous behaviour on its own.
       setPetState(moved < 6 ? "wave" : "idle");
+      positionBubble();
     },
-    [],
+    [positionBubble],
   );
 
   const handlePointerMove = useCallback(
@@ -203,6 +279,7 @@ export default function DraggablePet() {
       pos.current = { x: newX, y: newY };
       containerRef.current.style.left = `${newX}px`;
       containerRef.current.style.top = `${newY}px`;
+      positionBubble();
 
       const dx = e.clientX - lastClientX.current;
       lastClientX.current = e.clientX;
@@ -210,7 +287,7 @@ export default function DraggablePet() {
         setPetState(dx > 0 ? "runLeft" : "runRight");
       }
     },
-    [handlePointerUp],
+    [handlePointerUp, positionBubble],
   );
 
   return (
@@ -232,12 +309,92 @@ export default function DraggablePet() {
       onPointerCancel={handlePointerUp}
       onLostPointerCapture={handlePointerUp}
     >
+      {/* Waitlist speech bubble — floats above the pet, scrolls to the
+          waitlist on click. stopPropagation on pointerdown so tapping it
+          doesn't start a drag; hides itself while the pet is being dragged. */}
+      <div
+        ref={bubbleWrapRef}
+        className="pet-bubble-wrap"
+        aria-hidden={!bubbleVisible || isDragging}
+        style={{
+          position: "absolute",
+          left: "50%",
+          // top/bottom/transform/margins are set imperatively by positionBubble
+          // so React re-renders never clobber the on-screen clamp.
+          pointerEvents: "none",
+        }}
+      >
+        <a
+          ref={bubbleRef}
+          href="#waitlist"
+          className="pet-bubble"
+          onPointerDown={(e) => e.stopPropagation()}
+          tabIndex={bubbleVisible && !isDragging ? 0 : -1}
+          style={{
+            position: "relative",
+            display: "block",
+            width: "max-content",
+            maxWidth: "190px",
+            padding: "9px 13px",
+            borderRadius: "14px",
+            background: "var(--color-surface-raised)",
+            border: "1px solid var(--color-border-strong)",
+            boxShadow: "var(--shadow-card)",
+            color: "var(--color-text)",
+            fontSize: "0.75rem",
+            lineHeight: 1.4,
+            fontWeight: 500,
+            textAlign: "center",
+            textDecoration: "none",
+            cursor: "pointer",
+            whiteSpace: "normal",
+            pointerEvents: bubbleVisible && !isDragging ? "auto" : "none",
+            opacity: bubbleVisible && !isDragging ? 1 : 0,
+            transition:
+              "opacity var(--dur-normal) var(--ease-expo), filter var(--dur-fast)",
+            animation:
+              bubbleVisible && !isDragging
+                ? "pet-bubble-bob 3.2s ease-in-out infinite"
+                : "none",
+          }}
+        >
+          <span style={{ color: "var(--color-accent)", fontWeight: 700 }}>
+            Join the waitlist
+          </span>{" "}
+          to get me on your desktop!
+          {/* tail — position/rotation set imperatively by positionBubble */}
+          <span
+            ref={tailRef}
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              width: 10,
+              height: 10,
+              background: "var(--color-surface-raised)",
+              borderRight: "1px solid var(--color-border-strong)",
+              borderBottom: "1px solid var(--color-border-strong)",
+            }}
+          />
+        </a>
+      </div>
+
       <PetCanvas
         state={petState}
         onStateChange={(s) => setPetState(s as AnimState)}
         interactive={false}
         scale={SCALE}
       />
+
+      <style>{`
+        .pet-bubble:hover { filter: brightness(0.98); }
+        @keyframes pet-bubble-bob {
+          0%, 100% { transform: translateY(0); }
+          50%      { transform: translateY(-4px); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .pet-bubble { animation: none !important; }
+        }
+      `}</style>
     </div>
   );
 }

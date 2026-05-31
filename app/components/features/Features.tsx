@@ -1,112 +1,91 @@
 "use client";
 
-type Variant = "banner" | "tall" | "wide" | "normal";
+// Pixels to crop from the top of each 1080-tall gif to hide the macOS menu bar.
+const GIF_CROP_TOP = 64;
 
-interface Feature {
+interface Showcase {
   id: string;
+  eyebrow: string;
+  title: string;
+  body: string;
+  gif: string;
+  points: string[];
+}
+
+// Four alternating media ↔ text rows. Each gif is a looping screen
+// recording of Mischi, framed like a captured recording.
+const SHOWCASES: Showcase[] = [
+  {
+    id: "conversational",
+    eyebrow: "Conversational",
+    title: "Talk to it — it talks back",
+    body: "Mischi isn't just decoration. Strike up a conversation and your pet answers in its own voice, right there on your desktop. No window to open, no tab to find.",
+    gif: "/features/conversational.gif",
+    points: ["Lives on your desktop", "Responds in context", "Always within reach"],
+  },
+  {
+    id: "ai",
+    eyebrow: "AI-powered · BYOK",
+    title: "Bring your own model",
+    body: "Plug in any LLM. Drop in your API key, pick a model, and Mischi runs entirely on your terms. Press ⌘K to open chat from anywhere, anytime.",
+    gif: "/features/ai-chat.gif",
+    points: ["Any provider, your key", "Pick your model", "⌘K to open chat"],
+  },
+  {
+    id: "animations",
+    eyebrow: "Animations",
+    title: "Every move, yours to script",
+    body: "Idle, walk, wave, jump — map each animation to behaviors and chat lines. Tune how your pet reacts until it has a personality that feels genuinely alive.",
+    gif: "/features/chatlines.gif",
+    points: ["Idle, walk, wave, jump", "Map your own chat lines", "Reactions that fit you"],
+  },
+  {
+    id: "change-pet",
+    eyebrow: "Your collection",
+    title: "Swap pets whenever",
+    body: "Switch between any pet you've imported in a single click. Build a roster and change the vibe of your desktop on a whim — a focused cat now, a playful blob later.",
+    gif: "/features/change-pet.gif",
+    points: ["One-click switching", "Unlimited roster", "Import any format"],
+  },
+];
+
+interface Capability {
   title: string;
   body: string;
   icon: string;
-  col: string;
-  row: string;
-  variant: Variant;
-  accent?: boolean;
-  badge?: string;
 }
 
-// 3-col × 6-row explicit bento layout
-// Row 1: [offline    3×1    ]
-// Row 2: [transp 1×2][ontop ][menubar]
-// Row 3: [transp     ][modes 2×1    ]
-// Row 4: [import 2×1 ][notelemetry 1×2]
-// Row 5: [silicon 2×1][notelemetry  ]
-// Row 6: [ai-chat    3×1    ]
-const FEATURES: Feature[] = [
+// Everything else — the platform & privacy story, no recordings needed.
+const CAPABILITIES: Capability[] = [
   {
-    id: "offline",
-    title: "Offline-first",
-    body: "Everything runs locally. No server calls, no cloud, no internet required. Your pets work at 35,000 ft.",
     icon: "⚡",
-    col: "1 / 4",
-    row: "1",
-    variant: "banner",
-    badge: "No internet needed",
+    title: "Offline-first",
+    body: "Everything runs locally. No server calls, no cloud, no internet required.",
   },
   {
-    id: "transparent",
-    title: "Transparent rendering",
-    body: "Pets render on a transparent window layer — they live on your actual desktop, not inside a box.",
     icon: "✦",
-    col: "1",
-    row: "2 / 4",
-    variant: "tall",
-    accent: true,
+    title: "Transparent rendering",
+    body: "Pets render on a transparent layer — they live on your desktop, not in a box.",
   },
   {
-    id: "ontop",
-    title: "Always-on-top",
-    body: "Stays visible across all Spaces and full-screen apps without blocking anything.",
     icon: "◈",
-    col: "2",
-    row: "2",
-    variant: "normal",
+    title: "Always-on-top",
+    body: "Stays visible across every Space and full-screen app without blocking a thing.",
   },
   {
-    id: "menubar",
-    title: "Menu bar controls",
-    body: "Pause, hide, or switch behavior modes from the macOS menu bar.",
     icon: "≡",
-    col: "3",
-    row: "2",
-    variant: "normal",
+    title: "Menu bar controls",
+    body: "Pause, hide, or switch behavior modes straight from the macOS menu bar.",
   },
   {
-    id: "modes",
-    title: "Behavior modes",
-    body: "Focus, idle wandering, reactive — your pet adapts to how you work.",
-    icon: "◎",
-    col: "2 / 4",
-    row: "3",
-    variant: "wide",
-    accent: true,
-  },
-  {
-    id: "import",
-    title: "Import any format",
-    body: "Drag in a folder, .zip, or individual files. Supports PNG spritesheets and Codex packs.",
-    icon: "↓",
-    col: "1 / 3",
-    row: "4",
-    variant: "wide",
-  },
-  {
-    id: "notelemetry",
+    icon: "☽",
     title: "No telemetry",
     body: "Zero analytics, zero tracking. What runs on your Mac stays on your Mac.",
-    icon: "☽",
-    col: "3",
-    row: "4 / 6",
-    variant: "tall",
   },
   {
-    id: "silicon",
-    title: "Apple Silicon native",
-    body: "Built for M-series. Runs smooth on Intel too. macOS 13+.",
     icon: "◆",
-    col: "1 / 3",
-    row: "5",
-    variant: "wide",
-  },
-  {
-    id: "ai-chat",
-    title: "AI-Powered Chat",
-    body: "Ask your pet anything — it answers using the LLM of your choice. Press CMD+K to open chat instantly.",
-    icon: "⌘",
-    col: "1 / 4",
-    row: "6",
-    variant: "banner",
-    accent: true,
-    badge: "BYOK — bring your own key",
+    title: "Apple Silicon native",
+    body: "Built for M-series, smooth on Intel too. macOS 13 and up.",
   },
 ];
 
@@ -121,8 +100,9 @@ export default function Features() {
         borderTop: "1px solid var(--color-border)",
       }}
     >
-      <div style={{ maxWidth: "960px", margin: "0 auto" }}>
-        <div style={{ textAlign: "center", marginBottom: "64px" }}>
+      <div style={{ maxWidth: "1080px", margin: "0 auto" }}>
+        {/* Header */}
+        <div style={{ textAlign: "center", marginBottom: "72px" }}>
           <p
             style={{
               fontSize: "0.71875rem",
@@ -144,255 +124,269 @@ export default function Features() {
               color: "var(--color-text)",
             }}
           >
-            Built for your desktop
+            See Mischi in action
           </h2>
         </div>
 
+        {/* Alternating showcase rows */}
         <div
-          className="bento-grid"
           style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gridAutoRows: "minmax(152px, auto)",
-            gap: "10px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "clamp(72px, 9vw, 128px)",
           }}
         >
-          {FEATURES.map((feat) => (
-            <FeatureCard key={feat.id} {...feat} />
+          {SHOWCASES.map((s, i) => (
+            <ShowcaseRow key={s.id} {...s} reverse={i % 2 === 1} index={i} />
           ))}
+        </div>
+
+        {/* Remaining capabilities — no recordings */}
+        <div style={{ marginTop: "clamp(80px, 10vw, 140px)" }}>
+          <p
+            style={{
+              fontSize: "0.71875rem",
+              fontWeight: 600,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              color: "var(--color-text-dim)",
+              textAlign: "center",
+              marginBottom: "40px",
+            }}
+          >
+            And everything under the hood
+          </p>
+          <div
+            className="cap-grid"
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3, 1fr)",
+              gap: "12px",
+            }}
+          >
+            {CAPABILITIES.map((c) => (
+              <CapabilityCard key={c.title} {...c} />
+            ))}
+          </div>
         </div>
       </div>
 
       <style>{`
+        @media (max-width: 860px) {
+          .showcase-row { flex-direction: column !important; gap: 28px !important; }
+          .showcase-text { text-align: left !important; }
+        }
         @media (max-width: 720px) {
-          .bento-grid {
-            grid-template-columns: repeat(2, 1fr) !important;
-            grid-auto-rows: minmax(140px, auto) !important;
-            gap: 12px !important;
-          }
-          .bento-grid > * {
-            grid-column: auto !important;
-            grid-row: auto !important;
-          }
-          .feature-card {
-            flex-direction: column !important;
-            align-items: flex-start !important;
-            justify-content: flex-start !important;
-            gap: 14px !important;
-            padding: 20px !important;
-          }
-          .feature-icon {
-            width: 38px !important;
-            height: 38px !important;
-            font-size: 1.125rem !important;
-            margin-bottom: 0 !important;
-          }
-          .feature-text { margin-top: 0 !important; }
-          .feature-badge {
-            align-self: flex-start !important;
-            max-width: 100% !important;
-          }
-          .feature-badge > span:last-child { white-space: normal !important; }
+          .cap-grid { grid-template-columns: repeat(2, 1fr) !important; }
         }
         @media (max-width: 440px) {
-          .bento-grid { grid-template-columns: 1fr !important; }
+          .cap-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
     </section>
   );
 }
 
-function getBg(): string {
-  return "var(--color-surface)";
-}
-
-function FeatureCard({
+function ShowcaseRow({
+  eyebrow,
   title,
   body,
-  icon,
-  col,
-  row,
-  variant,
-  accent,
-  badge,
-}: Feature) {
-  const isBanner = variant === "banner";
-  const isTall = variant === "tall";
-  const isWide = variant === "wide";
-  // Featured cards (banner + accented tall/wide) get a slightly stronger
-  // elevation + sage-accented icon; everything else is a plain light surface.
-  const isDark = isBanner || (isTall && accent) || (isWide && accent);
-
-  const borderColor = isDark
-    ? "var(--color-border-strong)"
-    : "var(--color-border)";
-
-  const borderHover = "rgba(81, 139, 112, 0.15)";
-
-  const iconColor = isDark
-    ? "var(--color-accent)"
-    : "var(--color-text-muted)";
-
-  const iconBorder = isDark
-    ? "rgba(81, 139, 112, 0.30)"
-    : "var(--color-border)";
-
-  const titleColor = "var(--color-text)";
-
-  const bodyColor = "var(--color-text-muted)";
-
-  const iconSize = isBanner
-    ? "1.625rem"
-    : isTall
-      ? "1.25rem"
-      : isWide
-        ? "1.125rem"
-        : "1rem";
-  const boxSize = isBanner ? 56 : isTall ? 44 : isWide ? 40 : 36;
-
+  gif,
+  points,
+  reverse,
+  index,
+}: Showcase & { reverse: boolean; index: number }) {
   return (
     <div
-      className={`feature-card feature-${variant}${accent ? " feature-accent" : ""}`}
+      className="showcase-row"
       style={{
-        gridColumn: col,
-        gridRow: row,
-        padding: isBanner
-          ? "24px 32px"
-          : isTall
-            ? "28px 24px"
-            : isWide
-              ? "24px 28px"
-              : "22px",
-        borderRadius: "var(--radius-lg)",
-        background: getBg(),
-        border: `1px solid ${borderColor}`,
-        position: "relative",
-        overflow: "hidden",
         display: "flex",
-        flexDirection: isBanner || isWide ? "row" : "column",
-        alignItems: isBanner || isWide ? "center" : "flex-start",
-        justifyContent: isTall ? "space-between" : "flex-start",
-        gap: isBanner ? "24px" : isWide ? "20px" : "0",
-        transition:
-          "border-color var(--dur-normal), background var(--dur-normal)",
-      }}
-      onMouseEnter={(e) => {
-        const el = e.currentTarget as HTMLDivElement;
-        el.style.borderColor = borderHover;
-        el.style.background = "rgba(81, 139, 112, 0.03)";
-      }}
-      onMouseLeave={(e) => {
-        const el = e.currentTarget as HTMLDivElement;
-        el.style.borderColor = borderColor;
-        el.style.background = "var(--color-surface)";
+        flexDirection: reverse ? "row-reverse" : "row",
+        alignItems: "center",
+        gap: "clamp(32px, 5vw, 64px)",
       }}
     >
-      {/* Dot-grid for tall cards */}
-      {isTall && (
+      {/* Media — looping recording. The frame is a touch shorter than the
+          gif (1664×1080) and the image is bottom-anchored with object-fit
+          cover, so the macOS menu bar strip at the top is cropped out. */}
+      <div className="showcase-media" style={{ flex: "1.18 1 0", minWidth: 0 }}>
         <div
-          aria-hidden="true"
           style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: "120px",
-            opacity: 0.14,
-            backgroundImage:
-              "radial-gradient(circle, var(--color-text) 1px, transparent 1px)",
-            backgroundSize: "18px 18px",
-            maskImage: "linear-gradient(to top, black 0%, transparent 100%)",
-            WebkitMaskImage: "linear-gradient(to top, black 0%, transparent 100%)",
-            pointerEvents: "none",
+            position: "relative",
+            aspectRatio: `1664 / ${1080 - GIF_CROP_TOP}`,
+            borderRadius: "var(--radius-xl)",
+            overflow: "hidden",
+            border: "1px solid var(--color-border-strong)",
+            boxShadow: "var(--shadow-window)",
+            background: "var(--color-surface-sunken)",
           }}
-        />
-      )}
+        >
+          {/* Looping screen recording */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={gif}
+            alt={`${title} — screen recording of Mischi`}
+            loading={index === 0 ? "eager" : "lazy"}
+            decoding="async"
+            width={1664}
+            height={1080}
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "block",
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "center bottom",
+            }}
+          />
+        </div>
+      </div>
 
-      {/* Icon */}
-      <span
-        className="feature-icon"
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          width: boxSize,
-          height: boxSize,
-          borderRadius: "var(--radius-md)",
-          background: isDark
-            ? "rgba(81, 139, 112, 0.12)"
-            : "var(--color-surface-sunken)",
-          border: `1px solid ${iconBorder}`,
-          fontSize: iconSize,
-          flexShrink: 0,
-          marginBottom: isBanner || isWide ? "0" : isTall ? "0" : "16px",
-          color: iconColor,
-        }}
-        aria-hidden="true"
-      >
-        {icon}
-      </span>
-
-      {/* Text group */}
-      <div className="feature-text" style={{ flex: 1, marginTop: isTall ? "12px" : 0 }}>
+      {/* Text */}
+      <div className="showcase-text" style={{ flex: "0.92 1 0", minWidth: 0 }}>
+        <p
+          style={{
+            fontSize: "0.71875rem",
+            fontWeight: 600,
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            color: "var(--color-accent)",
+            marginBottom: "14px",
+          }}
+        >
+          {eyebrow}
+        </p>
         <h3
           style={{
-            fontSize: isBanner ? "1.0625rem" : "0.9375rem",
+            fontSize: "clamp(1.35rem, 1rem + 1.4vw, 1.85rem)",
             fontWeight: 700,
-            color: titleColor,
-            marginBottom: "6px",
-            letterSpacing: isBanner ? "-0.02em" : "-0.01em",
-            lineHeight: 1.2,
+            letterSpacing: "-0.025em",
+            lineHeight: 1.12,
+            color: "var(--color-text)",
+            marginBottom: "16px",
           }}
         >
           {title}
         </h3>
         <p
           style={{
-            fontSize: "0.8125rem",
-            color: bodyColor,
-            lineHeight: 1.65,
+            fontSize: "0.9375rem",
+            lineHeight: 1.7,
+            color: "var(--color-text-muted)",
+            marginBottom: "24px",
+            maxWidth: "44ch",
           }}
         >
           {body}
         </p>
-      </div>
-
-      {/* Badge for banner */}
-      {isBanner && badge && (
-        <div
-          className="feature-badge"
+        <ul
           style={{
-            flexShrink: 0,
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "6px",
-            padding: "5px 12px",
-            borderRadius: "999px",
-            background: "rgba(81, 139, 112, 0.1)",
-            border: "1px solid rgba(81, 139, 112, 0.2)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "10px",
+            listStyle: "none",
+            padding: 0,
+            margin: 0,
           }}
         >
-          <span
-            style={{
-              width: 6,
-              height: 6,
-              borderRadius: "50%",
-              background: "var(--color-accent)",
-              display: "inline-block",
-            }}
-          />
-          <span
-            style={{
-              fontSize: "0.71875rem",
-              color: "var(--color-accent)",
-              fontWeight: 600,
-              whiteSpace: "nowrap",
-            }}
-          >
-            {badge}
-          </span>
-        </div>
-      )}
+          {points.map((point) => (
+            <li
+              key={point}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                fontSize: "0.875rem",
+                color: "var(--color-text)",
+              }}
+            >
+              <span
+                aria-hidden="true"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 18,
+                  height: 18,
+                  borderRadius: "50%",
+                  flexShrink: 0,
+                  background: "var(--color-accent-dim)",
+                  color: "var(--color-accent)",
+                  fontSize: "0.625rem",
+                  fontWeight: 700,
+                }}
+              >
+                ✓
+              </span>
+              {point}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+function CapabilityCard({ icon, title, body }: Capability) {
+  return (
+    <div
+      style={{
+        padding: "24px",
+        borderRadius: "var(--radius-lg)",
+        background: "var(--color-surface)",
+        border: "1px solid var(--color-border)",
+        transition: "border-color var(--dur-normal), background var(--dur-normal)",
+      }}
+      onMouseEnter={(e) => {
+        const el = e.currentTarget as HTMLDivElement;
+        el.style.borderColor = "rgba(81, 139, 112, 0.35)";
+        el.style.background = "var(--color-surface-raised)";
+      }}
+      onMouseLeave={(e) => {
+        const el = e.currentTarget as HTMLDivElement;
+        el.style.borderColor = "var(--color-border)";
+        el.style.background = "var(--color-surface)";
+      }}
+    >
+      <span
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 38,
+          height: 38,
+          borderRadius: "var(--radius-md)",
+          background: "var(--color-surface-sunken)",
+          border: "1px solid var(--color-border)",
+          color: "var(--color-text-muted)",
+          fontSize: "1.125rem",
+          marginBottom: "16px",
+        }}
+        aria-hidden="true"
+      >
+        {icon}
+      </span>
+      <h4
+        style={{
+          fontSize: "0.9375rem",
+          fontWeight: 700,
+          color: "var(--color-text)",
+          marginBottom: "6px",
+          letterSpacing: "-0.01em",
+        }}
+      >
+        {title}
+      </h4>
+      <p
+        style={{
+          fontSize: "0.8125rem",
+          color: "var(--color-text-muted)",
+          lineHeight: 1.6,
+        }}
+      >
+        {body}
+      </p>
     </div>
   );
 }
