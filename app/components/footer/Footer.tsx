@@ -112,7 +112,18 @@ export default function Footer() {
 
         <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
           <p style={{ fontSize: '0.75rem', color: 'var(--color-text-dim)' }}>
-            © 2026 Mischi. A tiny desktop companion with an opinion.
+            © 2026 Mischi. A tiny desktop companion with an opinion. Crafted by{' '}
+            <a
+              href="https://kuud.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'var(--color-text-muted)', textDecoration: 'none', transition: 'color var(--dur-fast)' }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-text)' }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-text-muted)' }}
+            >
+              Kuud
+            </a>
+            .
           </p>
           <div style={{ display: 'flex', gap: '16px' }}>
             <SocialLink href="https://github.com/ajjuism" label="Mischi on GitHub">
