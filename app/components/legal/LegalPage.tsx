@@ -2,13 +2,14 @@ import Nav from '../nav/Nav'
 import Footer from '../footer/Footer'
 
 interface LegalPageProps {
+  eyebrow?: string
   title: string
-  updated: string
+  updated?: string
   intro?: string
   children: React.ReactNode
 }
 
-export default function LegalPage({ title, updated, intro, children }: LegalPageProps) {
+export default function LegalPage({ eyebrow = 'Legal', title, updated, intro, children }: LegalPageProps) {
   return (
     <>
       <Nav />
@@ -53,7 +54,7 @@ export default function LegalPage({ title, updated, intro, children }: LegalPage
                 marginBottom: '14px',
               }}
             >
-              Legal
+              {eyebrow}
             </p>
             <h1
               style={{
@@ -67,9 +68,11 @@ export default function LegalPage({ title, updated, intro, children }: LegalPage
             >
               {title}
             </h1>
-            <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-dim)' }}>
-              Last updated {updated}
-            </p>
+            {updated && (
+              <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-dim)' }}>
+                Last updated {updated}
+              </p>
+            )}
             {intro && (
               <p
                 style={{

@@ -28,9 +28,13 @@ const RANDOM_POOL: AnimState[] = [
   "wave", "jump", "dancing", "waiting", "tired", "review",
 ];
 
-// First-paint position; the mount effect immediately repositions to sit just
-// above the bottom of the viewport once we can read its height.
+// Starting position, until the mount effect measures the viewport and moves
+// the pet to sit just above its bottom edge.
 const INITIAL_POS = { x: 80, y: 400 };
+// That same resting spot for the desktop-sized pet, in CSS, so the
+// server-rendered pet already paints there rather than at INITIAL_POS and
+// then jumping once hydration catches up.
+const INITIAL_TOP = `max(100px, calc(100vh - ${Math.round(SPRITE_H * DESKTOP_SCALE) + 60}px))`;
 
 export default function DraggablePet() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -138,7 +142,7 @@ export default function DraggablePet() {
     return () => window.removeEventListener("resize", onResize);
   }, [positionBubble]);
 
-  // Pop the waitlist bubble in a beat after the pet settles.
+  // Pop the download bubble in a beat after the pet settles.
   useEffect(() => {
     const t = setTimeout(() => {
       positionBubble(true);
@@ -328,7 +332,7 @@ export default function DraggablePet() {
       style={{
         position: "fixed",
         left: INITIAL_POS.x,
-        top: INITIAL_POS.y,
+        top: INITIAL_TOP,
         zIndex: 9999,
         cursor: isDragging ? "grabbing" : "grab",
         touchAction: "none",
@@ -341,8 +345,8 @@ export default function DraggablePet() {
       onPointerCancel={handlePointerUp}
       onLostPointerCapture={handlePointerUp}
     >
-      {/* Waitlist speech bubble — floats above the pet, scrolls to the
-          waitlist on click. stopPropagation on pointerdown so tapping it
+      {/* Download speech bubble — floats above the pet, scrolls to the
+          download section on click. stopPropagation on pointerdown so tapping it
           doesn't start a drag; hides itself while the pet is being dragged. */}
       <div
         ref={bubbleWrapRef}
@@ -358,7 +362,7 @@ export default function DraggablePet() {
       >
         <a
           ref={bubbleRef}
-          href="#waitlist"
+          href="#download"
           className="pet-bubble"
           onPointerDown={(e) => e.stopPropagation()}
           tabIndex={bubbleVisible && !isDragging ? 0 : -1}
@@ -391,9 +395,9 @@ export default function DraggablePet() {
           }}
         >
           <span style={{ color: "var(--color-accent)", fontWeight: 700 }}>
-            Join the waitlist
+            Download Mischi
           </span>{" "}
-          to get me on your desktop!
+          and I&apos;ll move onto your desktop!
           {/* tail — position/rotation set imperatively by positionBubble */}
           <span
             ref={tailRef}

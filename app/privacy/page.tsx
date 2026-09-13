@@ -1,91 +1,165 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import LegalPage from '../components/legal/LegalPage'
+import { CONTACT_EMAIL } from '@/lib/release'
+
+const DESCRIPTION =
+  'The Mischi app has no telemetry and sends nothing to us. This policy explains what stays on your Mac, what goes to Groq if you use AI, and the little the website collects.'
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
-  description:
-    'The Mischi app collects no personal data and runs entirely offline. The only data we collect is the email you provide if you join the launch waitlist.',
+  description: DESCRIPTION,
   alternates: { canonical: '/privacy' },
   openGraph: {
     title: 'Privacy Policy | Mischi',
-    description:
-      'The Mischi app collects no personal data and runs entirely offline. The only data we collect is the email you provide if you join the launch waitlist.',
+    description: DESCRIPTION,
     url: '/privacy',
     type: 'article',
   },
 }
 
 export default function PrivacyPage() {
+  const email = <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+
   return (
     <LegalPage
       title="Privacy Policy"
-      updated="May 31, 2026"
-      intro="Mischi is built offline-first. The app runs entirely on your Mac: no telemetry, no phoning home, nothing stored about you. The only personal data we ever collect lives on this website, and only if you opt in to the launch waitlist by giving us your email. The details are below."
+      updated="September 14, 2026"
+      intro="Mischi is built offline-first. The app runs on your Mac with no account and no telemetry, and it never sends anything to us. This policy explains exactly what stays on your Mac, what goes to Groq if you choose to use AI, and the small amount of data this website handles."
     >
       <h2>The short version</h2>
       <ul>
         <li><strong>No accounts.</strong> You don’t sign up for anything to use Mischi.</li>
-        <li><strong>No telemetry.</strong> The app does not transmit usage data, crash reports, or analytics.</li>
-        <li><strong>No cloud sync.</strong> Your pets, preferences, and assets stay on your device.</li>
-        <li><strong>BYOK for AI.</strong> Mischi ships with Groq. If you enable AI features, you supply your own Groq API key and requests go directly from your Mac to Groq. We are not in the middle.</li>
-        <li><strong>Waitlist is opt-in.</strong> If you join the launch waitlist, we collect only your email to notify you when Mischi ships, and you can unsubscribe at any time.</li>
+        <li><strong>No telemetry.</strong> The app sends no analytics, usage data or crash reports, to us or anyone else.</li>
+        <li><strong>Your data stays on your Mac.</strong> Pets, settings, reminders and notes are stored locally and never uploaded.</li>
+        <li><strong>AI is optional.</strong> Only if you add your own Groq API key does the app contact Groq, directly from your Mac. We are never in the middle.</li>
+        <li><strong>The website doesn’t track you.</strong> No cookies, no analytics. We only get your email if you subscribe to the newsletter or write to us.</li>
+        <li><strong>We never sell your data</strong> or share it for advertising.</li>
       </ul>
 
-      <h2>What Mischi stores locally</h2>
+      <h2>Who we are</h2>
       <p>
-        Mischi reads and writes the following on your Mac. None of it leaves your device:
+        Mischi is made by Kuud, based in Kerala, India (<strong>we</strong>, <strong>us</strong>). We’re responsible for the personal data described in this policy. You can reach us through the <Link href="/contact">contact page</Link> or at {email}.
+      </p>
+
+      <h2>The Mischi app</h2>
+
+      <h3>What stays on your Mac</h3>
+      <p>Mischi stores the following locally. None of it is sent to us:</p>
+      <ul>
+        <li>Pets you import, copied into <code>~/Library/Application Support/mischi/Pets</code>. Your original files are never changed.</li>
+        <li>Your settings, reminders, animation names, chat lines and pet characters, in Mischi’s standard macOS preferences.</li>
+        <li>Notes you ask Mischi to remember, in <code>~/Library/Application Support/Standalone Codex Pets/notes.json</code>.</li>
+        <li>Your Groq API key, if you add one, in the macOS Keychain.</li>
+        <li>Screenshots you ask for, saved to your clipboard or your Desktop.</li>
+      </ul>
+      <p>
+        Ask Mischi doesn’t keep a conversation history: each question is handled on its own and isn’t saved to disk. The <Link href="/docs#uninstall">docs</Link> explain how to delete everything above.
+      </p>
+
+      <h3>Network access</h3>
+      <p>
+        Without a Groq API key, Mischi makes no network requests at all. It has no analytics, advertising or crash-reporting code, and it doesn’t check for updates in the background. macOS itself may collect diagnostics according to your Apple settings; that’s between you and Apple, and we don’t receive it.
+      </p>
+
+      <h3>macOS permissions</h3>
+      <p>Mischi asks for these only when you first use the feature that needs them, and works without them:</p>
+      <ul>
+        <li><strong>Microphone</strong>, for voice mode in Ask Mischi.</li>
+        <li><strong>Screen Recording</strong>, for Ask Mischi’s screenshot tool.</li>
+      </ul>
+      <p>You can turn either off at any time in System Settings → Privacy &amp; Security.</p>
+
+      <h3>AI features and Groq</h3>
+      <p>
+        If you add a Groq API key, Mischi sends requests straight from your Mac to Groq, over an encrypted connection, only when you use an AI feature:
       </p>
       <ul>
-        <li>Imported pet packs, spritesheets, and <code>pet.json</code> files you add.</li>
-        <li>Preferences (selected pet, behavior mode, menu-bar settings).</li>
-        <li>If you enable AI chat: a local copy of your Groq API key (in macOS Keychain) and your chat history.</li>
+        <li><strong>Ask Mischi:</strong> your question, your pet’s character, and the results of any tools used to answer it. For example, if you ask about your clipboard, its text is included; if you ask about your notes, the matching notes are included. Screenshots are not sent.</li>
+        <li><strong>Voice mode:</strong> your recording, for transcription. The audio file is deleted from your Mac once it’s been transcribed.</li>
+        <li><strong>Generated chatter and Enhance:</strong> your pet’s character description and animation names.</li>
+        <li><strong>Model list and connection test:</strong> a request made with your key, containing no personal content.</li>
       </ul>
       <p>
-        You can delete any of this at any time by removing the Mischi app or clearing the corresponding files in <code>~/Library/Application Support/Mischi</code>.
-      </p>
-
-      <h2>Third-party services</h2>
-      <p>
-        Mischi does not bundle any third-party analytics, advertising, or crash-reporting SDKs.
-      </p>
-      <p>
-        If you opt in to AI chat, requests are sent directly to Groq using the API key you configured. Groq’s own privacy policy governs how they handle the contents of your prompts. Mischi does not log, store, or proxy these requests.
+        Groq handles this data under its own <a href="https://groq.com/privacy-policy" target="_blank" rel="noopener noreferrer">privacy policy</a>. We never see these requests, and we don’t log, store or proxy them. If you ask Mischi to search the web or open a website, it hands off to your default browser, and that site’s own policies apply.
       </p>
 
       <h2>This website</h2>
+
+      <h3>Browsing and downloads</h3>
       <p>
-        The marketing site you’re reading does not use cookies for tracking or set any analytics identifiers. Standard server logs from our hosting provider may record IP addresses and request paths for security and operational purposes, retained for a short period.
+        mischi.app uses no cookies, no analytics and no advertising or tracking scripts. Fonts, images and videos are served from our own domain. Our hosting provider, Vercel, keeps standard server logs, such as IP address, browser type and the pages or files requested (including app downloads), to deliver the site and protect it from abuse. These logs are kept for a short period under Vercel’s retention settings, and we don’t use them to identify you.
       </p>
 
-      <h2>The launch waitlist</h2>
+      <h3>Contacting us</h3>
       <p>
-        Mischi isn’t released yet. If you’d like to know when it launches, you can join the waitlist by entering your email address. This is entirely optional, and nothing else on the site requires it.
+        When you send a message through the <Link href="/contact">contact page</Link>, we receive your email address, your name if you give it, your message, and your Mischi and macOS versions if they’re included. Our server passes the message to our email delivery provider, Resend, which delivers it to our inbox; the website itself doesn’t store it. Resend handles it under its own <a href="https://resend.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer">privacy policy</a>. As with the newsletter form, your IP address is held in memory briefly to limit repeated submissions.
       </p>
-      <ul>
-        <li><strong>What we collect:</strong> only the email address you enter. We don’t ask for your name or anything else, and the form sets no tracking cookies.</li>
-        <li><strong>Why:</strong> so we can email you when Mischi is available, plus the occasional progress update before then. Nothing else.</li>
-        <li><strong>Who processes it:</strong> your email is sent to and stored by Kit (ConvertKit), our email provider, acting on our behalf. Their handling is governed by <a href="https://kit.com/privacy" target="_blank" rel="noopener noreferrer">Kit’s privacy policy</a>.</li>
-        <li><strong>Spam protection:</strong> when you submit the form, our server briefly uses your IP address to limit abuse. It is not stored alongside your email or used to identify you.</li>
-        <li><strong>How long we keep it:</strong> until Mischi launches and we’ve notified you, or until you unsubscribe, whichever comes first.</li>
-        <li><strong>Your choices:</strong> every email includes a one-click unsubscribe link, and you can ask us to delete your address at any time by emailing <a href="mailto:kuudstudio@gmail.com">kuudstudio@gmail.com</a>.</li>
-      </ul>
       <p>
-        You provide your email voluntarily, and submitting the form is your consent to the above. We will never sell it, and we won’t share it beyond the provider named here.
+        We use your message only to reply and to fix what you reported, and we never add you to the newsletter. You can also email us directly at {email}.
+      </p>
+
+      <h3>The newsletter</h3>
+      <p>Subscribing is optional, and nothing else on the site or in the app requires it.</p>
+      <ul>
+        <li><strong>What we collect:</strong> only the email address you enter. No name, and the form sets no cookies.</li>
+        <li><strong>Why:</strong> to send you news about new versions and occasional updates about Mischi.</li>
+        <li><strong>Who stores it:</strong> our email provider, Kit (ConvertKit), and possibly a private Google Sheet we use as a backup of the list. See <a href="https://kit.com/privacy" target="_blank" rel="noopener noreferrer">Kit’s privacy policy</a> and <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google’s privacy policy</a>.</li>
+        <li><strong>Spam protection:</strong> when you submit the form, our server holds your IP address in memory for about a minute to limit repeated attempts. It isn’t stored with your email.</li>
+        <li><strong>Unsubscribing:</strong> every email has a one-click unsubscribe link, or you can ask us to delete your address at any time.</li>
+      </ul>
+
+      <h2>Legal bases</h2>
+      <p>If you’re in the European Economic Area or the United Kingdom, we rely on:</p>
+      <ul>
+        <li><strong>Consent</strong> for the newsletter. You can withdraw it at any time by unsubscribing.</li>
+        <li><strong>Legitimate interests</strong> for server logs that keep the website running and secure, and for replying to messages you send us.</li>
+      </ul>
+
+      <h2>Who we share data with</h2>
+      <p>
+        We only share personal data with the service providers named in this policy (Vercel, Kit, Google, Resend, and the provider that hosts our email inbox), and only so they can provide their service to us. We don’t sell personal data, and we don’t share it for cross-context behavioural advertising. We may disclose data if the law requires it.
+      </p>
+      <p>
+        Some of these providers are based in the United States or elsewhere outside your country. Where required, they protect transfers with safeguards such as the European Commission’s Standard Contractual Clauses.
+      </p>
+
+      <h2>How long we keep data</h2>
+      <ul>
+        <li><strong>Newsletter:</strong> until you unsubscribe or ask us to delete your address.</li>
+        <li><strong>Emails you send us:</strong> as long as we need them to handle your message, and then for a reasonable period in case you follow up.</li>
+        <li><strong>Server logs:</strong> for the short period set by our hosting provider.</li>
+      </ul>
+
+      <h2>Your rights</h2>
+      <p>
+        Depending on where you live, for example under India’s Digital Personal Data Protection Act, 2023 or the EU and UK GDPR, you may have the right to access, correct, delete or export your personal data, to object to or restrict how we use it, and to withdraw consent. Residents of California and other US states have similar rights, and we don’t discriminate against anyone for using them. Because we don’t track visitors, a Global Privacy Control or Do Not Track signal needs nothing further from us.
+      </p>
+      <p>
+        To use any of these rights, contact us at {email}. We’ll respond within the time the law requires. You can also complain to your local data protection authority.
+      </p>
+      <p>
+        Everything the app stores is already under your control on your Mac, and you can delete it yourself at any time.
+      </p>
+
+      <h2>Security</h2>
+      <p>
+        The website is served only over HTTPS, the app keeps your API key in the macOS Keychain, and requests to Groq are encrypted in transit. No method of storage or transmission is completely secure, but we keep the data we hold to a minimum. To report a security issue, see our <a href="/.well-known/security.txt">security.txt</a> or email {email}.
       </p>
 
       <h2>Children</h2>
       <p>
-        Mischi is suitable for general audiences. We do not knowingly collect data from anyone, including children under 13.
+        Mischi is suitable for general audiences, but the newsletter and website aren’t directed at children under 13, or under 16 in the EEA and UK. We don’t knowingly collect their personal data. If you think a child has given us their email, contact us and we’ll delete it.
       </p>
 
       <h2>Changes to this policy</h2>
       <p>
-        If we ever change how Mischi handles data, we will update this page and note the date at the top. For material changes, we will surface a notice in the app.
+        If we change how Mischi or this website handles data, we’ll update this page and the date at the top. For significant changes, we’ll post a notice on this website before they take effect.
       </p>
 
       <h2>Contact</h2>
       <p>
-        Questions about privacy, or want your waitlist email removed? Email us at <a href="mailto:kuudstudio@gmail.com">kuudstudio@gmail.com</a>.
+        Questions about privacy, or want your data removed? Use the <Link href="/contact">contact page</Link> or email {email}.
       </p>
     </LegalPage>
   )

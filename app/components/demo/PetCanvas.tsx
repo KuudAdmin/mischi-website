@@ -4,6 +4,8 @@ import { useRef, useEffect, useCallback, useState } from 'react'
 
 const FRAME_W = 192
 const FRAME_H = 208
+const SHEET_COLS = 8
+const SHEET_ROWS = 9
 const DISPLAY_SCALE = 1.75
 
 type AnimState = 'idle' | 'runRight' | 'runLeft' | 'wave' | 'jump' | 'tired' | 'waiting' | 'dancing' | 'review'
@@ -31,6 +33,37 @@ const STATES: Record<AnimState, StateConfig> = {
 const IDLE_TO_SLEEP_MS = 12000
 const IDLE_AUTO_WAVE_MS = 5000
 
+// One decoded image per spritesheet, shared by every PetCanvas on the page.
+// The page preloads the sheets from <head>, so by the time a canvas mounts the
+// bytes are usually already here; decode() readies the bitmap off the main
+// thread so the first frame can be drawn straight away.
+const sheets = new Map<string, Promise<HTMLImageElement>>()
+
+function loadSheet(src: string): Promise<HTMLImageElement> {
+  const cached = sheets.get(src)
+  if (cached) return cached
+
+  const img = new window.Image()
+  img.decoding = 'async'
+  img.src = src
+  const ready = img.decode().then(
+    () => img,
+    // decode() can reject for an image that is still drawable (an interrupted
+    // decode, say); fall back to the load event before giving up.
+    () =>
+      new Promise<HTMLImageElement>((resolve, reject) => {
+        const fail = () => reject(new Error(`Could not load ${src}`))
+        if (img.complete) return img.naturalWidth > 0 ? resolve(img) : fail()
+        img.onload = () => resolve(img)
+        img.onerror = fail
+      }),
+  )
+  // Don't cache a failure, so a later mount can retry.
+  ready.catch(() => sheets.delete(src))
+  sheets.set(src, ready)
+  return ready
+}
+
 interface PetCanvasProps {
   state?: AnimState
   onStateChange?: (s: AnimState) => void
@@ -56,7 +89,6 @@ export default function PetCanvas({
 }: PetCanvasProps) {
   const canvasRef  = useRef<HTMLCanvasElement>(null)
   const imgRef     = useRef<HTMLImageElement | null>(null)
-  const imgLoaded  = useRef(false)
   const rafRef     = useRef<number>(0)
   const frameRef   = useRef(0)
   const lastTime   = useRef(0)
@@ -64,7 +96,10 @@ export default function PetCanvas({
   const idleTimer          = useRef<ReturnType<typeof setTimeout> | null>(null)
   const autoWaveT          = useRef<ReturnType<typeof setTimeout> | null>(null)
   const repeatShortRef     = useRef(repeatShortAnims)
-  repeatShortRef.current = repeatShortAnims
+
+  useEffect(() => {
+    repeatShortRef.current = repeatShortAnims
+  }, [repeatShortAnims])
 
   const [currentState, setCurrentState] = useState<AnimState>('idle')
   const [loaded, setLoaded]             = useState(false)
@@ -95,6 +130,18 @@ export default function PetCanvas({
     }, IDLE_TO_SLEEP_MS)
   }, [interactive, autoAnimate, applyState])
 
+  // Paint the current frame. Smoothing is re-disabled on every draw because
+  // resizing the canvas resets the context state.
+  const draw = useCallback(() => {
+    const ctx = canvasRef.current?.getContext('2d')
+    const img = imgRef.current
+    if (!ctx || !img) return
+    ctx.imageSmoothingEnabled = false
+    const sy = STATES[stateRef.current].row * FRAME_H
+    ctx.clearRect(0, 0, canvasW, canvasH)
+    ctx.drawImage(img, frameRef.current * FRAME_W, sy, FRAME_W, FRAME_H, 0, 0, canvasW, canvasH)
+  }, [canvasW, canvasH])
+
   useEffect(() => {
     if (externalState && externalState !== stateRef.current) {
       applyState(externalState)
@@ -102,26 +149,24 @@ export default function PetCanvas({
   }, [externalState, applyState])
 
   useEffect(() => {
-    const img = new window.Image()
-    img.src = spritesheet
-    img.onload = () => {
-      imgRef.current = img
-      imgLoaded.current = true
-      setLoaded(true)
-      resetIdleTimers()
-    }
-  }, [spritesheet, resetIdleTimers])
+    let cancelled = false
+    loadSheet(spritesheet).then(
+      (img) => {
+        if (cancelled) return
+        imgRef.current = img
+        draw() // now, rather than on the next animation tick
+        setLoaded(true)
+        resetIdleTimers()
+      },
+      () => {},
+    )
+    return () => { cancelled = true }
+  }, [spritesheet, draw, resetIdleTimers])
 
   useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-    ctx.imageSmoothingEnabled = false
-
     const tick = (now: number) => {
       rafRef.current = requestAnimationFrame(tick)
-      if (!imgLoaded.current) return
+      if (!imgRef.current) return
 
       const cfg = STATES[stateRef.current]
       if (now - lastTime.current < 1000 / cfg.fps) return
@@ -141,12 +186,7 @@ export default function PetCanvas({
         frameRef.current = next
       }
 
-      const activeCfg = STATES[stateRef.current]
-      const sx = frameRef.current * FRAME_W
-      const sy = activeCfg.row * FRAME_H
-
-      ctx.clearRect(0, 0, canvasW, canvasH)
-      ctx.drawImage(imgRef.current!, sx, sy, FRAME_W, FRAME_H, 0, 0, canvasW, canvasH)
+      draw()
     }
 
     rafRef.current = requestAnimationFrame(tick)
@@ -155,7 +195,7 @@ export default function PetCanvas({
       if (idleTimer.current)  clearTimeout(idleTimer.current)
       if (autoWaveT.current)  clearTimeout(autoWaveT.current)
     }
-  }, [canvasW, canvasH, onStateChange, resetIdleTimers])
+  }, [draw, resetIdleTimers])
 
   const handleClick = useCallback(() => {
     if (!interactive) return
@@ -172,7 +212,26 @@ export default function PetCanvas({
   return (
     <div
       className={className}
-      style={{ position: 'relative', width: displayW, height: displayH, cursor: interactive ? 'pointer' : 'default', ...style }}
+      style={{
+        position: 'relative',
+        width: displayW,
+        height: displayH,
+        cursor: interactive ? 'pointer' : 'default',
+        // Until the canvas has painted, show the current state's first frame
+        // straight from the spritesheet as a CSS background. It's in the
+        // server-rendered HTML, so the pet appears the moment the image
+        // arrives instead of waiting for hydration and a decode.
+        ...(loaded
+          ? {}
+          : {
+              backgroundImage: `url(${spritesheet})`,
+              backgroundSize: `${SHEET_COLS * displayW}px ${SHEET_ROWS * displayH}px`,
+              backgroundPosition: `0 ${-STATES[currentState].row * displayH}px`,
+              backgroundRepeat: 'no-repeat',
+              imageRendering: 'pixelated',
+            }),
+        ...style,
+      }}
       onClick={handleClick}
       onDoubleClick={handleDblClick}
       onMouseEnter={() => { if (interactive && currentState === 'tired') applyState('idle') }}
@@ -181,17 +240,6 @@ export default function PetCanvas({
       tabIndex={interactive ? 0 : undefined}
       onKeyDown={(e) => { if (interactive && (e.key === 'Enter' || e.key === ' ')) handleClick() }}
     >
-      {!loaded && (
-        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{
-            width: 20, height: 20, borderRadius: '50%',
-            border: '2px solid var(--color-border)',
-            borderTopColor: 'var(--color-accent)',
-            animation: 'pet-spin 0.8s linear infinite',
-          }} />
-          <style>{`@keyframes pet-spin { to { transform: rotate(360deg); } }`}</style>
-        </div>
-      )}
       <canvas
         ref={canvasRef}
         width={canvasW}
@@ -200,8 +248,6 @@ export default function PetCanvas({
           width: displayW,
           height: displayH,
           imageRendering: 'pixelated',
-          opacity: loaded ? 1 : 0,
-          transition: 'opacity 0.4s',
           display: 'block',
         }}
       />

@@ -3,8 +3,14 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { RELEASE } from '@/lib/release'
 
-const NAV_LINKS = ['How it works', 'Features', 'FAQ']
+const NAV_LINKS = [
+  { label: 'Features', href: '/#features' },
+  { label: 'Docs', href: '/docs' },
+  { label: 'FAQ', href: '/#faq' },
+  { label: 'Contact', href: '/contact' },
+]
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false)
@@ -48,7 +54,7 @@ export default function Nav() {
         right: 0,
         zIndex: 100,
         transition: 'background var(--dur-normal) var(--ease-expo), border-color var(--dur-normal)',
-        background: scrolled || menuOpen ? 'rgba(244, 239, 230, 0.8)' : 'transparent',
+        background: scrolled || menuOpen ? 'rgba(248, 244, 236, 0.8)' : 'transparent',
         backdropFilter: scrolled || menuOpen ? 'blur(20px) saturate(160%)' : 'none',
         WebkitBackdropFilter: scrolled || menuOpen ? 'blur(20px) saturate(160%)' : 'none',
         borderBottom: scrolled || menuOpen ? '1px solid var(--color-border)' : '1px solid transparent',
@@ -96,14 +102,30 @@ export default function Nav() {
             style={{ height: '20px', width: 'auto' }}
             priority
           />
+          <span
+            style={{
+              fontSize: '0.625rem',
+              fontWeight: 600,
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              color: 'var(--sage-800)',
+              background: 'var(--color-accent-dim)',
+              border: '1px solid rgba(81, 139, 112, 0.25)',
+              borderRadius: '9999px',
+              padding: '2px 7px',
+              lineHeight: 1.4,
+            }}
+          >
+            {RELEASE.channel}
+          </span>
         </Link>
 
         {/* Desktop links */}
         <div className="nav-desktop-links" style={{ display: 'flex', alignItems: 'center', gap: '32px', flex: 1, justifyContent: 'center' }}>
-          {['How it works', 'Features', 'FAQ'].map((label) => (
+          {NAV_LINKS.map(({ label, href }) => (
             <Link
               key={label}
-              href={`/#${label.toLowerCase().replace(/\s+/g, '-')}`}
+              href={href}
               style={{
                 fontSize: '0.875rem',
                 fontWeight: 500,
@@ -122,7 +144,7 @@ export default function Nav() {
         {/* CTA + hamburger */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
           <Link
-            href="/#waitlist"
+            href="/#download"
             className="nav-cta-desktop"
             style={{
               display: 'inline-flex',
@@ -148,7 +170,7 @@ export default function Nav() {
               el.style.transform = 'translateY(0)'
             }}
           >
-            Join waitlist
+            Download
           </Link>
 
           {/* Hamburger — mobile only */}
@@ -210,7 +232,7 @@ export default function Nav() {
             style={{
               position: 'relative',
               zIndex: 95,
-              background: 'rgba(251, 248, 241, 0.98)',
+              background: 'rgba(253, 251, 246, 0.98)',
               backdropFilter: 'blur(24px) saturate(160%)',
               WebkitBackdropFilter: 'blur(24px) saturate(160%)',
               borderTop: '1px solid var(--color-border)',
@@ -222,10 +244,10 @@ export default function Nav() {
               animation: 'nav-drawer-in var(--dur-normal) var(--ease-expo)',
             }}
           >
-            {NAV_LINKS.map((label) => (
+            {NAV_LINKS.map(({ label, href }) => (
               <Link
                 key={label}
-                href={`/#${label.toLowerCase().replace(/\s+/g, '-')}`}
+                href={href}
                 onClick={closeMenu}
                 className="nav-drawer-link"
                 style={{
@@ -250,7 +272,7 @@ export default function Nav() {
             <div style={{ width: '100%', maxWidth: '320px', height: '1px', background: 'var(--color-border)', margin: '14px 0 18px' }} />
 
             <Link
-              href="/#waitlist"
+              href="/#download"
               onClick={closeMenu}
               style={{
                 display: 'inline-flex',
@@ -271,10 +293,10 @@ export default function Nav() {
               }}
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <path d="M2 4.5h12v8H2v-8Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
-                <path d="m2.5 5 5.5 4 5.5-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M8 2.5v7.5m0 0L4.75 6.75M8 10l3.25-3.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2.75 13h10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
               </svg>
-              Join the waitlist
+              Download for Mac
             </Link>
 
             <p
@@ -285,7 +307,7 @@ export default function Nav() {
                 letterSpacing: '0.04em',
               }}
             >
-              Coming soon · Apple Silicon · Intel · macOS 13+
+              Public beta · v{RELEASE.version} · Apple Silicon &amp; Intel · macOS 13+
             </p>
           </div>
         </>

@@ -47,7 +47,7 @@ const SHOWCASES: Showcase[] = [
     title: "Swap pets whenever",
     body: "Switch between any pet you've imported in a single click. Build a roster and change the vibe of your desktop on a whim. A focused cat now, a playful blob later.",
     video: "/features/change-pet.mp4",
-    points: ["One-click switching", "Unlimited roster", "Import any format"],
+    points: ["One-click switching", "Unlimited roster", "Codex-compatible pets"],
   },
 ];
 
@@ -62,22 +62,22 @@ const CAPABILITIES: Capability[] = [
   {
     icon: "⚡",
     title: "Offline-first",
-    body: "Everything runs locally. No server calls, no cloud, no internet required.",
+    body: "Your pet, animations and reminders run entirely on your Mac. AI is optional, and bring-your-own-key.",
   },
   {
     icon: "✦",
-    title: "Transparent rendering",
-    body: "Pets render on a transparent layer. They live on your desktop, not in a box.",
+    title: "Codex-compatible",
+    body: "Uses the same pet format as OpenAI Codex. Import a folder, a .zip, or everything in ~/.codex/pets.",
   },
   {
-    icon: "◈",
-    title: "Always-on-top",
-    body: "Stays visible across every Space and full-screen app without blocking a thing.",
+    icon: "◷",
+    title: "Reminders",
+    body: "Once, daily, weekly or on any interval. Your pet says it in a chat bubble, with an animation.",
   },
   {
-    icon: "≡",
-    title: "Menu bar controls",
-    body: "Pause, hide, or switch behavior modes straight from the macOS menu bar.",
+    icon: "◎",
+    title: "Voice mode",
+    body: "Talk instead of type. Groq Whisper transcribes what you say, then the recording is discarded.",
   },
   {
     icon: "☽",
@@ -86,8 +86,8 @@ const CAPABILITIES: Capability[] = [
   },
   {
     icon: "◆",
-    title: "Apple Silicon native",
-    body: "Built for M-series, smooth on Intel too. macOS 13 and up.",
+    title: "Native & Universal",
+    body: "Built in Swift for Apple Silicon and Intel. Signed, notarised, macOS 13 and up.",
   },
 ];
 

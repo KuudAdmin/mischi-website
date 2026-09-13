@@ -5,27 +5,39 @@ import { useState } from 'react'
 const QUESTIONS: { q: string; a: string }[] = [
   {
     q: 'Is Mischi free?',
-    a: 'Yes. Mischi is free to download and use. There are no accounts, no subscriptions, and no paid tier. If you enable AI chat with your own Groq API key, the only cost is whatever Groq charges for usage.',
+    a: 'Yes. Mischi is free to download and use, with no accounts and no subscriptions. If you turn on the AI features with your own Groq API key, Groq’s pricing applies to that usage, and Groq has a free tier.',
+  },
+  {
+    q: 'Mischi is in beta. What does that mean?',
+    a: 'Mischi works, and we use it every day, but it’s young. Expect frequent updates and the occasional rough edge. If something breaks, the Report it button in Preferences → About opens our contact page with your version already filled in.',
+  },
+  {
+    q: 'How do I install it?',
+    a: 'Download the DMG, open it, and drag Mischi into your Applications folder. It’s signed and notarised by Apple, so it opens without warnings. Mischi lives in your menu bar rather than the Dock. The docs have the full walkthrough.',
   },
   {
     q: 'Does Mischi need internet or a cloud account?',
-    a: 'No. Mischi runs entirely on your Mac. No accounts, no servers, no telemetry. The only network activity happens if you opt in to AI chat, and even then requests go directly from your Mac to Groq, using the API key you supplied.',
+    a: 'No account, ever. Your pet, animations, reminders and settings all work offline. The only network traffic is optional: if you add a Groq API key, chat, voice and generated chatter go directly from your Mac to Groq.',
   },
   {
     q: 'What Macs does it run on?',
-    a: 'Mischi ships as a Universal Binary for macOS 13 (Ventura) and later. It runs natively on Apple Silicon (M-series) and on Intel Macs.',
+    a: 'Mischi is a Universal app for macOS 13 (Ventura) and later. It runs natively on Apple Silicon (M-series) and on Intel Macs.',
   },
   {
     q: 'How does the AI chat work?',
-    a: 'Mischi ships with Groq and is bring-your-own-key. Paste in your Groq API key, choose from the available Groq models in settings, and requests go directly from your Mac to Groq. Mischi doesn’t sit in the middle, doesn’t bundle a model, and doesn’t sell credits. Press ⌘+K to open chat.',
+    a: 'Bring your own Groq key: paste it in Preferences → Advanced, pick a model, and hit Test. Then press ⌘K, or ⌘-double-click your pet, to ask Mischi anything. It can set reminders, take screenshots, read your clipboard, save notes, and open apps or websites. Your key is kept in the macOS Keychain.',
   },
   {
-    q: 'Where are my pets and settings stored?',
-    a: 'Everything lives locally in ~/Library/Application Support/Mischi/: pet packs, preferences, and (if you enable it) your AI chat history. Delete that folder to fully reset Mischi. Each pet is a self-contained directory you can copy, back up, or share.',
+    q: 'Can I use my Codex pets?',
+    a: 'Yes. Mischi uses the same pet format as OpenAI Codex. Click Scan Codex in Preferences → Pet and any pets in ~/.codex/pets are added to your library. The originals are never modified.',
   },
   {
     q: 'Can I make my own pet?',
-    a: 'Yes. Pets are just a folder containing a pet.json and a spritesheet (PNG or WebP, 192×208px per frame). The creator docs walk through animation states, hitboxes, and frame timing. A visual editor is on the roadmap.',
+    a: 'Yes. A pet is a folder with a pet.json and a 1536×1872 spritesheet: an 8×9 grid of 192×208 frames. Draw one yourself, or have Codex hatch one from a description or a photo. The creator guide in the docs walks through both.',
+  },
+  {
+    q: 'Where are my pets and settings stored?',
+    a: 'On your Mac. Pets live in ~/Library/Application Support/mischi/Pets, settings in Mischi’s macOS preferences, and your Groq key in the Keychain. Each pet is a self-contained folder you can copy, back up or share. The docs explain how to reset everything.',
   },
   {
     q: 'Is it available on Windows, Linux, or iOS?',
@@ -33,7 +45,7 @@ const QUESTIONS: { q: string; a: string }[] = [
   },
   {
     q: 'Does Mischi collect any data about me?',
-    a: 'No. The app has no analytics, no crash reporting, and no usage telemetry, and it never phones home. The only thing we ever collect is your email, and only if you opt in to the launch waitlist. See the Privacy Policy for the full picture.',
+    a: 'No. The app has no analytics, no crash reporting and no usage telemetry, and it never phones home. The only thing we ever collect is your email, and only if you sign up for the newsletter. See the Privacy Policy for the full picture.',
   },
 ]
 
@@ -123,11 +135,11 @@ export default function FAQ() {
               Still have a question?
             </p>
             <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
-              Email us and we read every one.
+              Send us a note. We read every one.
             </p>
           </div>
           <a
-            href="mailto:kuudstudio@gmail.com"
+            href="/contact"
             style={{
               display: 'inline-flex',
               flexShrink: 0,
@@ -159,7 +171,7 @@ export default function FAQ() {
               <rect x="3" y="5" width="18" height="14" rx="2" />
               <path d="m4 7 8 6 8-6" />
             </svg>
-            Email us
+            Contact us
           </a>
         </div>
       </div>
