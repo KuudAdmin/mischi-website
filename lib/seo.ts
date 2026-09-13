@@ -19,8 +19,8 @@ export const SITE_DESCRIPTION =
 
 export const SITE_TAGLINE = 'Your Mac deserves a companion.'
 
-/** X/Twitter handle for card attribution. Update to the real handle. */
-export const TWITTER_HANDLE = '@mischiapp'
+/** X/Twitter handle for card attribution — the one the footer and the app's About pane link to. */
+export const TWITTER_HANDLE = '@ajjuism'
 
 export const SITE_KEYWORDS = [
   'Mischi',

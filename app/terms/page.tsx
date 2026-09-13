@@ -1,13 +1,17 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import LegalPage from '../components/legal/LegalPage'
+import { CONTACT_EMAIL } from '@/lib/release'
+
+const DESCRIPTION = 'The terms that govern your use of the Mischi macOS app and the mischi.app website.'
 
 export const metadata: Metadata = {
   title: 'Terms of Use',
-  description: 'Terms governing your use of the Mischi macOS application and website.',
+  description: DESCRIPTION,
   alternates: { canonical: '/terms' },
   openGraph: {
     title: 'Terms of Use | Mischi',
-    description: 'Terms governing your use of the Mischi macOS application and website.',
+    description: DESCRIPTION,
     url: '/terms',
     type: 'article',
   },
@@ -17,68 +21,124 @@ export default function TermsPage() {
   return (
     <LegalPage
       title="Terms of Use"
-      updated="May 27, 2026"
-      intro="By installing or using Mischi, you agree to the terms below. They’re short on purpose. Mischi is a small desktop utility, not a service."
+      updated="September 14, 2026"
+      intro="These terms cover the Mischi app for macOS and the mischi.app website. They’re written to be read, but they are a binding agreement, so please take a few minutes with them."
     >
-      <h2>The software</h2>
+      <h2>1. Agreement</h2>
       <p>
-        Mischi is a macOS application that runs animated desktop pets on your Mac. It runs entirely on your device. You install it, you own your copy of it, and you decide what to do with it.
+        By downloading, installing or using Mischi (the <strong>app</strong>), or by using mischi.app (the <strong>website</strong>), you agree to these terms and to our <Link href="/privacy">Privacy Policy</Link>. If you don’t agree, don’t use the app or the website. If you use Mischi on behalf of an organisation, you confirm you’re allowed to accept these terms for it.
+      </p>
+      <p>
+        Mischi is made by Kuud, based in Kerala, India (<strong>we</strong>, <strong>us</strong>).
       </p>
 
-      <h2>License</h2>
+      <h2>2. Beta software</h2>
       <p>
-        You are granted a non-exclusive, non-transferable, revocable license to install and use Mischi on Macs you own or control, for personal or internal business use. You may not redistribute, resell, or sublicense the application binary itself.
-      </p>
-      <p>
-        Pet packs, spritesheets, and other assets you create or import are <strong>yours</strong>. Mischi makes no claim over them.
+        Mischi is in public beta. It works, but it’s still under active development: it may contain bugs, behave differently from one version to the next, and occasionally need its settings reset after an update. Keep your own copies of any pets you create. Please <Link href="/contact">report problems</Link> when you find them.
       </p>
 
-      <h2>No warranty</h2>
+      <h2>3. Your licence to use Mischi</h2>
       <p>
-        Mischi is provided <strong>as-is</strong>, without warranty of any kind, express or implied, including but not limited to merchantability, fitness for a particular purpose, and non-infringement. We don’t guarantee the app will work on every macOS version, with every accessory, or that it will be free of bugs.
+        Mischi is free. We grant you a personal, non-exclusive, non-transferable, revocable licence to install and use the app on Macs you own or control, for personal use or internal business use.
+      </p>
+      <p>You may not:</p>
+      <ul>
+        <li>sell, rent, sublicense or redistribute the app, or host the installer anywhere other than by linking to mischi.app;</li>
+        <li>modify the app, or reverse engineer, decompile or disassemble it, except to the extent the law expressly allows despite this restriction;</li>
+        <li>remove or alter its code signature, notarisation, copyright notices or branding;</li>
+        <li>use the app to build a competing product, or to extract bundled artwork for use elsewhere.</li>
+      </ul>
+
+      <h2>4. What we own</h2>
+      <p>
+        The app, the website, and everything in them, including the Mischi name, logo, bundled pet artwork, text, videos and design, belong to us or our licensors and are protected by intellectual property laws. These terms don’t transfer any ownership to you. All rights not expressly granted are reserved.
       </p>
 
-      <h2>Limitation of liability</h2>
+      <h2>5. Your pets and content</h2>
       <p>
-        To the maximum extent permitted by law, the authors of Mischi will not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of (or inability to use) the application, including but not limited to lost productivity, hurt feelings from a sleepy desktop pet, or anything else.
+        Pets, spritesheets, character descriptions, chat lines, reminders and notes you create or import are <strong>yours</strong>. They stay on your Mac, and Mischi never uploads them to us.
+      </p>
+      <p>
+        If you import pets made by someone else, you’re responsible for making sure you have the right to use them. Mischi does not review imported files.
       </p>
 
-      <h2>AI chat features (BYOK)</h2>
+      <h2>6. AI features</h2>
       <p>
-        If you enable AI chat, you provide your own Groq API key and choose from the models Groq offers. You are responsible for:
+        AI features are optional and only work with your own Groq API key. By using them you also agree to <a href="https://groq.com/terms-of-use" target="_blank" rel="noopener noreferrer">Groq’s terms</a> and acceptable use policy, and you’re responsible for any charges on your Groq account.
       </p>
       <ul>
-        <li>Complying with Groq’s terms and acceptable use policy.</li>
-        <li>Any usage charges incurred against your API key.</li>
-        <li>The content of the prompts you send and the responses you receive.</li>
+        <li><strong>AI output can be wrong.</strong> Replies are generated by third-party models and may be inaccurate, incomplete, or inappropriate. Don’t rely on them for medical, legal, financial, safety or other important decisions.</li>
+        <li><strong>Ask Mischi takes actions.</strong> At your request it can take screenshots, read your clipboard, add reminders, save notes, open apps and websites, and start web searches. It decides which tool to use from what you ask, and it can misunderstand. You’re responsible for the requests you make and for checking the results.</li>
+        <li><strong>Mind what you share.</strong> Whatever you type or say, and anything a tool reads for you (such as clipboard text), is sent to Groq to produce an answer. Don’t ask Mischi about passwords, secrets or other people’s personal data.</li>
       </ul>
+
+      <h2>7. Third parties and trademarks</h2>
       <p>
-        Mischi does not relay, log, or modify these requests. They go directly from your Mac to Groq.
+        Mischi works with services and formats from other companies, such as Groq for AI and the OpenAI Codex pet format. We don’t control those services and aren’t responsible for them. Mischi is an independent project and is not affiliated with, sponsored by, or endorsed by OpenAI, Groq or Apple. Codex, Groq, Apple, Mac and macOS are trademarks of their respective owners.
+      </p>
+      <p>
+        Links on the website to other sites, such as Buy Me a Coffee, X or Groq, are provided for convenience. Their own terms and policies apply.
       </p>
 
-      <h2>Acceptable use</h2>
+      <h2>8. Acceptable use</h2>
+      <p>Don’t use the app or the website to:</p>
+      <ul>
+        <li>break the law or infringe anyone’s rights, including intellectual property and privacy rights;</li>
+        <li>harass, deceive or harm anyone, or create or share unlawful content;</li>
+        <li>interfere with the website, including overloading, probing or scraping it, abusing the newsletter or contact forms, or trying to bypass their limits.</li>
+      </ul>
+
+      <h2>9. Feedback</h2>
       <p>
-        Don’t use Mischi for anything illegal, harmful, or that infringes someone else’s rights. Don’t reverse-engineer the binary to extract bundled assets you don’t have a license for.
+        If you send us bug reports, ideas or other feedback, you allow us to use them to improve Mischi, without any obligation to you. We’ll handle any personal information in your message according to our <Link href="/privacy">Privacy Policy</Link>.
       </p>
 
-      <h2>Third-party content</h2>
+      <h2>10. Updates and availability</h2>
       <p>
-        If you import pet packs or spritesheets from third parties, you are responsible for ensuring you have the right to use them. Mischi does not vet imported assets.
+        We may release new versions, change or remove features, or stop offering Mischi at any time. We aren’t obliged to provide updates, support or maintenance. The app doesn’t update itself: installing a new version is up to you.
       </p>
 
-      <h2>Updates</h2>
+      <h2>11. Ending this agreement</h2>
       <p>
-        We may release updates to fix bugs, add features, or change behavior. Updates are optional. If a future version changes how the app behaves in a way that matters, we will mention it in the release notes.
+        You can stop using Mischi at any time by deleting it. Your licence ends automatically if you breach these terms; if that happens, you must stop using the app and delete it. Sections 4, 5, 7 and 9 through 15 survive the end of this agreement.
       </p>
 
-      <h2>Changes to these terms</h2>
+      <h2>12. No warranty</h2>
       <p>
-        We may revise these terms occasionally. When we do, we update the date at the top of this page. Continued use of Mischi after a revision means you accept the revised terms.
+        <strong>To the fullest extent the law allows, the app and the website are provided “as is” and “as available”, without warranties of any kind, whether express, implied or statutory, including warranties of merchantability, fitness for a particular purpose, title, non-infringement, accuracy, and uninterrupted or error-free operation.</strong> We don’t promise that Mischi will work on every Mac or macOS version, meet your needs, be free of bugs, or keep your data safe from loss.
       </p>
 
-      <h2>Contact</h2>
+      <h2>13. Limitation of liability</h2>
       <p>
-        Questions or concerns about these terms? Email us at <a href="mailto:kuudstudio@gmail.com">kuudstudio@gmail.com</a>.
+        <strong>To the fullest extent the law allows, we won’t be liable for any indirect, incidental, special, consequential, exemplary or punitive damages, or for any loss of data, profits, revenue, goodwill or productivity, arising from or related to the app, the website, AI output, actions taken by the app at your request, or these terms, even if we were told such damages were possible.</strong>
+      </p>
+      <p>
+        <strong>To the fullest extent the law allows, our total liability for all claims related to the app, the website or these terms will not exceed the amount you paid us for the app, if any.</strong>
+      </p>
+
+      <h2>14. Indemnity</h2>
+      <p>
+        To the extent the law allows, you agree to cover any claims, losses and reasonable costs we face because you misused the app or the website, broke these terms, or infringed someone else’s rights.
+      </p>
+
+      <h2>15. Legal bits</h2>
+      <ul>
+        <li><strong>Your rights as a consumer.</strong> Some places don’t allow certain warranty exclusions or liability limits. Nothing in these terms limits rights you have under laws that can’t be waived by contract.</li>
+        <li><strong>Governing law.</strong> These terms are governed by the laws of India. The courts in Kerala, India have exclusive jurisdiction over any dispute arising from or related to them. If you use Mischi as a consumer, this doesn’t take away the protection of mandatory laws where you live.</li>
+        <li><strong>Severability.</strong> If part of these terms is found unenforceable, that part is limited as little as needed and the rest stays in effect.</li>
+        <li><strong>No waiver.</strong> If we don’t enforce a term straight away, we haven’t given up the right to enforce it later.</li>
+        <li><strong>Assignment.</strong> You can’t transfer these terms to anyone else. We may transfer them, for example if the project changes hands.</li>
+        <li><strong>Entire agreement.</strong> These terms and the Privacy Policy are the whole agreement between you and us about Mischi.</li>
+      </ul>
+
+      <h2>16. Changes to these terms</h2>
+      <p>
+        We may update these terms. When we do, we’ll change the date at the top of this page, and for significant changes we’ll give notice on this website. If you keep using Mischi after an update takes effect, you accept the updated terms.
+      </p>
+
+      <h2>17. Contact</h2>
+      <p>
+        Questions about these terms? Use the <Link href="/contact">contact page</Link> or email us at <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
       </p>
     </LegalPage>
   )

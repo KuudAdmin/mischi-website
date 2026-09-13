@@ -17,9 +17,9 @@
 
 ## What's here
 
-This repo is the Mischi landing page, built with the Next.js App Router. It covers
-the hero, how-it-works, a looping-video feature showcase, FAQ, legal pages, and an
-opt-in waitlist backed by a small server route.
+This repo is the Mischi website, built with the Next.js App Router. It covers the
+hero, how-it-works, a looping-video feature showcase, the download section, FAQ,
+newsletter signup, docs, a contact page, and legal pages.
 
 - **Next.js (App Router)** + TypeScript
 - **Tailwind v4** with a hand-tuned design-token system (warm paper + sage)
@@ -36,32 +36,60 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-> Local secrets (for the waitlist) live in `.env.local`. See `.env.example` for the keys.
+> Local secrets (for the newsletter and contact form) live in `.env.local`. See `.env.example` for the keys.
 
-## Waitlist
+## Shipping a new app version
 
-The "Join the waitlist" form posts to `app/api/waitlist/route.ts`, which keeps the
-provider keys server-side and forwards signups to Kit (ConvertKit). Full setup,
-environment variables, deployment, and troubleshooting live in
-**[WAITLIST_SETUP.md](./WAITLIST_SETUP.md)**.
+1. Build the notarised DMG in the app repo (`./build.sh --release-dmg`).
+2. Copy it into `public/downloads/`.
+3. Update `lib/release.ts`: version, date, file name, size and SHA-256
+   (`shasum -a 256 Mischi-x.y.z.dmg`).
+
+The hero, nav, download section, docs, footer and JSON-LD all read from `lib/release.ts`.
+
+## Contact page
+
+`/contact` is where the app's **Preferences → About → Report it** button lands. The app
+appends `?v=<version>&os=<macOS build>`, which the form attaches to the report.
+
+The form posts to `app/api/contact/route.ts`, which validates the message (honeypot,
+same-origin check, per-IP rate limit) and sends it through [Resend](https://resend.com)
+to `CONTACT_EMAIL`, with the sender as Reply-To. It needs:
+
+- `RESEND_API_KEY`
+- `CONTACT_FROM_EMAIL`: a sender on a domain verified in Resend, e.g. `Mischi <contact@mail.mischi.app>`
+- `CONTACT_TO_EMAIL` (optional): defaults to `CONTACT_EMAIL` in `lib/release.ts`
+
+If sending fails, the form offers the same message as a pre-filled email instead.
+
+## Newsletter
+
+The newsletter form posts to `app/api/subscribe/route.ts`, which keeps the provider
+keys server-side and forwards signups to Kit (`KIT_API_KEY`, `KIT_FORM_ID`) and/or a
+Google Sheet (`NEWSLETTER_SHEET_ENDPOINT`, or the older `WAITLIST_SHEET_ENDPOINT`).
+A signup is accepted if at least one backend takes it.
 
 ## Project structure
 
 ```text
 app/
-  components/        UI sections (hero, features, faq, footer, …)
-  api/waitlist/      server route for waitlist signups
+  components/        UI sections (hero, download, newsletter, faq, footer, …)
+  api/subscribe/     server route for newsletter signups
+  docs/              user guide: install, settings, AI, creating pets
+  contact/           bug reports and questions (linked from the app)
   privacy/, terms/   legal pages
   opengraph-image    dynamic social card
   globals.css        design tokens + base styles
+lib/release.ts       current app version + download details
 lib/seo.ts           site metadata + config
+public/downloads/    notarised DMGs
 public/features/     feature recordings (mp4 + poster)
 docs/og.png          social-card snapshot (used in this README)
 ```
 
 ## Deploying
 
-Deploys to [Vercel](https://vercel.com). Add the waitlist environment variables
+Deploys to [Vercel](https://vercel.com). Add the newsletter and contact environment variables
 under **Project → Settings → Environment Variables** (none are `NEXT_PUBLIC_`, so
 they stay server-side), then ship.
 

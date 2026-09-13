@@ -8,6 +8,7 @@ import {
   SITE_KEYWORDS,
   TWITTER_HANDLE,
 } from '@/lib/seo'
+import { RELEASE } from '@/lib/release'
 import './globals.css'
 
 const inter = Inter({
@@ -84,7 +85,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   colorScheme: 'light',
-  themeColor: '#F4EFE6',
+  themeColor: '#F8F4EC',
 }
 
 const jsonLd = {
@@ -114,7 +115,10 @@ const jsonLd = {
       url: SITE_URL,
       image: `${SITE_URL}/icon-3d.png`,
       applicationCategory: 'UtilitiesApplication',
-      operatingSystem: 'macOS',
+      operatingSystem: 'macOS 13.0 or later',
+      softwareVersion: RELEASE.version,
+      downloadUrl: `${SITE_URL}${RELEASE.dmgUrl}`,
+      fileSize: RELEASE.size,
       offers: {
         '@type': 'Offer',
         price: '0',

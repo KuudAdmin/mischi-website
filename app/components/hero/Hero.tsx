@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react'
 import Image from 'next/image'
 import PetCanvas from '../demo/PetCanvas'
 import MacWindow from './MacWindow'
+import { RELEASE } from '@/lib/release'
 
 type AnimState =
   | 'idle'
@@ -104,6 +105,45 @@ export default function Hero() {
             textAlign: 'left',
           }}
         >
+          <a
+            href="/docs"
+            className="hero-pill hero-reveal"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '10px',
+              padding: '4px 14px 4px 4px',
+              marginBottom: '22px',
+              borderRadius: '9999px',
+              background: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+              color: 'var(--color-text-muted)',
+              fontSize: '0.8125rem',
+              textDecoration: 'none',
+              whiteSpace: 'nowrap',
+              animationDelay: '0s',
+            }}
+          >
+            <span
+              style={{
+                fontSize: '0.6875rem',
+                fontWeight: 600,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                color: 'var(--sage-800)',
+                background: 'var(--color-accent-dim)',
+                borderRadius: '9999px',
+                padding: '3px 9px',
+              }}
+            >
+              {RELEASE.channel}
+            </span>
+            v{RELEASE.version} is out · Read the docs
+            <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </a>
+
           <h1
             id="hero-heading"
             className="hero-headline hero-reveal"
@@ -149,7 +189,8 @@ export default function Hero() {
             }}
           >
             <a
-              href="#waitlist"
+              href={RELEASE.dmgUrl}
+              download
               className="hero-cta"
               style={{
                 display: 'inline-flex',
@@ -177,10 +218,10 @@ export default function Hero() {
               }}
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <path d="M2 4.5h12v8H2v-8Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
-                <path d="m2.5 5 5.5 4 5.5-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M8 2.5v7.5m0 0L4.75 6.75M8 10l3.25-3.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2.75 13h10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
               </svg>
-              Join the waitlist
+              Download for Mac
               <Image src="/app-icon.png" alt="" width={20} height={20} style={{ borderRadius: '4px' }} />
             </a>
 
@@ -423,6 +464,12 @@ export default function Hero() {
           to   { opacity: 1; transform: translateY(0); }
         }
         .hero-reveal { animation: hero-fade-up 0.7s var(--ease-expo) both; }
+        .hero-pill { transition: border-color var(--dur-fast), background var(--dur-fast), color var(--dur-fast); }
+        .hero-pill:hover {
+          border-color: rgba(81, 139, 112, 0.35) !important;
+          background: var(--color-surface-raised) !important;
+          color: var(--color-text) !important;
+        }
         @media (prefers-reduced-motion: reduce) {
           .hero-reveal { animation: none; opacity: 1; }
         }

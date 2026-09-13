@@ -5,22 +5,22 @@ import Image from 'next/image'
 const STEPS = [
   {
     number: '01',
-    title: 'Import your pet',
-    body: 'Drop in a folder or .zip containing your spritesheet and pet.json. Any existing Codex pet works out of the box.',
+    title: 'Download & install',
+    body: 'Grab the DMG and drag Mischi into Applications. It’s signed and notarised by Apple, so it opens like any other app.',
     icon: '/feature-1.webp',
     iconAlt: 'Pet file icon',
   },
   {
     number: '02',
-    title: 'Pet appears on desktop',
-    body: 'Mischi renders your pet in a transparent, always-on-top window, right on your screen, without blocking your work.',
+    title: 'Meet your pet',
+    body: 'A pet is already waiting on your desktop, in a transparent window that never blocks your work. Drag it anywhere you like.',
     icon: '/feature-2.webp',
     iconAlt: '3D pet icon',
   },
   {
     number: '03',
-    title: 'Customize & interact',
-    body: 'Set behavior modes, tweak animation speed, pick what triggers reactions. Your pet adapts to your workflow.',
+    title: 'Make it yours',
+    body: 'Import Codex pets or your own, name animations, set reminders, and add a Groq key to chat with ⌘K.',
     icon: '/feature-3.webp',
     iconAlt: 'Settings icon',
   },

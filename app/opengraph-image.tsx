@@ -29,7 +29,7 @@ export default async function OpengraphImage() {
           alignItems: 'center',
           position: 'relative',
           background:
-            'radial-gradient(900px 700px at 80% 50%, #EDF4F0 0%, #F4EFE6 62%)',
+            'radial-gradient(900px 700px at 80% 50%, #EDF4F0 0%, #F8F4EC 62%)',
           color: '#1B211D',
           fontFamily: 'sans-serif',
           overflow: 'hidden',
@@ -107,7 +107,7 @@ export default async function OpengraphImage() {
               marginTop: '40px',
             }}
           >
-            {['macOS', 'Offline-first'].map((label) => (
+            {['macOS', 'Free public beta'].map((label) => (
               <div
                 key={label}
                 style={{
@@ -117,7 +117,7 @@ export default async function OpengraphImage() {
                   fontSize: 24,
                   fontWeight: 600,
                   color: '#3D6A56',
-                  background: '#FBF8F1',
+                  background: '#FDFBF6',
                   border: '1px solid #D8E9E0',
                   borderRadius: 9999,
                 }}

@@ -22,12 +22,14 @@ export default function Reveal({
     const el = ref.current
     if (!el) return
 
+    // Nothing to animate: reveal on the next frame instead of synchronously
+    // inside the effect, which would force an immediate second render.
     if (
       typeof IntersectionObserver === 'undefined' ||
       window.matchMedia('(prefers-reduced-motion: reduce)').matches
     ) {
-      setShown(true)
-      return
+      const frame = requestAnimationFrame(() => setShown(true))
+      return () => cancelAnimationFrame(frame)
     }
 
     const io = new IntersectionObserver(
