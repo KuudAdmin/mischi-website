@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { track } from '@/lib/analytics'
 
 // Submissions go to our own server route (app/api/subscribe/route.ts), which
 // holds the provider keys server-side and forwards to Kit / a Google Sheet.
@@ -31,6 +32,7 @@ export default function Newsletter() {
       })
       if (res.ok) {
         setStatus('success')
+        track('newsletter_subscribed')
         return
       }
       const data = (await res.json().catch(() => null)) as { error?: string } | null

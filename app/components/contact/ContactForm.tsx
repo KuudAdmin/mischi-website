@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { CONTACT_EMAIL } from '@/lib/release'
+import { track } from '@/lib/analytics'
 
 type Topic = 'bug' | 'idea' | 'question' | 'other'
 type Status = 'idle' | 'sending' | 'sent' | 'error'
@@ -108,6 +109,7 @@ export default function ContactForm() {
       })
       if (res.ok) {
         setStatus('sent')
+        track('contact_message_sent', { topic, from_app: fromApp })
         return
       }
       const data = (await res.json().catch(() => null)) as { error?: string; fallback?: boolean } | null
@@ -308,20 +310,52 @@ export default function ContactForm() {
         </form>
       )}
 
-      <div className="contact-aside">
-        <Link href="/docs#troubleshooting" className="contact-link-card">
-          <strong>Troubleshooting</strong>
-          <span>Fixes for the most common problems.</span>
-        </Link>
-        <Link href="/#faq" className="contact-link-card">
-          <strong>FAQ</strong>
-          <span>Quick answers about Mischi.</span>
-        </Link>
-        <a href={`mailto:${CONTACT_EMAIL}`} className="contact-link-card">
-          <strong>Email</strong>
-          <span>{CONTACT_EMAIL}</span>
-        </a>
-      </div>
+      <nav aria-labelledby="contact-aside-label">
+        <p id="contact-aside-label" className="contact-aside-label">Other ways to get help</p>
+        <div className="contact-aside">
+          <Link href="/docs#troubleshooting" className="contact-link-card">
+            <span className="contact-link-icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="9" />
+                <circle cx="12" cy="12" r="3.75" />
+                <path d="m5.6 5.6 3.75 3.75M14.65 14.65l3.75 3.75M14.65 9.35l3.75-3.75M5.6 18.4l3.75-3.75" />
+              </svg>
+            </span>
+            <span className="contact-link-text">
+              <strong>Troubleshooting</strong>
+              <span>Fixes for common problems</span>
+            </span>
+            <ChevronIcon />
+          </Link>
+          <Link href="/#faq" className="contact-link-card">
+            <span className="contact-link-icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M9.25 9.25a2.85 2.85 0 0 1 5.5 1c0 1.9-2.75 2.6-2.75 4" />
+                <path d="M12 17.25h.01" />
+              </svg>
+            </span>
+            <span className="contact-link-text">
+              <strong>FAQ</strong>
+              <span>Quick answers about Mischi</span>
+            </span>
+            <ChevronIcon />
+          </Link>
+          <a href={`mailto:${CONTACT_EMAIL}`} className="contact-link-card">
+            <span className="contact-link-icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="5" width="18" height="14" rx="2" />
+                <path d="m3.5 7 8.5 6 8.5-6" />
+              </svg>
+            </span>
+            <span className="contact-link-text">
+              <strong>Email us</strong>
+              <span>{CONTACT_EMAIL}</span>
+            </span>
+            <ChevronIcon />
+          </a>
+        </div>
+      </nav>
 
       <style>{`
         .contact { display: flex; flex-direction: column; gap: 20px; }
@@ -478,24 +512,47 @@ export default function ContactForm() {
         }
         .contact .contact-sent-title { margin: 0 0 4px; font-weight: 600; color: var(--color-text); }
         .contact .contact-sent-body { margin: 0 0 16px; font-size: 0.9375rem; overflow-wrap: anywhere; }
+        .contact .contact-aside-label {
+          margin: 8px 0 10px;
+          font-size: 0.6875rem;
+          font-weight: 600;
+          letter-spacing: 0.07em;
+          text-transform: uppercase;
+          color: var(--color-text-dim);
+        }
         .contact-aside { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
         .contact .contact-link-card {
           display: flex;
-          flex-direction: column;
-          gap: 4px;
-          padding: 16px 18px;
+          align-items: center;
+          gap: 12px;
+          padding: 14px;
           border-radius: var(--radius-lg);
           background: var(--color-surface);
           border: 1px solid var(--color-border);
           color: var(--color-text-muted);
-          font-size: 0.8125rem;
-          line-height: 1.5;
           text-decoration: none;
-          overflow-wrap: anywhere;
           transition: border-color var(--dur-fast), background var(--dur-fast);
         }
         .contact .contact-link-card:hover { border-color: rgba(81, 139, 112, 0.35); background: var(--color-surface-raised); }
-        .contact-link-card strong { color: var(--color-text); font-size: 0.875rem; }
+        .contact-link-icon {
+          flex: none;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 36px;
+          height: 36px;
+          border-radius: 10px;
+          background: var(--color-accent-dim);
+          color: var(--sage-800);
+        }
+        .contact-link-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; line-height: 1.4; }
+        .contact-link-text strong { font-size: 0.875rem; font-weight: 600; color: var(--color-text); }
+        .contact-link-text span { font-size: 0.78125rem; color: var(--color-text-muted); overflow-wrap: anywhere; }
+        .contact-link-arrow { flex: none; color: var(--color-text-dim); transition: transform var(--dur-fast), color var(--dur-fast); }
+        .contact .contact-link-card:hover .contact-link-arrow { transform: translateX(2px); color: var(--sage-700); }
+        @media (max-width: 760px) and (min-width: 641px) {
+          .contact-aside { grid-template-columns: minmax(0, 1fr); }
+        }
         @media (max-width: 640px) {
           .contact-card { padding: 20px; }
           .contact-row { grid-template-columns: minmax(0, 1fr); }
@@ -504,6 +561,14 @@ export default function ContactForm() {
         }
       `}</style>
     </div>
+  )
+}
+
+function ChevronIcon() {
+  return (
+    <svg className="contact-link-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="m9 6 6 6-6 6" />
+    </svg>
   )
 }
 
