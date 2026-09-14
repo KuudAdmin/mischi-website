@@ -1,6 +1,29 @@
 import type { NextConfig } from "next";
 
+// PostHog is reached through our own domain (/relay/*), so privacy extensions
+// that block third-party trackers by hostname don't silently drop events.
+// The region must match the PostHog project; "eu" unless told otherwise.
+const posthogRegion = process.env.NEXT_PUBLIC_POSTHOG_REGION === "us" ? "us" : "eu";
+
 const nextConfig: NextConfig = {
+  // PostHog's API paths end in a slash; redirecting them would break ingestion.
+  skipTrailingSlashRedirect: true,
+  async rewrites() {
+    return [
+      {
+        source: "/relay/static/:path*",
+        destination: `https://${posthogRegion}-assets.i.posthog.com/static/:path*`,
+      },
+      {
+        source: "/relay/array/:path*",
+        destination: `https://${posthogRegion}-assets.i.posthog.com/array/:path*`,
+      },
+      {
+        source: "/relay/:path*",
+        destination: `https://${posthogRegion}.i.posthog.com/:path*`,
+      },
+    ];
+  },
   async headers() {
     return [
       {

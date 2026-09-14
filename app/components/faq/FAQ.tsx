@@ -45,7 +45,7 @@ const QUESTIONS: { q: string; a: string }[] = [
   },
   {
     q: 'Does Mischi collect any data about me?',
-    a: 'No. The app has no analytics, no crash reporting and no usage telemetry, and it never phones home. The only thing we ever collect is your email, and only if you sign up for the newsletter. See the Privacy Policy for the full picture.',
+    a: 'Not from the app: it has no analytics, crash reporting or usage telemetry, and it never phones home. This website uses cookieless, anonymous analytics to count things like downloads, and we only get your email if you subscribe to the newsletter or write to us. See the Privacy Policy for the full picture.',
   },
 ]
 

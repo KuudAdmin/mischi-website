@@ -62,6 +62,24 @@ to `CONTACT_EMAIL`, with the sender as Reply-To. It needs:
 
 If sending fails, the form offers the same message as a pre-filled email instead.
 
+## Analytics
+
+Cookieless [PostHog](https://posthog.com) counts pageviews and a few named events. It
+stays off until `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` is set, and never loads for
+visitors who send Do Not Track or Global Privacy Control.
+
+- `instrumentation-client.ts` starts PostHog (memory persistence, no autocapture,
+  no session recording).
+- `lib/analytics.ts` classifies link clicks by destination (`download_clicked`,
+  `docs_link_clicked`, `outbound_link_clicked`, …) and exports `track()` for the
+  form events (`newsletter_subscribed`, `contact_message_sent`,
+  `docs_search_result_opened`).
+- Events go through `/relay/*` on our own domain (rewrites in `next.config.ts`).
+  Set `NEXT_PUBLIC_POSTHOG_REGION=us` if the PostHog project is in the US region.
+
+Never add personal data (emails, names, message text) to event properties; the
+privacy policy promises it isn't collected.
+
 ## Newsletter
 
 The newsletter form posts to `app/api/subscribe/route.ts`, which keeps the provider

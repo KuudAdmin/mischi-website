@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { track } from '@/lib/analytics'
 
 interface Entry {
   sectionId: string
@@ -16,7 +17,8 @@ interface Result {
   score: number
 }
 
-const MAX_RESULTS = 8
+const MAX_RESULTS = 6
+const SNIPPET_LENGTH = 90
 
 // The index is read from the rendered docs the first time someone searches, so
 // it always matches what's on the page — there's no second copy to maintain.
@@ -39,8 +41,13 @@ function buildIndex(): Entry[] {
         }
         entries.push(current)
       } else {
-        // innerText keeps table cells and list items apart.
-        current.text += ` ${child.innerText}`
+        // innerText keeps table cells and list items apart. Column headings
+        // ("Message", "What to check") aren't content, so leave them out.
+        let text = child.innerText
+        child.querySelectorAll<HTMLElement>('thead').forEach((head) => {
+          text = text.replace(head.innerText, '')
+        })
+        current.text += ` ${text}`
       }
     }
   })
@@ -48,23 +55,37 @@ function buildIndex(): Entry[] {
   return entries
 }
 
+// Terms need two characters and a letter or digit, so a stray "/" or "." doesn't
+// match every file path on the page.
 function termsOf(query: string): string[] {
-  return query.toLowerCase().split(/\s+/).filter(Boolean)
+  return query
+    .toLowerCase()
+    .split(/\s+/)
+    .filter((t) => t.length >= 2 && /[\p{L}\p{N}]/u.test(t))
 }
 
+// A short excerpt that starts on a word boundary just before the first match.
 function snippetOf(text: string, terms: string[]): string {
   const lower = text.toLowerCase()
   const first = terms
     .map((t) => lower.indexOf(t))
     .filter((i) => i >= 0)
     .sort((a, b) => a - b)[0]
-  const start = first === undefined ? 0 : Math.max(0, first - 40)
-  const end = start + 130
-  return `${start > 0 ? '…' : ''}${text.slice(start, end).trim()}${end < text.length ? '…' : ''}`
+  if (first === undefined) return text.slice(0, SNIPPET_LENGTH)
+  let start = Math.max(0, first - 24)
+  if (start > 0) {
+    const space = text.lastIndexOf(' ', start)
+    start = space >= 0 && first - space < 40 ? space + 1 : start
+  }
+  let end = Math.min(text.length, start + SNIPPET_LENGTH)
+  if (end < text.length) {
+    const space = text.lastIndexOf(' ', end)
+    if (space > first) end = space
+  }
+  return `${start > 0 ? '…' : ''}${text.slice(start, end)}${end < text.length ? '…' : ''}`
 }
 
-function search(index: Entry[], query: string): Result[] {
-  const terms = termsOf(query)
+function search(index: Entry[], terms: string[]): Result[] {
   if (terms.length === 0) return []
   const results: Result[] = []
   for (const entry of index) {
@@ -98,6 +119,24 @@ function Highlight({ text, terms }: { text: string; terms: string[] }) {
   )
 }
 
+function SectionIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M14.5 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7.5Z" />
+      <path d="M14 3v5h5" />
+      <path d="M9 13h6M9 17h4" />
+    </svg>
+  )
+}
+
+function HeadingIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M5 9h14M5 15h14M10 4 8 20M16 4l-2 16" />
+    </svg>
+  )
+}
+
 export default function DocsSearch() {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<Result[]>([])
@@ -106,6 +145,7 @@ export default function DocsSearch() {
   const indexRef = useRef<Entry[] | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const boxRef = useRef<HTMLDivElement>(null)
+  const listRef = useRef<HTMLDivElement>(null)
 
   // "/" or ⌘K / Ctrl+K focuses the search from anywhere on the page.
   useEffect(() => {
@@ -132,13 +172,27 @@ export default function DocsSearch() {
   function update(value: string) {
     if (!indexRef.current) indexRef.current = buildIndex()
     setQuery(value)
-    setResults(search(indexRef.current, value))
+    setResults(search(indexRef.current, termsOf(value)))
     setActive(0)
     setOpen(true)
   }
 
+  function moveActive(next: number) {
+    setActive(next)
+    listRef.current
+      ?.querySelector(`#docs-search-result-${next}`)
+      ?.scrollIntoView({ block: 'nearest' })
+  }
+
   function go(result: Result) {
     const { el, sectionId } = result.entry
+    // The search words show what people look for and whether the docs cover it.
+    track('docs_search_result_opened', {
+      query: query.trim().slice(0, 60),
+      result: result.entry.heading,
+      section: result.entry.section,
+      position: results.indexOf(result) + 1,
+    })
     setOpen(false)
     inputRef.current?.blur()
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -155,10 +209,10 @@ export default function DocsSearch() {
     if (e.key === 'ArrowDown' && results.length) {
       e.preventDefault()
       setOpen(true)
-      setActive((i) => (i + 1) % results.length)
+      moveActive((active + 1) % results.length)
     } else if (e.key === 'ArrowUp' && results.length) {
       e.preventDefault()
-      setActive((i) => (i - 1 + results.length) % results.length)
+      moveActive((active - 1 + results.length) % results.length)
     } else if (e.key === 'Enter' && results[active]) {
       e.preventDefault()
       go(results[active])
@@ -186,7 +240,7 @@ export default function DocsSearch() {
         id="docs-search-input"
         type="search"
         className="docs-search-input"
-        placeholder="Search the docs, e.g. “voice”, “pet.json”, “reminders”"
+        placeholder="Search the docs"
         value={query}
         onChange={(e) => update(e.target.value)}
         onFocus={() => { if (query.trim()) setOpen(true) }}
@@ -199,45 +253,66 @@ export default function DocsSearch() {
         aria-autocomplete="list"
         aria-activedescendant={showPanel && results[active] ? `docs-search-result-${active}` : undefined}
       />
-      <kbd className="docs-search-kbd" aria-hidden="true">/</kbd>
+      <kbd className="docs-search-kbd" aria-hidden="true">⌘K</kbd>
 
       <p className="docs-search-status" aria-live="polite">
-        {query.trim() ? `${results.length} ${results.length === 1 ? 'result' : 'results'}` : ''}
+        {terms.length ? `${results.length} ${results.length === 1 ? 'result' : 'results'}` : ''}
       </p>
 
       {showPanel && (
-        <div id="docs-search-results" role="listbox" aria-label="Search results" className="docs-search-panel">
-          {results.length > 0 ? (
-            results.map((result, i) => (
-              <div
-                key={`${result.entry.sectionId}-${result.entry.heading}`}
-                id={`docs-search-result-${i}`}
-                role="option"
-                aria-selected={i === active}
-                className="docs-search-result"
-                data-active={i === active}
-                onPointerEnter={() => setActive(i)}
-                onPointerDown={(e) => e.preventDefault()}
-                onClick={() => go(result)}
-              >
-                <span className="docs-search-crumb">
-                  {result.entry.heading === result.entry.section ? 'Section' : result.entry.section}
-                </span>
-                <span className="docs-search-title">
-                  <Highlight text={result.entry.heading} terms={terms} />
-                </span>
-                {result.snippet && (
-                  <span className="docs-search-snippet">
-                    <Highlight text={result.snippet} terms={terms} />
-                  </span>
-                )}
-              </div>
-            ))
-          ) : (
+        <div className="docs-search-panel">
+          {terms.length === 0 ? (
+            <p className="docs-search-empty">Keep typing to search…</p>
+          ) : results.length === 0 ? (
             <p className="docs-search-empty">
-              Nothing matches “{query.trim()}”. Try a different word, or <a href="/contact">ask us</a>.
+              No results for “{query.trim()}”. <a href="/contact">Ask us instead</a>
             </p>
+          ) : (
+            <div ref={listRef} id="docs-search-results" role="listbox" aria-label="Search results" className="docs-search-list">
+              {results.map((result, i) => {
+                const isSection = result.entry.heading === result.entry.section
+                return (
+                  <div
+                    key={`${result.entry.sectionId}-${result.entry.heading}`}
+                    id={`docs-search-result-${i}`}
+                    role="option"
+                    aria-selected={i === active}
+                    className="docs-search-result"
+                    data-active={i === active}
+                    onPointerEnter={() => setActive(i)}
+                    onPointerDown={(e) => e.preventDefault()}
+                    onClick={() => go(result)}
+                  >
+                    <span className="docs-search-result-icon">
+                      {isSection ? <SectionIcon /> : <HeadingIcon />}
+                    </span>
+                    <span className="docs-search-result-main">
+                      <span className="docs-search-result-top">
+                        <span className="docs-search-title">
+                          <Highlight text={result.entry.heading} terms={terms} />
+                        </span>
+                        {!isSection && <span className="docs-search-crumb">{result.entry.section}</span>}
+                      </span>
+                      {result.snippet && (
+                        <span className="docs-search-snippet">
+                          <Highlight text={result.snippet} terms={terms} />
+                        </span>
+                      )}
+                    </span>
+                    <svg className="docs-search-enter" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M20 5v7a3 3 0 0 1-3 3H5" />
+                      <path d="m9 11-4 4 4 4" />
+                    </svg>
+                  </div>
+                )
+              })}
+            </div>
           )}
+          <div className="docs-search-foot" aria-hidden="true">
+            <span><kbd>↑</kbd><kbd>↓</kbd> to move</span>
+            <span><kbd>↵</kbd> to open</span>
+            <span><kbd>esc</kbd> to close</span>
+          </div>
         </div>
       )}
 
@@ -245,10 +320,11 @@ export default function DocsSearch() {
         .docs-search {
           position: relative;
           z-index: 20;
-          max-width: 560px;
+          max-width: 520px;
           margin-top: 28px;
         }
-        .docs-search-label {
+        .docs-search-label,
+        .docs-search-status {
           position: absolute;
           width: 1px;
           height: 1px;
@@ -266,7 +342,7 @@ export default function DocsSearch() {
         }
         .docs-search-input {
           width: 100%;
-          padding: 12px 44px 12px 42px;
+          padding: 11px 56px 11px 42px;
           border-radius: 9999px;
           background: var(--color-surface);
           border: 1px solid var(--color-border-strong);
@@ -281,64 +357,89 @@ export default function DocsSearch() {
         .docs-search-input:focus { border-color: var(--color-accent); background: var(--color-surface-raised); }
         .docs-search-kbd {
           position: absolute;
-          right: 14px;
+          right: 12px;
           top: 50%;
           transform: translateY(-50%);
-          min-width: 22px;
           padding: 0 6px;
           font-family: var(--font-geist-mono), monospace;
-          font-size: 0.75rem;
+          font-size: 0.6875rem;
           line-height: 20px;
-          text-align: center;
           color: var(--color-text-dim);
           background: var(--color-surface-sunken);
           border: 1px solid var(--color-border);
           border-radius: 5px;
           pointer-events: none;
+          transition: opacity var(--dur-fast);
         }
-        .docs-search-input:focus ~ .docs-search-kbd { opacity: 0; }
-        .docs-search-status {
-          position: absolute;
-          width: 1px;
-          height: 1px;
-          overflow: hidden;
-          clip: rect(0 0 0 0);
-        }
+        .docs-search-input:focus ~ .docs-search-kbd,
+        .docs-search-input:not(:placeholder-shown) ~ .docs-search-kbd { opacity: 0; }
+
         .docs-search-panel {
           position: absolute;
           top: calc(100% + 8px);
           left: 0;
           right: 0;
-          max-height: min(440px, 60vh);
-          overflow-y: auto;
-          padding: 6px;
+          overflow: hidden;
           background: var(--color-surface-raised);
           border: 1px solid var(--color-border-strong);
           border-radius: var(--radius-lg);
           box-shadow: var(--shadow-card);
         }
+        .docs-search-list {
+          max-height: 340px;
+          overflow-y: auto;
+          padding: 6px;
+        }
         .docs-search-result {
           display: flex;
-          flex-direction: column;
-          gap: 2px;
-          padding: 10px 12px;
+          align-items: center;
+          gap: 12px;
+          padding: 8px 10px;
           border-radius: var(--radius-md);
           cursor: pointer;
         }
         .docs-search-result[data-active='true'] { background: var(--color-accent-dim); }
-        .docs-search-crumb {
-          font-size: 0.6875rem;
+        .docs-search-result-icon {
+          flex: none;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 30px;
+          height: 30px;
+          border-radius: 8px;
+          background: var(--color-surface-sunken);
+          color: var(--color-text-muted);
+        }
+        .docs-search-result[data-active='true'] .docs-search-result-icon {
+          background: var(--color-surface-raised);
+          color: var(--sage-800);
+        }
+        .docs-search-result-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+        .docs-search-result-top { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+        .docs-search-title {
+          flex: none;
+          max-width: 70%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          font-size: 0.875rem;
           font-weight: 600;
-          letter-spacing: 0.06em;
-          text-transform: uppercase;
+          color: var(--color-text);
+        }
+        .docs-search-crumb {
+          min-width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          font-size: 0.75rem;
           color: var(--color-text-dim);
         }
-        .docs-search-title { font-size: 0.9375rem; font-weight: 600; color: var(--color-text); }
         .docs-search-snippet {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
           font-size: 0.8125rem;
-          line-height: 1.5;
           color: var(--color-text-muted);
-          overflow-wrap: anywhere;
         }
         .docs-search-result mark {
           background: rgba(81, 139, 112, 0.18);
@@ -346,9 +447,11 @@ export default function DocsSearch() {
           border-radius: 3px;
           padding: 0 1px;
         }
+        .docs-search-enter { flex: none; color: var(--sage-700); opacity: 0; }
+        .docs-search-result[data-active='true'] .docs-search-enter { opacity: 1; }
         .docs-search-empty {
           margin: 0;
-          padding: 14px 12px;
+          padding: 16px 16px 14px;
           font-size: 0.875rem;
           color: var(--color-text-muted);
         }
@@ -357,6 +460,29 @@ export default function DocsSearch() {
           text-decoration: none;
           border-bottom: 1px solid rgba(81, 139, 112, 0.35);
         }
+        .docs-search-foot {
+          display: flex;
+          gap: 16px;
+          padding: 8px 14px;
+          border-top: 1px solid var(--color-border);
+          background: var(--color-surface);
+          font-size: 0.75rem;
+          color: var(--color-text-dim);
+        }
+        .docs-search-foot kbd {
+          display: inline-block;
+          min-width: 18px;
+          margin-right: 3px;
+          padding: 0 4px;
+          font-family: var(--font-geist-mono), monospace;
+          font-size: 0.6875rem;
+          line-height: 17px;
+          text-align: center;
+          color: var(--color-text-muted);
+          background: var(--color-surface-raised);
+          border: 1px solid var(--color-border-strong);
+          border-radius: 4px;
+        }
         @keyframes docs-search-flash {
           from { background-color: rgba(81, 139, 112, 0.16); }
           to   { background-color: transparent; }
@@ -364,6 +490,11 @@ export default function DocsSearch() {
         .docs-search-hit {
           animation: docs-search-flash 1.8s var(--ease-expo);
           border-radius: 6px;
+        }
+        @media (max-width: 640px) {
+          .docs-search-foot { display: none; }
+          .docs-search-kbd { display: none; }
+          .docs-search-input { padding-right: 16px; }
         }
         @media (prefers-reduced-motion: reduce) {
           .docs-search-hit { animation: none; }

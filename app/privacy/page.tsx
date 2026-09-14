@@ -33,7 +33,7 @@ export default function PrivacyPage() {
         <li><strong>No telemetry.</strong> The app sends no analytics, usage data or crash reports, to us or anyone else.</li>
         <li><strong>Your data stays on your Mac.</strong> Pets, settings, reminders and notes are stored locally and never uploaded.</li>
         <li><strong>AI is optional.</strong> Only if you add your own Groq API key does the app contact Groq, directly from your Mac. We are never in the middle.</li>
-        <li><strong>The website doesn’t track you.</strong> No cookies, no analytics. We only get your email if you subscribe to the newsletter or write to us.</li>
+        <li><strong>The website counts visits, it doesn’t track you.</strong> Cookieless, anonymous analytics tell us things like how many people download Mischi. No cookies, no profiles, no advertising. We only get your email if you subscribe to the newsletter or write to us.</li>
         <li><strong>We never sell your data</strong> or share it for advertising.</li>
       </ul>
 
@@ -88,7 +88,21 @@ export default function PrivacyPage() {
 
       <h3>Browsing and downloads</h3>
       <p>
-        mischi.app uses no cookies, no analytics and no advertising or tracking scripts. Fonts, images and videos are served from our own domain. Our hosting provider, Vercel, keeps standard server logs, such as IP address, browser type and the pages or files requested (including app downloads), to deliver the site and protect it from abuse. These logs are kept for a short period under Vercel’s retention settings, and we don’t use them to identify you.
+        mischi.app sets no cookies and uses no advertising or cross-site tracking. Fonts, images and videos are served from our own domain. Our hosting provider, Vercel, keeps standard server logs, such as IP address, browser type and the pages or files requested (including app downloads), to deliver the site and protect it from abuse. These logs are kept for a short period under Vercel’s retention settings, and we don’t use them to identify you.
+      </p>
+
+      <h3>Usage analytics</h3>
+      <p>
+        To understand how the site is used, such as how many people download Mischi, read the docs or send us a message, we use PostHog, set up to be as private as possible:
+      </p>
+      <ul>
+        <li><strong>No cookies or browser storage.</strong> Nothing is saved on your device, so we can’t recognise you between visits or follow you across other sites, and no profile is built about you.</li>
+        <li><strong>What’s recorded:</strong> the pages you view, which kinds of links you click (for example download, docs or external links), words you search for in the docs, and that a form was sent. Also basic technical details: browser, device type, the referring site, and an approximate location worked out from your IP address. The IP address itself is discarded and never stored.</li>
+        <li><strong>What isn’t:</strong> your email address, name or message text, anything you type into forms, and screen recordings.</li>
+        <li><strong>Your choice is respected:</strong> if your browser sends a Do Not Track or Global Privacy Control signal, analytics don’t load at all.</li>
+      </ul>
+      <p>
+        Events are sent through our own domain to PostHog, which processes them for us under its <a href="https://posthog.com/privacy" target="_blank" rel="noopener noreferrer">privacy policy</a>.
       </p>
 
       <h3>Contacting us</h3>
@@ -113,12 +127,12 @@ export default function PrivacyPage() {
       <p>If you’re in the European Economic Area or the United Kingdom, we rely on:</p>
       <ul>
         <li><strong>Consent</strong> for the newsletter. You can withdraw it at any time by unsubscribing.</li>
-        <li><strong>Legitimate interests</strong> for server logs that keep the website running and secure, and for replying to messages you send us.</li>
+        <li><strong>Legitimate interests</strong> for server logs that keep the website running and secure, for anonymous usage analytics that help us improve it, and for replying to messages you send us.</li>
       </ul>
 
       <h2>Who we share data with</h2>
       <p>
-        We only share personal data with the service providers named in this policy (Vercel, Kit, Google, Resend, and the provider that hosts our email inbox), and only so they can provide their service to us. We don’t sell personal data, and we don’t share it for cross-context behavioural advertising. We may disclose data if the law requires it.
+        We only share personal data with the service providers named in this policy (Vercel, PostHog, Kit, Google, Resend, and the provider that hosts our email inbox), and only so they can provide their service to us. We don’t sell personal data, and we don’t share it for cross-context behavioural advertising. We may disclose data if the law requires it.
       </p>
       <p>
         Some of these providers are based in the United States or elsewhere outside your country. Where required, they protect transfers with safeguards such as the European Commission’s Standard Contractual Clauses.
@@ -129,11 +143,12 @@ export default function PrivacyPage() {
         <li><strong>Newsletter:</strong> until you unsubscribe or ask us to delete your address.</li>
         <li><strong>Emails you send us:</strong> as long as we need them to handle your message, and then for a reasonable period in case you follow up.</li>
         <li><strong>Server logs:</strong> for the short period set by our hosting provider.</li>
+        <li><strong>Analytics events:</strong> for up to a year. They’re never linked to your name or email.</li>
       </ul>
 
       <h2>Your rights</h2>
       <p>
-        Depending on where you live, for example under India’s Digital Personal Data Protection Act, 2023 or the EU and UK GDPR, you may have the right to access, correct, delete or export your personal data, to object to or restrict how we use it, and to withdraw consent. Residents of California and other US states have similar rights, and we don’t discriminate against anyone for using them. Because we don’t track visitors, a Global Privacy Control or Do Not Track signal needs nothing further from us.
+        Depending on where you live, for example under India’s Digital Personal Data Protection Act, 2023 or the EU and UK GDPR, you may have the right to access, correct, delete or export your personal data, to object to or restrict how we use it, and to withdraw consent. Residents of California and other US states have similar rights, and we don’t discriminate against anyone for using them. Our analytics set no cookies and build no profiles, and they don’t load at all when your browser sends a Global Privacy Control or Do Not Track signal.
       </p>
       <p>
         To use any of these rights, contact us at {email}. We’ll respond within the time the law requires. You can also complain to your local data protection authority.
