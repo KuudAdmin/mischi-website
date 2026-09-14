@@ -48,6 +48,10 @@ export default function DesktopScene() {
   const [walkDir, setWalkDir] = useState<1 | -1 | null>(null)
   const [walkMs, setWalkMs] = useState(0)
   const [bubble, setBubble] = useState(false)
+  // False until the laptop image and the cat's sprite sheet are both ready, so
+  // the scene appears as one piece instead of the cat arriving on its own.
+  const [ready, setReady] = useState(false)
+  const imgRef = useRef<HTMLImageElement>(null)
   const timers = useRef<ReturnType<typeof setTimeout>[]>([])
   const screenRef = useRef<HTMLDivElement>(null)
   const petRef = useRef<HTMLDivElement>(null)
@@ -74,9 +78,37 @@ export default function DesktopScene() {
     return ((pet.left + pet.width / 2 - screen.left) / screen.width) * 100
   }
 
-  // The page's one orchestrated moment: the pet strolls in and says hello.
-  // With reduced motion it's simply already there.
+  // Reveal the laptop, pet and controls together once the laptop image and the
+  // sprite sheet are decoded (both are preloaded, so this is usually quick).
+  // A cap makes sure a slow network never leaves the hero empty.
   useEffect(() => {
+    let cancelled = false
+    const reveal = () => {
+      if (!cancelled) setReady(true)
+    }
+    const img = imgRef.current
+    const laptop = !img
+      ? Promise.resolve()
+      : img.complete && img.naturalWidth > 0
+        ? img.decode()
+        : new Promise<void>((resolve) => {
+            img.addEventListener('load', () => resolve(), { once: true })
+            img.addEventListener('error', () => resolve(), { once: true })
+          }).then(() => img.decode())
+    const sheet = new window.Image()
+    sheet.src = '/spritesheet_cat.webp'
+    Promise.all([laptop, sheet.decode()].map((p) => p.catch(() => {}))).then(reveal)
+    const cap = setTimeout(reveal, 2500)
+    return () => {
+      cancelled = true
+      clearTimeout(cap)
+    }
+  }, [])
+
+  // The page's one orchestrated moment: once the scene is in, the pet strolls
+  // in and says hello. With reduced motion it's simply already there.
+  useEffect(() => {
+    if (!ready) return
     const pending = timers.current
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     pending.push(
@@ -96,10 +128,10 @@ export default function DesktopScene() {
         setMood(walkMood(1))
         setX(INTRO_X)
         pending.push(setTimeout(greet, (INTRO_X - LEFT_X) * MS_PER_PCT))
-      }, 700),
+      }, 450),
     )
     return () => pending.forEach(clearTimeout)
-  }, [])
+  }, [ready])
 
   function act(control: Control) {
     clearTimers()
@@ -152,9 +184,17 @@ export default function DesktopScene() {
   const moving = walkDir !== null && walkMs > 0 && !reducedMotion
 
   return (
-    <div className="desk-wrap" role="group" aria-label="Try Mischi: a pet living on a Mac desktop">
+    <div
+      className="desk-wrap"
+      data-ready={ready || undefined}
+      role="group"
+      aria-label="Try Mischi: a pet living on a Mac desktop"
+    >
+      {/* Without JavaScript nothing would flip data-ready, so just show it. */}
+      <noscript dangerouslySetInnerHTML={{ __html: '<style>.desk-wrap{opacity:1;transform:none}</style>' }} />
       <div className="desk">
         <Image
+          ref={imgRef}
           className="desk-mac"
           src="/hero/macbook-pro.webp"
           alt=""
@@ -211,13 +251,19 @@ export default function DesktopScene() {
       </div>
 
       <style>{`
+        /* Hidden (its space already reserved) until data-ready, then the
+           laptop, cat and controls fade up together in one motion. */
         .desk-wrap {
           width: 100%;
           display: flex;
           flex-direction: column;
           align-items: center;
           gap: 18px;
+          opacity: 0;
+          transform: translateY(12px);
+          transition: opacity 0.6s var(--ease-expo), transform 0.9s var(--ease-expo);
         }
+        .desk-wrap[data-ready] { opacity: 1; transform: none; }
         .desk { position: relative; width: 100%; isolation: isolate; }
         .desk-mac {
           display: block;
@@ -391,6 +437,7 @@ export default function DesktopScene() {
           .desk-ctl { padding: 5px 9px; font-size: 11.5px; }
         }
         @media (prefers-reduced-motion: reduce) {
+          .desk-wrap { transform: none; transition: none; }
           .desk-bubble { animation: none; }
         }
       `}</style>
