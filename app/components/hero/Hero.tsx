@@ -179,11 +179,16 @@ export default function Hero() {
           .hero-sub { margin-inline: auto; }
           .hero-actions { justify-content: center; }
         }
+        /* Phones: tighter spacing and type so the copy and the cat scene both
+           fit the first screen. */
         @media (max-width: 520px) {
-          .hero { padding-top: 96px; padding-bottom: 48px; }
-          .hero-pill { white-space: normal; }
-          .hero-actions { flex-direction: column; width: 100%; }
-          .hero-cta { width: 100%; }
+          .hero { padding-top: 76px; padding-bottom: 20px; }
+          .hero-grid { gap: 16px; }
+          .hero-pill { white-space: normal; font-size: 0.75rem; }
+          .hero-headline { margin: 14px 0 12px; font-size: 2.25rem; }
+          .hero-sub { margin-bottom: 20px; font-size: 1rem; line-height: 1.55; }
+          .hero-actions { flex-direction: column; width: 100%; gap: 10px; margin-bottom: 8px; }
+          .hero-cta { width: 100%; padding-block: 13px; }
         }
       `}</style>
     </section>

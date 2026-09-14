@@ -2,16 +2,15 @@
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import Image from 'next/image'
-import { Wifi } from 'iconsax-react'
 import PetCanvas from '../demo/PetCanvas'
 
 type Mood = 'idle' | 'wave' | 'jump' | 'dancing' | 'tired' | 'waiting' | 'review' | 'runLeft' | 'runRight'
 
-// Where the pet can stand on the floor, as a percentage of the scene's width.
+// Where the pet can stand on the floor, as a percentage of the screen's width.
 const LEFT_X = 20
 const RIGHT_X = 80
 const INTRO_X = 56
-// Walking pace: milliseconds per percent of the scene crossed.
+// Walking pace: milliseconds per percent of the screen crossed.
 const MS_PER_PCT = 42
 
 // In the cat sheet, the runRight row faces right and runLeft faces left.
@@ -32,18 +31,17 @@ const CONTROLS: Control[] = [
   { label: 'Review', mood: 'review' },
 ]
 
-// Abstract "text" lines in the two background windows. Deliberately not a
-// real app: they're scenery, and the pet is the subject.
-const LINES_A = [58, 82, 70, 44]
-const LINES_B = [64, 40, 76]
-
 function subscribeReducedMotion(onChange: () => void) {
   const query = window.matchMedia('(prefers-reduced-motion: reduce)')
   query.addEventListener('change', onChange)
   return () => query.removeEventListener('change', onChange)
 }
 
-/** A small macOS desktop with the pet living on it, plus controls for every animation. */
+/**
+ * The pet living on a real MacBook Pro, plus controls for every animation.
+ * The live layer sits exactly over the mockup's screen, so its own macOS
+ * wallpaper and menu bar show through behind the pet.
+ */
 export default function DesktopScene() {
   const [x, setX] = useState(LEFT_X)
   const [mood, setMood] = useState<Mood>('idle')
@@ -51,7 +49,7 @@ export default function DesktopScene() {
   const [walkMs, setWalkMs] = useState(0)
   const [bubble, setBubble] = useState(false)
   const timers = useRef<ReturnType<typeof setTimeout>[]>([])
-  const sceneRef = useRef<HTMLDivElement>(null)
+  const screenRef = useRef<HTMLDivElement>(null)
   const petRef = useRef<HTMLDivElement>(null)
 
   const reducedMotion = useSyncExternalStore(
@@ -70,10 +68,10 @@ export default function DesktopScene() {
 
   // Where the pet actually is right now, including partway through a walk.
   const currentX = () => {
-    const scene = sceneRef.current?.getBoundingClientRect()
+    const screen = screenRef.current?.getBoundingClientRect()
     const pet = petRef.current?.getBoundingClientRect()
-    if (!scene || !pet || !scene.width) return x
-    return ((pet.left + pet.width / 2 - scene.left) / scene.width) * 100
+    if (!screen || !pet || !screen.width) return x
+    return ((pet.left + pet.width / 2 - screen.left) / screen.width) * 100
   }
 
   // The page's one orchestrated moment: the pet strolls in and says hello.
@@ -143,158 +141,141 @@ export default function DesktopScene() {
   }
 
   const isActive = (c: Control) => (c.walk ? walkDir === c.walk : walkDir === null && mood === c.mood)
+
+  // When the dock overflows (phones), slide the pressed control to the start
+  // of the row so the ones beyond it peek in. Only the dock scrolls.
+  function slideToStart(button: HTMLButtonElement) {
+    const dock = button.parentElement
+    if (!dock || dock.scrollWidth <= dock.clientWidth) return
+    dock.scrollTo({ left: Math.max(0, button.offsetLeft - 4), behavior: reducedMotion ? 'auto' : 'smooth' })
+  }
   const moving = walkDir !== null && walkMs > 0 && !reducedMotion
 
   return (
-    <div ref={sceneRef} className="desk" role="group" aria-label="Try Mischi: a pet living on a Mac desktop">
-      <div className="desk-menubar" aria-hidden="true">
-        <span className="desk-menus">
-          <b>Finder</b>
-          <span>File</span>
-          <span>Edit</span>
-          <span>View</span>
-          <span>Go</span>
-          <span>Window</span>
-        </span>
-        <span className="desk-status">
-          <span className="desk-mischi">
-            <Image src="/mischi-icon-02.svg" alt="" width={13} height={13} />
-          </span>
-          <Wifi size={13} variant="Bold" color="currentColor" />
-          <span>Mon 9:41</span>
-        </span>
-      </div>
+    <div className="desk-wrap" role="group" aria-label="Try Mischi: a pet living on a Mac desktop">
+      <div className="desk">
+        <Image
+          className="desk-mac"
+          src="/hero/macbook-pro.webp"
+          alt=""
+          width={2000}
+          height={1220}
+          sizes="(max-width: 960px) 92vw, 640px"
+          preload
+        />
 
-      <div className="desk-window desk-window-a" aria-hidden="true">
-        <div className="desk-bar"><i /><i /><i /></div>
-        <div className="desk-lines">
-          {LINES_A.map((w, i) => <span key={i} style={{ width: `${w}%` }} />)}
-        </div>
-      </div>
-      <div className="desk-window desk-window-b" aria-hidden="true">
-        <div className="desk-bar"><i /><i /><i /></div>
-        <div className="desk-lines">
-          {LINES_B.map((w, i) => <span key={i} style={{ width: `${w}%` }} />)}
-        </div>
-      </div>
-
-      {/* The pet's stage sits directly on top of the dock, so the pet always
-          stands just above the controls however many rows they wrap to. */}
-      <div className="desk-floor">
-        <div className="desk-stage">
-          <div
-            ref={petRef}
-            className="desk-pet"
-            // Only a walk ever animates the pet's position.
-            style={{ left: `${x}%`, transition: moving ? `left ${walkMs}ms linear` : 'none' }}
-            onClick={() => act({ label: 'Wave', mood: 'wave' })}
-            aria-hidden="true"
-          >
-            <span className="desk-shadow" />
-            <PetCanvas
-              state={mood}
-              onStateChange={syncMood}
-              interactive={false}
-              autoAnimate={false}
-              scale={0.46}
-              spritesheet="/spritesheet_cat.webp"
-            />
-            {bubble && <span className="desk-bubble">Stretch break in 5 minutes?</span>}
+        {/* The live layer, placed exactly over the mockup's screen. */}
+        <div ref={screenRef} className="desk-screen">
+          <div className="desk-stage">
+            <div
+              ref={petRef}
+              className="desk-pet"
+              // Only a walk ever animates the pet's position.
+              style={{ left: `${x}%`, transition: moving ? `left ${walkMs}ms linear` : 'none' }}
+              onClick={() => act({ label: 'Wave', mood: 'wave' })}
+              aria-hidden="true"
+            >
+              <span className="desk-shadow" />
+              <PetCanvas
+                state={mood}
+                onStateChange={syncMood}
+                interactive={false}
+                autoAnimate={false}
+                scale={0.46}
+                spritesheet="/spritesheet_cat.webp"
+                className="desk-sprite"
+              />
+              {bubble && <span className="desk-bubble">Stretch break in 5 minutes?</span>}
+            </div>
           </div>
         </div>
+      </div>
 
-        <div className="desk-dock" aria-label="Pet animations">
-          {CONTROLS.map((c) => (
-            <button
-              key={c.label}
-              type="button"
-              className="desk-ctl"
-              aria-label={c.aria}
-              aria-pressed={isActive(c)}
-              onClick={() => act(c)}
-            >
-              {c.label}
-            </button>
-          ))}
-        </div>
+      {/* Under the laptop, like a remote. */}
+      <div className="desk-dock" aria-label="Pet animations">
+        {CONTROLS.map((c) => (
+          <button
+            key={c.label}
+            type="button"
+            className="desk-ctl"
+            aria-label={c.aria}
+            aria-pressed={isActive(c)}
+            onClick={(e) => {
+              act(c)
+              slideToStart(e.currentTarget)
+            }}
+          >
+            {c.label}
+          </button>
+        ))}
       </div>
 
       <style>{`
-        .desk {
-          position: relative;
+        .desk-wrap {
           width: 100%;
-          aspect-ratio: 16 / 11;
-          overflow: hidden;
-          isolation: isolate;
-          border-radius: 20px;
-          background-color: #C4533F;
-          background-image:
-            radial-gradient(120% 90% at 88% 0%, var(--desk-a, #F4A259) 0%, transparent 55%),
-            radial-gradient(110% 100% at 0% 100%, var(--desk-c, #9E3A5B) 0%, transparent 60%),
-            linear-gradient(135deg, var(--desk-b, #D95D39), #B84A4A 60%, var(--desk-c, #9E3A5B));
-          box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.3),
-            0 32px 64px -36px rgba(90, 40, 30, 0.5);
-        }
-        /* No backdrop-filter anywhere in the scene: combined with the hero's
-           fade-in it can make Chrome paint the whole scene washed out. */
-        .desk-menubar {
-          position: absolute;
-          inset: 0 0 auto 0;
-          z-index: 3;
-          height: 26px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 0 14px;
-          background: rgba(255, 248, 240, 0.14);
-          font-size: 12px;
-          color: rgba(255, 248, 240, 0.82);
-        }
-        .desk-menus { display: flex; gap: 14px; }
-        .desk-menus b { font-weight: 600; color: rgba(255, 248, 240, 0.95); }
-        .desk-status { display: flex; align-items: center; gap: 10px; }
-        .desk-mischi {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          width: 22px;
-          height: 17px;
-          border-radius: 5px;
-          background: rgba(255, 248, 240, 0.55);
-        }
-        .desk-window {
-          position: absolute;
-          overflow: hidden;
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          border-radius: 10px;
-          background: rgba(255, 248, 240, 0.1);
-        }
-        .desk-window-a { left: 7%; top: 14%; width: 44%; height: 38%; }
-        .desk-window-b { left: 47%; top: 24%; width: 40%; height: 34%; }
-        .desk-bar { height: 18px; display: flex; align-items: center; gap: 5px; padding: 0 9px; background: rgba(255, 255, 255, 0.08); }
-        .desk-bar i { display: block; width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, 0.4); }
-        .desk-lines { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; }
-        .desk-lines span { display: block; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.16); }
-
-        /* Bottom-anchored column: the pet's stage, then the dock. Because the
-           dock is in the flow, the stage always rests right on top of it. */
-        .desk-floor {
-          position: absolute;
-          left: 0;
-          right: 0;
-          bottom: 14px;
-          z-index: 4;
           display: flex;
           flex-direction: column;
           align-items: center;
+          gap: 18px;
         }
-        /* As tall as the pet, less the ~9px of empty space under its feet, plus
-           a 10px gap so it stands just above the dock. */
-        .desk-stage { position: relative; align-self: stretch; height: 87px; margin-bottom: 10px; }
+        .desk { position: relative; width: 100%; isolation: isolate; }
+        .desk-mac {
+          display: block;
+          width: 100%;
+          height: auto;
+          user-select: none;
+          pointer-events: none;
+        }
+        /* A soft floor shadow under the laptop (cheaper than a drop-shadow
+           filter on the whole image). */
+        .desk::after {
+          content: '';
+          position: absolute;
+          left: 4%;
+          right: 4%;
+          bottom: -3%;
+          z-index: -1;
+          height: 8%;
+          border-radius: 50%;
+          background: radial-gradient(closest-side, rgba(70, 35, 25, 0.22), transparent);
+        }
+        /* Measured from the mockup, inside the black bezel: the screen starts
+           9% from the left and 2.131% from the top, and is 82% x 86.885% of
+           the image, with top corners rounded by about 1% x 1.5%.
+           It's also a size container, so the cat can be sized as a share of
+           the screen and stay in proportion at any laptop size. */
+        .desk-screen {
+          --cat: 15cqw;
+          position: absolute;
+          left: 9%;
+          top: 2.131%;
+          width: 82%;
+          height: 86.885%;
+          overflow: hidden;
+          container-type: size;
+          border-radius: 0.98% 0.98% 0 0 / 1.51% 1.51% 0 0;
+        }
+
+        /* The cat's size comes from --cat (its width). The sprite is 192x208,
+           with empty space under its feet worth about a tenth of its width;
+           the offsets below are in those proportions. PetCanvas sets pixel
+           sizes inline, hence the !important. */
+        .desk-sprite {
+          width: var(--cat) !important;
+          height: calc(var(--cat) * 1.0833) !important;
+          background-size: 800% 900% !important;
+        }
+        .desk-sprite canvas { width: 100% !important; height: 100% !important; }
+        .desk-stage {
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 5%;
+          height: calc(var(--cat) * 0.98);
+        }
         .desk-pet {
           position: absolute;
-          bottom: -9px;
+          bottom: calc(var(--cat) * -0.102);
           transform: translateX(-50%);
           line-height: 0;
           cursor: pointer;
@@ -302,21 +283,20 @@ export default function DesktopScene() {
         .desk-shadow {
           position: absolute;
           left: 50%;
-          bottom: 7px;
+          bottom: calc(var(--cat) * 0.08);
           width: 56%;
-          height: 8px;
+          height: max(5px, calc(var(--cat) * 0.09));
           border-radius: 50%;
-          background: rgba(40, 12, 10, 0.28);
+          background: rgba(20, 8, 6, 0.35);
           filter: blur(3px);
           transform: translateX(-50%);
         }
-        /* Sits just clear of the ears (the sprite has ~9px of empty space above
-           them at this size). Placement uses the translate property so the
-           pop-in animation can own transform. */
+        /* Sits just clear of the ears. Placement uses the translate property
+           so the pop-in animation can own transform. */
         .desk-bubble {
           position: absolute;
-          left: 50%;
-          bottom: calc(100% - 3px);
+          left: 60%;
+          bottom: calc(100% + var(--cat) * 0.03);
           z-index: 2;
           padding: 6px 11px;
           border-radius: 13px;
@@ -326,26 +306,21 @@ export default function DesktopScene() {
           color: #1B211D;
           white-space: nowrap;
           box-shadow: 0 8px 20px -10px rgba(40, 15, 10, 0.5);
-          translate: -50% 0;
-          transform-origin: bottom center;
+          translate: -20px 0;
+          transform-origin: bottom left;
           animation: desk-pop 0.35s var(--ease-spring) both;
         }
         .desk-bubble::after {
           content: '';
           position: absolute;
-          left: 50%;
+          left: 20px;
           bottom: -4px;
           width: 9px;
           height: 9px;
           background: #FFFFFF;
           transform: translateX(-50%) rotate(45deg);
         }
-        /* With room to spare, the bubble rises up and to the right of the
-           head, its tail pointing back down at the pet. */
-        @media (min-width: 601px) {
-          .desk-bubble { left: 60%; translate: -20px 0; transform-origin: bottom left; }
-          .desk-bubble::after { left: 20px; }
-        }
+
         .desk-dock {
           position: relative;
           z-index: 1;
@@ -354,11 +329,12 @@ export default function DesktopScene() {
           justify-content: center;
           gap: 2px;
           width: max-content;
-          max-width: calc(100% - 24px);
+          max-width: 100%;
           padding: 4px;
+          border: 1px solid var(--color-border);
           border-radius: 9999px;
-          background: rgba(255, 255, 255, 0.94);
-          box-shadow: 0 10px 24px -12px rgba(40, 15, 10, 0.5);
+          background: var(--color-surface-raised);
+          box-shadow: 0 10px 24px -16px rgba(40, 15, 10, 0.35);
         }
         .desk-ctl {
           padding: 6px 10px;
@@ -374,22 +350,45 @@ export default function DesktopScene() {
           transition: background 0.13s, color 0.13s;
         }
         .desk-ctl:hover { background: rgba(27, 33, 29, 0.07); color: #1B211D; }
-        .desk-ctl[aria-pressed='true'] { background: var(--sage-600); color: var(--cta-ink); }
+        /* A soft tint, not a solid fill: solid sage is kept for real calls to
+           action (Download), so the chosen animation never competes with it. */
+        .desk-ctl[aria-pressed='true'] { background: var(--sage-100); color: var(--sage-900); font-weight: 600; }
         .desk-ctl:focus-visible { outline: 2px solid var(--sage-600); outline-offset: 1px; }
         @keyframes desk-pop {
           from { opacity: 0; transform: translateY(4px) scale(0.94); }
           to   { opacity: 1; transform: none; }
         }
         @media (max-width: 1100px) and (min-width: 961px) {
-          .desk-dock { width: 330px; border-radius: 18px; }
+          .desk-dock { border-radius: 18px; }
         }
+
+        /* Phones: the same laptop, sized so the whole hero still fits the first
+           screen. About 567px of it goes to the hero copy, the gap and the
+           dock; the laptop takes the height that's left (it's 0.61 as tall as
+           it is wide), but never narrower than 220px. The cat takes a larger
+           share of the smaller screen, the bubble centres over it, and the
+           dock is one swipeable row. */
         @media (max-width: 600px) {
-          .desk { aspect-ratio: 4 / 4.2; border-radius: 16px; }
-          .desk-menubar { font-size: 11px; }
-          .desk-menus span:nth-child(n + 4) { display: none; }
-          .desk-dock { width: 290px; border-radius: 18px; }
+          .desk-wrap { gap: 12px; }
+          .desk { width: max(220px, min(100%, calc((100svh - 567px) / 0.61))); }
+          .desk-screen { --cat: 20cqw; }
+          .desk-bubble {
+            left: 50%;
+            padding: 4px 9px;
+            border-radius: 10px;
+            font-size: 10.5px;
+            translate: -50% 0;
+            transform-origin: bottom center;
+          }
+          .desk-bubble::after { left: 50%; bottom: -3px; width: 7px; height: 7px; }
+          .desk-dock {
+            flex-wrap: nowrap;
+            justify-content: flex-start;
+            overflow-x: auto;
+            scrollbar-width: none;
+          }
+          .desk-dock::-webkit-scrollbar { display: none; }
           .desk-ctl { padding: 5px 9px; font-size: 11.5px; }
-          .desk-bubble { font-size: 11.5px; }
         }
         @media (prefers-reduced-motion: reduce) {
           .desk-bubble { animation: none; }

@@ -33,6 +33,7 @@ const LINKS: FooterGroup[] = [
     items: [
       { label: 'FAQ', href: '/#faq' },
       { label: 'Contact', href: '/contact' },
+      { label: 'Buy me a coffee', href: 'https://www.buymeacoffee.com/ajjuism' },
       { label: 'Privacy', href: '/privacy' },
       { label: 'Terms', href: '/terms' },
     ],

@@ -27,10 +27,12 @@
   --color-accent-dim:      rgba(81, 139, 112, 0.10);
   --color-accent-glow:     rgba(81, 139, 112, 0.30);
 
-  /* Primary CTA — sage fill, cream text, darkens on interaction */
-  --cta:        #518B70;
-  --cta-hover:  #467A62;
-  --cta-active: #3D6A56;
+  /* Primary CTA — sage fill, cream text, darkens on interaction. A little
+     deeper and more saturated than the sage-600 brand anchor so buttons read
+     rich rather than dusty, while staying in the same green family. */
+  --cta:        #3F8A66;
+  --cta-hover:  #357A59;
+  --cta-active: #2D6A4D;
   --cta-ink:    #F7F3EA;                        /* cream text on sage fills */
 
   /* Optional warmth — soft clay for the "Buy me a coffee" secondary */
