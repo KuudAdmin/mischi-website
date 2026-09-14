@@ -28,7 +28,7 @@ const CONTROLS: Control[] = [
   // This cat's "dancing" row is drawn as a playful hop, so it's labelled Play.
   { label: 'Play', mood: 'dancing' },
   { label: 'Wait', mood: 'waiting' },
-  { label: 'Sleep', mood: 'tired' },
+  { label: 'Tired', mood: 'tired' },
   { label: 'Review', mood: 'review' },
 ]
 
