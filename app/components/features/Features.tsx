@@ -71,6 +71,7 @@ export default function Features() {
   const [sectionRef, inView] = useInView<HTMLElement>({ threshold: 0.3 })
   const videoRef = useRef<HTMLVideoElement>(null)
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
+  const tabsRef = useRef<HTMLDivElement>(null)
 
   const reducedMotion = useSyncExternalStore(
     subscribeReducedMotion,
@@ -89,6 +90,16 @@ export default function Features() {
     if (inView && !hovering && !reducedMotion) video.play().catch(() => {})
     else video.pause()
   }, [active, inView, hovering, reducedMotion])
+
+  // When the tabs overflow (phones), slide the chosen tab to the start of the
+  // strip so the next ones peek in and read as more to tap. Only the strip
+  // scrolls, never the page, so auto-advance can't yank the reader around.
+  useEffect(() => {
+    const list = tabsRef.current
+    const tab = tabRefs.current[active]
+    if (!list || !tab || list.scrollWidth <= list.clientWidth) return
+    list.scrollTo({ left: Math.max(0, tab.offsetLeft - 4), behavior: reducedMotion ? 'auto' : 'smooth' })
+  }, [active, reducedMotion])
 
   function select(index: number, focus = false) {
     const next = (index + SHOWCASES.length) % SHOWCASES.length
@@ -113,7 +124,7 @@ export default function Features() {
             <p className="fx-eyebrow">What it does</p>
             <h2 id="features-heading" className="fx-title">A pet with a few tricks</h2>
           </div>
-          <div className="fx-tabs" role="tablist" aria-label="Features">
+          <div ref={tabsRef} className="fx-tabs" role="tablist" aria-label="Features">
             {SHOWCASES.map((s, i) => (
               <button
                 key={s.id}
@@ -215,7 +226,9 @@ export default function Features() {
           letter-spacing: -0.028em;
           color: var(--color-text);
         }
+        /* position: relative so each tab's offsetLeft is measured from the strip. */
         .fx-tabs {
+          position: relative;
           display: flex;
           gap: 4px;
           max-width: 100%;

@@ -43,8 +43,8 @@ export default function DraggablePet() {
   const [bubbleVisible, setBubbleVisible] = useState(false);
   const [scale, setScale] = useState(DESKTOP_SCALE);
   const [inHero, setInHero] = useState(true);
-  // False until the mount effect has measured the screen, so a phone never
-  // flashes the pet in the hero before it knows it's a phone.
+  // False until the mount effect has measured the screen, so the pet never
+  // flashes in the hero before the page knows where it is.
   const [ready, setReady] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
@@ -158,8 +158,8 @@ export default function DraggablePet() {
     return () => clearTimeout(t);
   }, [positionBubble]);
 
-  // Track whether the hero is under the middle of the viewport, so on phones
-  // the pet can stay out of the hero cat's way.
+  // Track whether the hero is under the middle of the viewport, so the pet
+  // can stay out of the hero cat's way.
   useEffect(() => {
     const hero = document.getElementById("hero");
     if (!hero || typeof IntersectionObserver === "undefined") return;
@@ -349,9 +349,9 @@ export default function DraggablePet() {
 
   // The bubble shrinks on phones (where the pet itself is smaller).
   const compact = scale < DESKTOP_SCALE;
-  // On phones the whole pet sits out the hero, where it would clash with the
-  // hero cat, and fades in as soon as the hero scrolls past.
-  const petHidden = compact && inHero;
+  // The whole pet sits out the hero, where it would clash with the hero cat,
+  // and fades in as soon as the hero scrolls past.
+  const petHidden = inHero;
   // The × closes the bubble for this page view.
   const showBubble = bubbleVisible && !isDragging && !dismissed && !petHidden;
 
@@ -467,11 +467,9 @@ export default function DraggablePet() {
       />
 
       <style>{`
-        /* Phones only: hidden until the script says otherwise (it keeps the
-           pet out of the hero). Desktop never matches, so it shows at once. */
-        @media (max-width: 767.98px) {
-          .pet-roam:not([data-shown]) { opacity: 0; visibility: hidden; pointer-events: none; }
-        }
+        /* Hidden until the script says otherwise (it keeps the pet out of the
+           hero), so it never flashes there before the page has loaded. */
+        .pet-roam:not([data-shown]) { opacity: 0; visibility: hidden; pointer-events: none; }
         .pet-bubble:hover { filter: brightness(0.98); }
         .pet-bubble-close {
           position: absolute;
