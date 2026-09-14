@@ -47,7 +47,8 @@ export default function Hero() {
           </p>
         </div>
 
-        <div id="demo" className="hero-demo hero-reveal" style={{ animationDelay: '0.2s' }}>
+        {/* The scene handles its own entrance, once its images are ready. */}
+        <div id="demo" className="hero-demo">
           <DesktopScene />
         </div>
       </div>
@@ -162,13 +163,6 @@ export default function Hero() {
           to   { opacity: 1; transform: translateY(0); }
         }
         .hero-reveal { animation: hero-fade-up 0.7s var(--ease-expo) both; }
-        /* The scene only rises, never fades: fading a layered scene in can
-           leave Chrome painting it washed out. */
-        @keyframes hero-rise {
-          from { transform: translateY(16px); }
-          to   { transform: translateY(0); }
-        }
-        .hero-demo.hero-reveal { animation-name: hero-rise; }
         @media (prefers-reduced-motion: reduce) {
           .hero-reveal { animation: none; opacity: 1; }
         }
