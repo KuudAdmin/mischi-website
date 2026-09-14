@@ -127,7 +127,7 @@ export default function LegalPage({ eyebrow = 'Legal', title, updated, intro, ch
           }
           .legal-body a:hover { border-bottom-color: var(--color-accent); }
           .legal-body code {
-            font-family: var(--font-geist-mono), monospace;
+            font-family: var(--font-mono);
             font-size: 0.875em;
             padding: 2px 6px;
             background: var(--color-surface-sunken);

@@ -96,7 +96,7 @@ export default function PrivacyPage() {
         To understand how the site is used, such as how many people download Mischi, read the docs or send us a message, we use PostHog, set up to be as private as possible:
       </p>
       <ul>
-        <li><strong>No cookies or browser storage.</strong> Nothing is saved on your device, so we can’t recognise you between visits or follow you across other sites, and no profile is built about you.</li>
+        <li><strong>No cookies or browser storage.</strong> Analytics save nothing on your device, so we can’t recognise you between visits or follow you across other sites, and no profile is built about you.</li>
         <li><strong>What’s recorded:</strong> the pages you view, which kinds of links you click (for example download, docs or external links), words you search for in the docs, and that a form was sent. Also basic technical details: browser, device type, the referring site, and an approximate location worked out from your IP address. The IP address itself is discarded and never stored.</li>
         <li><strong>What isn’t:</strong> your email address, name or message text, anything you type into forms, and screen recordings.</li>
         <li><strong>Your choice is respected:</strong> if your browser sends a Do Not Track or Global Privacy Control signal, analytics don’t load at all.</li>
@@ -108,6 +108,9 @@ export default function PrivacyPage() {
       <h3>Contacting us</h3>
       <p>
         When you send a message through the <Link href="/contact">contact page</Link>, we receive your email address, your name if you give it, your message, and your Mischi and macOS versions if they’re included. Our server passes the message to our email delivery provider, Resend, which delivers it to our inbox; the website itself doesn’t store it. Resend handles it under its own <a href="https://resend.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer">privacy policy</a>. As with the newsletter form, your IP address is held in memory briefly to limit repeated submissions.
+      </p>
+      <p>
+        If you start writing and leave before sending, the contact page keeps your unsent message in your browser’s local storage so you can pick up where you left off. That draft stays on your device and never reaches us; it’s deleted when you send the message or choose Start fresh.
       </p>
       <p>
         We use your message only to reply and to fix what you reported, and we never add you to the newsletter. You can also email us directly at {email}.

@@ -169,6 +169,11 @@ export default function DocsSearch() {
     }
   }, [])
 
+  // /docs?search (linked from the contact page) opens with the search focused.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).has('search')) inputRef.current?.focus()
+  }, [])
+
   function update(value: string) {
     if (!indexRef.current) indexRef.current = buildIndex()
     setQuery(value)
@@ -361,7 +366,7 @@ export default function DocsSearch() {
           top: 50%;
           transform: translateY(-50%);
           padding: 0 6px;
-          font-family: var(--font-geist-mono), monospace;
+          font-family: var(--font-mono);
           font-size: 0.6875rem;
           line-height: 20px;
           color: var(--color-text-dim);
@@ -474,7 +479,7 @@ export default function DocsSearch() {
           min-width: 18px;
           margin-right: 3px;
           padding: 0 4px;
-          font-family: var(--font-geist-mono), monospace;
+          font-family: var(--font-mono);
           font-size: 0.6875rem;
           line-height: 17px;
           text-align: center;

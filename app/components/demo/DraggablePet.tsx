@@ -42,6 +42,11 @@ export default function DraggablePet() {
   const [isDragging, setIsDragging] = useState(false);
   const [bubbleVisible, setBubbleVisible] = useState(false);
   const [scale, setScale] = useState(DESKTOP_SCALE);
+  const [inHero, setInHero] = useState(true);
+  // False until the mount effect has measured the screen, so a phone never
+  // flashes the pet in the hero before it knows it's a phone.
+  const [ready, setReady] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
 
   const scaleRef = useRef(DESKTOP_SCALE);
   const dimsRef = useRef({
@@ -123,6 +128,7 @@ export default function DraggablePet() {
       const h = Math.round(SPRITE_H * s);
       dimsRef.current = { w, h };
       setScale(s);
+      setReady(true);
 
       if (initial) {
         pos.current = { x: 80, y: Math.max(window.innerHeight - h - 60, 100) };
@@ -142,7 +148,8 @@ export default function DraggablePet() {
     return () => window.removeEventListener("resize", onResize);
   }, [positionBubble]);
 
-  // Pop the download bubble in a beat after the pet settles.
+  // Pop the bubble in a beat after the pet settles. Closing it only lasts
+  // for this page view, so it's back after a reload.
   useEffect(() => {
     const t = setTimeout(() => {
       positionBubble(true);
@@ -151,10 +158,27 @@ export default function DraggablePet() {
     return () => clearTimeout(t);
   }, [positionBubble]);
 
+  // Track whether the hero is under the middle of the viewport, so on phones
+  // the pet can stay out of the hero cat's way.
+  useEffect(() => {
+    const hero = document.getElementById("hero");
+    if (!hero || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry) setInHero(entry.isIntersecting);
+      },
+      { rootMargin: "-50% 0px -50% 0px" },
+    );
+    io.observe(hero);
+    return () => io.disconnect();
+  }, []);
+
   // Re-measure the bubble after it resizes with the breakpoint.
   useEffect(() => {
     positionBubble(true);
   }, [scale, positionBubble]);
+
+  const dismissBubble = useCallback(() => setDismissed(true), []);
 
   // Take a short stroll across the screen using the run animation, then settle.
   const startWalk = useCallback(() => {
@@ -325,10 +349,18 @@ export default function DraggablePet() {
 
   // The bubble shrinks on phones (where the pet itself is smaller).
   const compact = scale < DESKTOP_SCALE;
+  // On phones the whole pet sits out the hero, where it would clash with the
+  // hero cat, and fades in as soon as the hero scrolls past.
+  const petHidden = compact && inHero;
+  // The × closes the bubble for this page view.
+  const showBubble = bubbleVisible && !isDragging && !dismissed && !petHidden;
 
   return (
     <div
       ref={containerRef}
+      className="pet-roam"
+      data-shown={ready && !petHidden ? "" : undefined}
+      aria-hidden={petHidden || undefined}
       style={{
         position: "fixed",
         left: INITIAL_POS.x,
@@ -337,7 +369,7 @@ export default function DraggablePet() {
         cursor: isDragging ? "grabbing" : "grab",
         touchAction: "none",
         userSelect: "none",
-        transition: isDragging ? "none" : "filter 0.2s",
+        transition: isDragging ? "none" : "filter 0.2s, opacity 0.3s, visibility 0.3s",
       }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
@@ -351,7 +383,7 @@ export default function DraggablePet() {
       <div
         ref={bubbleWrapRef}
         className="pet-bubble-wrap"
-        aria-hidden={!bubbleVisible || isDragging}
+        aria-hidden={!showBubble}
         style={{
           position: "absolute",
           left: "50%",
@@ -360,12 +392,28 @@ export default function DraggablePet() {
           pointerEvents: "none",
         }}
       >
+        <button
+          type="button"
+          className="pet-bubble-close"
+          aria-label="Hide the pet's message"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={dismissBubble}
+          tabIndex={showBubble ? 0 : -1}
+          style={{
+            opacity: showBubble ? 1 : 0,
+            pointerEvents: showBubble ? "auto" : "none",
+          }}
+        >
+          <svg width="8" height="8" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+            <path d="M2 2l6 6M8 2l-6 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+          </svg>
+        </button>
         <a
           ref={bubbleRef}
           href="#download"
           className="pet-bubble"
           onPointerDown={(e) => e.stopPropagation()}
-          tabIndex={bubbleVisible && !isDragging ? 0 : -1}
+          tabIndex={showBubble ? 0 : -1}
           style={{
             position: "relative",
             display: "block",
@@ -384,14 +432,11 @@ export default function DraggablePet() {
             textDecoration: "none",
             cursor: "pointer",
             whiteSpace: "normal",
-            pointerEvents: bubbleVisible && !isDragging ? "auto" : "none",
-            opacity: bubbleVisible && !isDragging ? 1 : 0,
+            pointerEvents: showBubble ? "auto" : "none",
+            opacity: showBubble ? 1 : 0,
             transition:
               "opacity var(--dur-normal) var(--ease-expo), filter var(--dur-fast)",
-            animation:
-              bubbleVisible && !isDragging
-                ? "pet-bubble-bob 3.2s ease-in-out infinite"
-                : "none",
+            animation: showBubble ? "pet-bubble-bob 3.2s ease-in-out infinite" : "none",
           }}
         >
           <span style={{ color: "var(--color-accent)", fontWeight: 700 }}>
@@ -422,7 +467,31 @@ export default function DraggablePet() {
       />
 
       <style>{`
+        /* Phones only: hidden until the script says otherwise (it keeps the
+           pet out of the hero). Desktop never matches, so it shows at once. */
+        @media (max-width: 767.98px) {
+          .pet-roam:not([data-shown]) { opacity: 0; visibility: hidden; pointer-events: none; }
+        }
         .pet-bubble:hover { filter: brightness(0.98); }
+        .pet-bubble-close {
+          position: absolute;
+          top: -7px;
+          right: -7px;
+          z-index: 1;
+          display: grid;
+          place-items: center;
+          width: 18px;
+          height: 18px;
+          padding: 0;
+          border: 1px solid var(--color-border-strong);
+          border-radius: 50%;
+          background: var(--color-surface-raised);
+          color: var(--color-text-muted);
+          cursor: pointer;
+          transition: opacity var(--dur-normal) var(--ease-expo), color var(--dur-fast);
+        }
+        .pet-bubble-close:hover { color: var(--color-text); }
+        .pet-bubble-close:focus-visible { outline: 2px solid var(--sage-600); outline-offset: 2px; }
         @keyframes pet-bubble-bob {
           0%, 100% { transform: translateY(0); }
           50%      { transform: translateY(-4px); }

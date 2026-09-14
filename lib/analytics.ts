@@ -19,6 +19,8 @@ export type AnalyticsEvent =
   | 'email_link_clicked'
   | 'newsletter_subscribed'
   | 'contact_message_sent'
+  | 'contact_fallback_used'
+  | 'contact_draft_restored'
 
 type Properties = Record<string, string | number | boolean | undefined>
 

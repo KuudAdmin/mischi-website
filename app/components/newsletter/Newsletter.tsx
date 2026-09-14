@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import { TickCircle } from 'iconsax-react'
+import PetCanvas from '../demo/PetCanvas'
 import { track } from '@/lib/analytics'
 
 // Submissions go to our own server route (app/api/subscribe/route.ts), which
@@ -45,65 +47,36 @@ export default function Newsletter() {
   }
 
   return (
-    <section
-      id="newsletter"
-      aria-labelledby="newsletter-heading"
-      className="section-pad"
-      style={{ paddingInline: '24px', borderTop: '1px solid var(--color-border)' }}
-    >
-      <div className="newsletter-card">
-        <div
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background:
-              'radial-gradient(ellipse 60% 90% at 0% 0%, rgba(81, 139, 112, 0.10) 0%, transparent 70%)',
-            pointerEvents: 'none',
-          }}
-        />
-
-        <div style={{ position: 'relative' }}>
-          <p style={{ fontSize: '0.71875rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-accent)', marginBottom: '12px' }}>
-            Newsletter
-          </p>
-          <h2
-            id="newsletter-heading"
-            style={{ fontSize: 'var(--text-xl)', fontWeight: 700, letterSpacing: '-0.025em', lineHeight: 1.15, color: 'var(--color-text)', marginBottom: '12px' }}
-          >
-            News from the desktop
-          </h2>
-          <p style={{ fontSize: '0.9375rem', color: 'var(--color-text-muted)', lineHeight: 1.65, maxWidth: '42ch' }}>
-            New versions, pets worth adopting, and a peek at what we&apos;re building next. A few emails a year, never spam.
-          </p>
+    <section id="newsletter" aria-labelledby="newsletter-heading" className="nl">
+      <div className="nl-band">
+        {/* The cat peeks over the band's top edge. */}
+        <div className="nl-pet" aria-hidden="true">
+          <PetCanvas
+            state={status === 'success' ? 'dancing' : 'waiting'}
+            interactive={false}
+            autoAnimate={false}
+            scale={0.4}
+            spritesheet="/spritesheet_cat.webp"
+          />
         </div>
 
-        <div style={{ position: 'relative' }}>
+        <div className="nl-copy">
+          <h2 id="newsletter-heading" className="nl-title">News from the desktop</h2>
+          <p className="nl-sub">New versions and pets worth adopting. A few emails a year, never spam.</p>
+        </div>
+
+        <div className="nl-action">
           {status === 'success' ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-              <div
-                aria-hidden="true"
-                style={{
-                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                  width: 44, height: 44, borderRadius: '50%',
-                  background: 'var(--color-accent-dim)', color: 'var(--color-accent)',
-                }}
-              >
-                <svg width="20" height="20" viewBox="0 0 22 22" fill="none">
-                  <path d="M5 11.5 9 15.5 17 6.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-              <div role="status">
-                <p style={{ fontWeight: 600, color: 'var(--color-text)', marginBottom: '2px' }}>You&apos;re subscribed!</p>
-                <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', overflowWrap: 'anywhere' }}>
-                  The next update goes to <strong style={{ color: 'var(--color-text)', fontWeight: 600 }}>{email}</strong>.
-                </p>
-              </div>
-            </div>
+            <p role="status" className="nl-done">
+              <TickCircle size={20} variant="Bold" color="currentColor" aria-hidden="true" />
+              <span>
+                Subscribed. The next update goes to <strong>{email}</strong>.
+              </span>
+            </p>
           ) : (
             <>
-              <form onSubmit={handleSubmit} className="newsletter-form">
-                <label htmlFor="newsletter-email" style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)' }}>
+              <form onSubmit={handleSubmit} className="nl-form">
+                <label htmlFor="newsletter-email" className="nl-sr">
                   Email address
                 </label>
 
@@ -129,16 +102,21 @@ export default function Newsletter() {
                   autoComplete="email"
                   placeholder="you@example.com"
                   value={email}
-                  onChange={(e) => { setEmail(e.target.value); if (status === 'error') { setStatus('idle'); setError('') } }}
+                  onChange={(e) => {
+                    setEmail(e.target.value)
+                    if (status === 'error') {
+                      setStatus('idle')
+                      setError('')
+                    }
+                  }}
                   disabled={status === 'submitting'}
-                  className="newsletter-input"
+                  className="nl-input"
                 />
-                <button type="submit" disabled={status === 'submitting'} className="newsletter-btn">
+                <button type="submit" disabled={status === 'submitting'} className="nl-btn">
                   {status === 'submitting' ? 'Subscribing…' : 'Subscribe'}
                 </button>
               </form>
-
-              <p role={status === 'error' ? 'alert' : undefined} style={{ fontSize: '0.75rem', color: status === 'error' ? 'var(--clay-ink)' : 'var(--color-text-dim)', marginTop: '12px', paddingInline: '4px' }}>
+              <p role={status === 'error' ? 'alert' : undefined} className="nl-note" data-error={status === 'error' || undefined}>
                 {status === 'error'
                   ? error || 'Something went wrong. Please try again in a moment.'
                   : 'Unsubscribe with one click, anytime.'}
@@ -149,59 +127,71 @@ export default function Newsletter() {
       </div>
 
       <style>{`
-        .newsletter-card {
+        .nl { padding: 96px 24px clamp(4rem, 3rem + 3vw, 6rem); }
+        .nl-band {
           position: relative;
-          overflow: hidden;
-          max-width: 960px;
+          max-width: 1080px;
           margin: 0 auto;
           display: grid;
-          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-          gap: 40px;
+          grid-template-columns: minmax(0, 1fr) minmax(0, 440px);
+          gap: 24px 48px;
           align-items: center;
-          padding: 44px;
+          padding: 32px 40px;
+          border: 1px solid var(--color-border);
           border-radius: var(--radius-2xl);
           background: var(--color-surface);
-          border: 1px solid var(--color-border);
-          box-shadow: var(--shadow-soft);
         }
-        .newsletter-form { display: flex; align-items: stretch; gap: 10px; }
-        .newsletter-input {
+        /* Feet on the band's top edge; ~8px of transparent padding under the sprite. */
+        .nl-pet { position: absolute; top: 8px; left: 40px; transform: translateY(-100%); line-height: 0; }
+        .nl-title {
+          font-size: clamp(1.4rem, 1.1rem + 1vw, 1.75rem);
+          font-weight: 700;
+          line-height: 1.15;
+          letter-spacing: -0.022em;
+          color: var(--color-text);
+        }
+        .nl-sub { margin-top: 6px; font-size: 0.9375rem; line-height: 1.6; color: var(--color-text-muted); }
+        .nl-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+        .nl-form { display: flex; align-items: stretch; gap: 8px; }
+        .nl-input {
           flex: 1;
           min-width: 0;
           padding: 11px 16px;
+          border: 1px solid var(--color-border);
           border-radius: 9999px;
           background: var(--color-surface-sunken);
-          border: 1px solid var(--color-border);
-          color: var(--color-text);
           font-size: 0.9375rem;
+          color: var(--color-text);
           outline: none;
           transition: border-color var(--dur-fast);
         }
-        .newsletter-input:focus { border-color: var(--color-accent); }
-        .newsletter-btn {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
+        .nl-input:focus { border-color: var(--color-accent); }
+        .nl-btn {
           padding: 11px 22px;
+          border: 0;
           border-radius: 9999px;
           background: var(--cta);
-          color: var(--cta-ink);
-          font-weight: 600;
           font-size: 0.875rem;
-          border: none;
+          font-weight: 600;
+          color: var(--cta-ink);
           white-space: nowrap;
           cursor: pointer;
-          box-shadow: var(--shadow-soft);
           transition: background var(--dur-fast), transform var(--dur-fast), opacity var(--dur-fast);
         }
-        .newsletter-btn:hover:not(:disabled) { background: var(--cta-hover); transform: translateY(-1px); }
-        .newsletter-btn:disabled { opacity: 0.7; cursor: default; }
+        .nl-btn:hover:not(:disabled) { background: var(--cta-hover); transform: translateY(-1px); }
+        .nl-btn:disabled { opacity: 0.7; cursor: default; }
+        .nl-btn:focus-visible { outline: 2px solid var(--sage-600); outline-offset: 2px; }
+        .nl-note { margin-top: 8px; padding-inline: 4px; font-size: 0.75rem; color: var(--color-text-dim); }
+        .nl-note[data-error] { color: var(--clay-ink); }
+        .nl-done { display: flex; align-items: center; gap: 10px; font-size: 0.9375rem; color: var(--color-text-muted); overflow-wrap: anywhere; }
+        .nl-done svg { flex: none; color: var(--sage-600); }
+        .nl-done strong { font-weight: 600; color: var(--color-text); }
         @media (max-width: 820px) {
-          .newsletter-card { grid-template-columns: minmax(0, 1fr); gap: 24px; padding: 28px; }
+          .nl-band { grid-template-columns: minmax(0, 1fr); padding: 28px 24px 24px; }
+          .nl-pet { left: auto; right: 24px; }
         }
         @media (max-width: 480px) {
-          .newsletter-form { flex-direction: column; }
-          .newsletter-btn { width: 100%; }
+          .nl-form { flex-direction: column; }
         }
       `}</style>
     </section>

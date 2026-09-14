@@ -69,6 +69,21 @@
     0 14px 32px -16px rgba(43, 38, 28, 0.10);
   --sage-ring: 0 0 0 1px rgba(81, 139, 112, 0.30);
 
+  /* Warm "desk" wallpaper, borrowed from the feature recordings. Used in exactly
+     two places, the hero's desktop scene and the download band, so the page
+     opens and closes on the same note. */
+  --desk-a:   #F4A259;
+  --desk-b:   #D95D39;
+  --desk-c:   #9E3A5B;
+  --desk-ink: #FFF8F0;
+
+  /* Dark "ink" surface: the creator strip, the page's one dark moment. */
+  --ink-surface: #1F2521;
+  --ink-line:    #39413C;
+  --ink-text:    #EDEBE4;
+  --ink-muted:   #B9BDB3;
+  --ink-accent:  #8FC7A6;
+
   /* Typography */
   --text-hero: clamp(2.8rem, 1.2rem + 5.5vw, 5.5rem);
   --text-xl:   clamp(1.4rem, 0.9rem + 1.8vw, 2.2rem);
@@ -319,9 +334,11 @@ h1, h2, h3, h4, h5, h6 {
 ::-webkit-scrollbar-thumb:hover { background: var(--sage-700); }
 
 /* ── Selection ─────────────────────────────────────────────────────────── */
+/* A solid highlight with light text, so selected text stays readable on the
+   cream page, the dark creator strip and the warm download band alike. */
 ::selection {
-  background: var(--color-accent-dim);
-  color: var(--color-text);
+  background: var(--sage-600);
+  color: #FFFFFF;
 }
 
 /* ── Scroll reveal (see components/Reveal.tsx) ─────────────────────────── */
