@@ -15,6 +15,7 @@ const TOPICS = {
   bug: 'Bug report',
   idea: 'Feature idea',
   question: 'Question',
+  pet: 'Pet showcase',
   other: 'Message',
 } as const
 type Topic = keyof typeof TOPICS
@@ -32,6 +33,10 @@ function line(value: unknown, max: number): string {
 /** A multi-line value, trimmed and capped. */
 function block(value: unknown, max = MAX_TEXT): string {
   return typeof value === 'string' ? value.trim().slice(0, max) : ''
+}
+
+function topicIsPet(value: unknown): boolean {
+  return value === 'pet'
 }
 
 function fail(status: number, error: string, fallback = false) {
@@ -72,6 +77,8 @@ export async function POST(request: Request) {
   const expected = block(body.expected)
   const steps = block(body.steps)
   const message = block(body.message)
+  const link = topicIsPet(body.topic) ? line(body.link, 300) : ''
+  const customSubject = line(body.subject, 120)
 
   if (!EMAIL_RE.test(email)) {
     return fail(422, 'Please enter a valid email address so we can reply.')
@@ -97,7 +104,10 @@ export async function POST(request: Request) {
           ['What they expected', expected],
           ['Steps to reproduce', steps],
         ]
-      : [['Message', message]]
+      : [
+          ['Message', message],
+          ['Link', link],
+        ]
 
   const header = [
     `From: ${name ? `${name} <${email}>` : email}`,
@@ -111,7 +121,10 @@ export async function POST(request: Request) {
     '--\nSent from the contact form on mischi.app. Reply to this email to answer them directly.',
   ].join('\n\n')
 
-  const subject = `[Mischi] ${TOPICS[topic]}${version ? ` (v${version})` : ''} from ${name || email}`
+  // A subject the sender edited wins; otherwise build one from the topic.
+  const subject = customSubject
+    ? `[Mischi] ${customSubject} (from ${name || email})`
+    : `[Mischi] ${TOPICS[topic]}${version ? ` (v${version})` : ''} from ${name || email}`
 
   try {
     const res = await fetch('https://api.resend.com/emails', {
