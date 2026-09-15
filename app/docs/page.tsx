@@ -128,8 +128,9 @@ export default function DocsPage() {
             <section id="basics" aria-labelledby="basics-h">
               <h2 id="basics-h">Everyday use</h2>
               <p>
-                Your pet lives in a transparent window above your other apps. It follows you to every Space and
-                over full-screen apps, and it never steals focus from what you&apos;re doing.
+                Your pet lives in a transparent window above your other apps. It follows you to every Space and,
+                with <strong>Window level</strong> set to Floating or Always on Top, over full-screen apps too. It
+                never steals focus from what you&apos;re doing.
               </p>
               <Table
                 head={['Do this', 'To']}

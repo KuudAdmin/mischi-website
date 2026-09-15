@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { Coffee } from 'iconsax-react'
 import { RELEASE } from '@/lib/release'
 
 // `soon: true` marks something not ready until launch — rendered greyed-out and
@@ -33,7 +34,6 @@ const LINKS: FooterGroup[] = [
     items: [
       { label: 'FAQ', href: '/#faq' },
       { label: 'Contact', href: '/contact' },
-      { label: 'Buy me a coffee', href: 'https://www.buymeacoffee.com/ajjuism' },
       { label: 'Privacy', href: '/privacy' },
       { label: 'Terms', href: '/terms' },
     ],
@@ -76,6 +76,30 @@ export default function Footer() {
             <p style={{ marginTop: '12px', fontSize: '0.75rem', color: 'var(--color-text-dim)', fontFamily: 'var(--font-geist-mono)' }}>
               v{RELEASE.version} · {RELEASE.channel}
             </p>
+            {/* A small, warm button rather than another plain link, in the clay
+                tones reserved for supporting the maker. */}
+            <a
+              href="https://www.buymeacoffee.com/ajjuism"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-coffee footer-coffee"
+            >
+              <Coffee size={16} color="currentColor" aria-hidden="true" />
+              Buy me a coffee
+            </a>
+            <style>{`
+              .footer-coffee {
+                margin-top: 16px;
+                padding: 7px 14px 7px 11px;
+                border-radius: 9999px;
+                font-weight: 500;
+                text-decoration: none;
+                white-space: nowrap;
+              }
+              .footer-coffee svg { flex: none; transition: transform var(--dur-fast) var(--ease-spring); }
+              .footer-coffee:hover svg { transform: rotate(-10deg) translateY(-1px); }
+              .footer-coffee:focus-visible { outline: 2px solid var(--clay); outline-offset: 2px; }
+            `}</style>
           </div>
 
           {LINKS.map((group) => (
@@ -114,22 +138,13 @@ export default function Footer() {
           ))}
         </div>
 
-        <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
-          <p style={{ fontSize: '0.75rem', color: 'var(--color-text-dim)' }}>
-            © 2026 Mischi. A tiny desktop companion with an opinion. Crafted by{' '}
-            <a
-              href="https://kuud.in"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: 'var(--color-text-muted)', textDecoration: 'none', transition: 'color var(--dur-fast)' }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-text)' }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-text-muted)' }}
-            >
-              Kuud
-            </a>
-            .
+        {/* One row at every width: the text takes the space it needs (wrapping
+            onto two lines on phones) and the icon stays beside it. */}
+        <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
+          <p style={{ flex: '1 1 auto', minWidth: 0, fontSize: '0.75rem', lineHeight: 1.6, color: 'var(--color-text-dim)' }}>
+            © 2026 Mischi. A tiny desktop companion with an opinion.
           </p>
-          <div style={{ display: 'flex', gap: '16px' }}>
+          <div style={{ display: 'flex', flex: 'none', gap: '16px' }}>
             <SocialLink href="https://x.com/ajjuism" label="Follow Mischi’s maker on X">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>

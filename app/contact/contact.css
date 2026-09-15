@@ -566,14 +566,27 @@
 @media (max-width: 640px) {
   .ct-main { padding-top: 92px; padding-inline: 16px; }
   .ct-right { --ct-pet-room: 64px; }
-  .ct-topicbar { flex-direction: column; align-items: stretch; gap: 8px; padding: 10px 14px; }
-  .ct-row { grid-template-columns: 58px minmax(0, 1fr); gap: 8px; padding: 0 14px; }
-  .ct-row-label { font-size: 0.75rem; }
+  /* Roomier on phones: wider side padding everywhere, labels only as wide as
+     their text (like iOS Mail), taller rows, and the focus bar kept well in
+     from the window's edge. */
+  .ct-titlebar { padding: 12px 18px; }
+  .ct-topicbar { flex-direction: column; align-items: stretch; gap: 10px; padding: 14px 18px; }
+  .ct-row { grid-template-columns: auto minmax(0, 1fr); gap: 12px; padding: 0 18px; }
+  .ct-row-label { padding: 15px 0; text-align: left; font-size: 0.8125rem; }
+  .ct-row-value { padding: 8px 0; }
+  .ct-input { padding: 8px 0; }
   .ct-from { grid-template-columns: minmax(0, 1fr); }
-  .ct-from .ct-input + .ct-input { padding-left: 0; border-left: 0; border-top: 1px solid var(--color-border); }
-  .ct-body { padding: 18px 18px 14px; }
-  .ct-alert { margin: 12px 14px; }
-  .ct-toolbar { padding: 10px 12px; }
+  .ct-from .ct-input + .ct-input {
+    margin-top: 4px;
+    padding-top: 12px;
+    padding-left: 0;
+    border-left: 0;
+    border-top: 1px solid var(--color-border);
+  }
+  .ct-body { gap: 22px; padding: 24px 22px 20px; }
+  .ct-section { margin-left: -12px; padding-left: 10px; }
+  .ct-alert { margin: 14px 18px; }
+  .ct-toolbar { padding: 12px 14px; }
   .ct-toolbar-hint:not(:has(.ct-missing)) { display: none; }
   .ct-toolbar-hint:has(.ct-missing) { flex: 1; }
   .ct-send { flex: 1; justify-content: center; }

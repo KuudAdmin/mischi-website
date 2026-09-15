@@ -21,6 +21,10 @@ const QUESTIONS: { q: string; a: string }[] = [
     a: 'Bring your own Groq key: paste it in Preferences → Advanced, pick a model, and hit Test. Then press ⌘K, or ⌘-double-click your pet, to ask Mischi anything. It can set reminders, take screenshots, read your clipboard, save notes, and open apps or websites. Your key is kept in the macOS Keychain.',
   },
   {
+    q: 'Is Mischi the only pet I can use?',
+    a: 'No. Mischi, the cream cat, is the one pet that comes built in, but you can have as many as you like. Use Import Pet Folder… or Import Pet .zip… in the menu bar menu, click Scan Codex in Preferences to bring in pets from ~/.codex/pets, or draw your own. Switch between them anytime from Library in the menu bar menu.',
+  },
+  {
     q: 'Can I use my Codex pets?',
     a: 'Yes. Mischi uses the same pet format as OpenAI Codex. Click Scan Codex in Preferences → Pet and any pets in ~/.codex/pets are added to your library. The originals are never modified.',
   },
@@ -45,6 +49,10 @@ const QUESTIONS: { q: string; a: string }[] = [
     a: 'On your Mac. Pets live in ~/Library/Application Support/mischi/Pets, settings in Mischi’s macOS preferences, and your Groq key in the Keychain. Each pet is a self-contained folder you can copy, back up or share. The docs explain how to reset everything.',
   },
   {
+    q: 'Why can’t I see my pet when an app is in full screen?',
+    a: 'First check Window level in Preferences → Window. Desktop tucks the pet behind every window, full-screen apps included, so set it to Floating or Always on Top. Next, open the menu bar menu: if it says Show Pet, the pet is hidden, so click it. If the pet still doesn’t appear over a particular full-screen app, fill the screen without full screen instead (hold Option and click the green window button), and tell us which app on the contact page so we can look into it.',
+  },
+  {
     q: 'Is it available on Windows, Linux, or iOS?',
     a: 'Not today. Mischi relies on macOS-specific window behavior: transparent always-on-top overlays that work across Spaces and full-screen apps. A Windows port is something we’re exploring. iOS isn’t on the roadmap, since the sandbox model doesn’t allow desktop pets.',
   },
@@ -52,7 +60,7 @@ const QUESTIONS: { q: string; a: string }[] = [
 
 // The most-asked questions show first; the rest stay in the page (and in
 // search results) behind "Show more".
-const VISIBLE = 6
+const VISIBLE = 7
 
 export default function FAQ() {
   const [open, setOpen] = useState<number | null>(null)
