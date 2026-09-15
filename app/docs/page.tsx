@@ -171,6 +171,10 @@ export default function DocsPage() {
                 A pet is a folder containing a <code>pet.json</code> and a <code>spritesheet.webp</code>. It&apos;s
                 the same format OpenAI Codex uses, so every Codex pet works in Mischi.
               </p>
+              <p>
+                You can start with one from the <Link href="/pets">Mischi pet library</Link>, or import pets you
+                have made yourself.
+              </p>
 
               <h3>Add pets</h3>
               <Table

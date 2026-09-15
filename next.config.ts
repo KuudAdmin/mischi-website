@@ -49,6 +49,15 @@ const nextConfig: NextConfig = {
           { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
         ],
       },
+      {
+        // Pet packages are versioned by filename/folder in the public library.
+        source: "/pets/downloads/:file*",
+        headers: [
+          { key: "Content-Type", value: "application/zip" },
+          { key: "Content-Disposition", value: "attachment" },
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
     ];
   },
 };

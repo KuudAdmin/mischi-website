@@ -137,6 +137,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-scroll-behavior="smooth"
       className={`${inter.variable} ${interTight.variable} ${geistMono.variable} ${cookie.variable} h-full antialiased`}
       suppressHydrationWarning
     >

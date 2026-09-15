@@ -7,6 +7,7 @@ import { RELEASE } from '@/lib/release'
 
 const NAV_LINKS = [
   { label: 'Features', href: '/#features' },
+  { label: 'Pets', href: '/pets' },
   { label: 'Docs', href: '/docs' },
   { label: 'FAQ', href: '/#faq' },
   { label: 'Contact', href: '/contact' },

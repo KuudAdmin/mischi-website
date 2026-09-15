@@ -16,6 +16,7 @@ const LINKS: FooterGroup[] = [
     items: [
       { label: 'Download', href: '/#download' },
       { label: 'Features', href: '/#features' },
+      { label: 'Pets', href: '/pets' },
       { label: 'Newsletter', href: '/#newsletter' },
       { label: 'Changelog', href: '#', soon: true },
     ],
