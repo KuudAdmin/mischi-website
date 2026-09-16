@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect, useCallback, useState } from 'react'
+import { useRef, useEffect, useCallback, useMemo, useState } from 'react'
 
 const FRAME_W = 192
 const FRAME_H = 208
@@ -17,6 +17,8 @@ interface StateConfig {
   loop: boolean
   next?: AnimState
 }
+
+type StateConfigOverrides = Partial<Record<AnimState, Partial<StateConfig>>>
 
 const STATES: Record<AnimState, StateConfig> = {
   idle:     { row: 0, frames: 6, fps: 8,  loop: true },
@@ -67,11 +69,14 @@ function loadSheet(src: string): Promise<HTMLImageElement> {
 interface PetCanvasProps {
   state?: AnimState
   onStateChange?: (s: AnimState) => void
+  replayKey?: number
+  stateConfigOverrides?: StateConfigOverrides
   interactive?: boolean
   autoAnimate?: boolean
   scale?: number
   spritesheet?: string
   repeatShortAnims?: boolean
+  pixelated?: boolean
   className?: string
   style?: React.CSSProperties
 }
@@ -79,11 +84,14 @@ interface PetCanvasProps {
 export default function PetCanvas({
   state: externalState,
   onStateChange,
+  replayKey,
+  stateConfigOverrides,
   interactive = true,
   autoAnimate = true,
   scale = DISPLAY_SCALE,
   spritesheet = '/spritesheet.webp',
   repeatShortAnims = false,
+  pixelated = true,
   className,
   style,
 }: PetCanvasProps) {
@@ -96,6 +104,7 @@ export default function PetCanvas({
   const idleTimer          = useRef<ReturnType<typeof setTimeout> | null>(null)
   const autoWaveT          = useRef<ReturnType<typeof setTimeout> | null>(null)
   const repeatShortRef     = useRef(repeatShortAnims)
+  const replayKeyRef       = useRef(replayKey)
 
   useEffect(() => {
     repeatShortRef.current = repeatShortAnims
@@ -108,15 +117,36 @@ export default function PetCanvas({
   const displayH = Math.round(FRAME_H * scale)
   const canvasW  = displayW * 2
   const canvasH  = displayH * 2
+  const stateConfigs = useMemo(() => {
+    if (!stateConfigOverrides) return STATES
 
-  const applyState = useCallback((s: AnimState) => {
-    if (stateRef.current === s) return
+    return (Object.keys(STATES) as AnimState[]).reduce((configs, state) => {
+      configs[state] = { ...STATES[state], ...stateConfigOverrides[state] }
+      return configs
+    }, {} as Record<AnimState, StateConfig>)
+  }, [stateConfigOverrides])
+
+  // Paint the current frame. Canvas resizing resets smoothing, so reapply the
+  // caller's rendering mode on every draw.
+  const draw = useCallback(() => {
+    const ctx = canvasRef.current?.getContext('2d')
+    const img = imgRef.current
+    if (!ctx || !img) return
+    ctx.imageSmoothingEnabled = !pixelated
+    const sy = stateConfigs[stateRef.current].row * FRAME_H
+    ctx.clearRect(0, 0, canvasW, canvasH)
+    ctx.drawImage(img, frameRef.current * FRAME_W, sy, FRAME_W, FRAME_H, 0, 0, canvasW, canvasH)
+  }, [canvasW, canvasH, pixelated, stateConfigs])
+
+  const applyState = useCallback((s: AnimState, options?: { replay?: boolean }) => {
+    if (!options?.replay && stateRef.current === s) return
     stateRef.current = s
     frameRef.current = 0
-    lastTime.current = 0
+    lastTime.current = globalThis.performance?.now?.() ?? 0
     setCurrentState(s)
+    draw()
     onStateChange?.(s)
-  }, [onStateChange])
+  }, [draw, onStateChange])
 
   const resetIdleTimers = useCallback(() => {
     if (idleTimer.current)  clearTimeout(idleTimer.current)
@@ -130,23 +160,14 @@ export default function PetCanvas({
     }, IDLE_TO_SLEEP_MS)
   }, [interactive, autoAnimate, applyState])
 
-  // Paint the current frame. Smoothing is re-disabled on every draw because
-  // resizing the canvas resets the context state.
-  const draw = useCallback(() => {
-    const ctx = canvasRef.current?.getContext('2d')
-    const img = imgRef.current
-    if (!ctx || !img) return
-    ctx.imageSmoothingEnabled = false
-    const sy = STATES[stateRef.current].row * FRAME_H
-    ctx.clearRect(0, 0, canvasW, canvasH)
-    ctx.drawImage(img, frameRef.current * FRAME_W, sy, FRAME_W, FRAME_H, 0, 0, canvasW, canvasH)
-  }, [canvasW, canvasH])
-
   useEffect(() => {
-    if (externalState && externalState !== stateRef.current) {
-      applyState(externalState)
+    if (!externalState) return
+    const shouldReplay = replayKey !== undefined && replayKeyRef.current !== replayKey
+    replayKeyRef.current = replayKey
+    if (externalState !== stateRef.current || shouldReplay) {
+      applyState(externalState, { replay: shouldReplay })
     }
-  }, [externalState, applyState])
+  }, [externalState, replayKey, applyState])
 
   useEffect(() => {
     let cancelled = false
@@ -168,17 +189,16 @@ export default function PetCanvas({
       rafRef.current = requestAnimationFrame(tick)
       if (!imgRef.current) return
 
-      const cfg = STATES[stateRef.current]
+      const cfg = stateConfigs[stateRef.current]
       if (now - lastTime.current < 1000 / cfg.fps) return
       lastTime.current = now
 
       const next = frameRef.current + 1
       if (next >= cfg.frames) {
         if (!cfg.loop && cfg.next && !repeatShortRef.current) {
-          stateRef.current = cfg.next
-          setCurrentState(cfg.next)
-          frameRef.current = 0
+          applyState(cfg.next, { replay: true })
           resetIdleTimers()
+          return
         } else {
           frameRef.current = (cfg.loop || repeatShortRef.current) ? 0 : cfg.frames - 1
         }
@@ -195,17 +215,17 @@ export default function PetCanvas({
       if (idleTimer.current)  clearTimeout(idleTimer.current)
       if (autoWaveT.current)  clearTimeout(autoWaveT.current)
     }
-  }, [draw, resetIdleTimers])
+  }, [applyState, draw, resetIdleTimers, stateConfigs])
 
   const handleClick = useCallback(() => {
     if (!interactive) return
-    applyState(currentState === 'tired' ? 'idle' : 'wave')
+    applyState(currentState === 'tired' ? 'idle' : 'wave', { replay: true })
     resetIdleTimers()
   }, [interactive, currentState, applyState, resetIdleTimers])
 
   const handleDblClick = useCallback(() => {
     if (!interactive) return
-    applyState('jump')
+    applyState('jump', { replay: true })
     resetIdleTimers()
   }, [interactive, applyState, resetIdleTimers])
 
@@ -226,9 +246,9 @@ export default function PetCanvas({
           : {
               backgroundImage: `url(${spritesheet})`,
               backgroundSize: `${SHEET_COLS * displayW}px ${SHEET_ROWS * displayH}px`,
-              backgroundPosition: `0 ${-STATES[currentState].row * displayH}px`,
+              backgroundPosition: `0 ${-stateConfigs[currentState].row * displayH}px`,
               backgroundRepeat: 'no-repeat',
-              imageRendering: 'pixelated',
+              imageRendering: pixelated ? 'pixelated' : 'auto',
             }),
         ...style,
       }}
@@ -247,7 +267,7 @@ export default function PetCanvas({
         style={{
           width: displayW,
           height: displayH,
-          imageRendering: 'pixelated',
+          imageRendering: pixelated ? 'pixelated' : 'auto',
           display: 'block',
         }}
       />

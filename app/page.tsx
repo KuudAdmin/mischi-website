@@ -14,9 +14,9 @@ import DraggablePet from './components/demo/DraggablePet'
 import Reveal from './components/Reveal'
 
 export default function Page() {
-  // Fetch both pet spritesheets from <head>, alongside the JS bundle, rather
+  // Fetch hero and demo pet spritesheets from <head>, alongside the JS bundle, rather
   // than after hydration when PetCanvas first asks for them.
-  preload('/spritesheet_cat.webp', { as: 'image', fetchPriority: 'high' })
+  preload('/pets/library/orbit/spritesheet.webp', { as: 'image', fetchPriority: 'high' })
   preload('/spritesheet.webp', { as: 'image', fetchPriority: 'high' })
 
   return (

@@ -6,14 +6,27 @@ import PetCanvas from '../demo/PetCanvas'
 
 type Mood = 'idle' | 'wave' | 'jump' | 'dancing' | 'tired' | 'waiting' | 'review' | 'runLeft' | 'runRight'
 
+const ORBIT_SPRITESHEET = '/pets/library/orbit/spritesheet.webp'
+const ORBIT_STATE_CONFIG_OVERRIDES = {
+  idle: { fps: 5 },
+  runRight: { fps: 8 },
+  runLeft: { fps: 8 },
+  wave: { fps: 6 },
+  jump: { fps: 7 },
+  tired: { fps: 4 },
+  waiting: { fps: 5, loop: false, next: 'idle' as const },
+  dancing: { fps: 6, loop: false, next: 'idle' as const },
+  review: { fps: 5, loop: false, next: 'idle' as const },
+}
+
 // Where the pet can stand on the floor, as a percentage of the screen's width.
 const LEFT_X = 20
 const RIGHT_X = 80
 const INTRO_X = 56
 // Walking pace: milliseconds per percent of the screen crossed.
-const MS_PER_PCT = 42
+const MS_PER_PCT = 58
 
-// In the cat sheet, the runRight row faces right and runLeft faces left.
+// In Codex pet sheets, the directional rows are separated by facing direction.
 const walkMood = (dir: 1 | -1): Mood => (dir > 0 ? 'runRight' : 'runLeft')
 
 type Control = { label: string; aria?: string; mood?: Mood; walk?: 1 | -1 }
@@ -21,14 +34,13 @@ type Control = { label: string; aria?: string; mood?: Mood; walk?: 1 | -1 }
 const CONTROLS: Control[] = [
   { label: 'Idle', mood: 'idle' },
   { label: 'Wave', mood: 'wave' },
-  { label: 'Jump', mood: 'jump' },
-  { label: '← Walk', aria: 'Walk left', walk: -1 },
-  { label: 'Walk →', aria: 'Walk right', walk: 1 },
-  // This cat's "dancing" row is drawn as a playful hop, so it's labelled Play.
-  { label: 'Play', mood: 'dancing' },
-  { label: 'Wait', mood: 'waiting' },
-  { label: 'Tired', mood: 'tired' },
-  { label: 'Review', mood: 'review' },
+  { label: 'Hop', mood: 'jump' },
+  { label: '← Scoot', aria: 'Scoot left', walk: -1 },
+  { label: 'Scoot →', aria: 'Scoot right', walk: 1 },
+  { label: 'Cheer', mood: 'dancing' },
+  { label: 'Scan', mood: 'waiting' },
+  { label: 'Sleep', mood: 'tired' },
+  { label: 'Focus', mood: 'review' },
 ]
 
 function subscribeReducedMotion(onChange: () => void) {
@@ -48,8 +60,9 @@ export default function DesktopScene() {
   const [walkDir, setWalkDir] = useState<1 | -1 | null>(null)
   const [walkMs, setWalkMs] = useState(0)
   const [bubble, setBubble] = useState(false)
-  // False until the laptop image and the cat's sprite sheet are both ready, so
-  // the scene appears as one piece instead of the cat arriving on its own.
+  const [replayKey, setReplayKey] = useState(0)
+  // False until the laptop image and Orbit's sprite sheet are both ready, so
+  // the scene appears as one piece instead of the pet arriving on its own.
   const [ready, setReady] = useState(false)
   const imgRef = useRef<HTMLImageElement>(null)
   const timers = useRef<ReturnType<typeof setTimeout>[]>([])
@@ -96,7 +109,7 @@ export default function DesktopScene() {
             img.addEventListener('error', () => resolve(), { once: true })
           }).then(() => img.decode())
     const sheet = new window.Image()
-    sheet.src = '/spritesheet_cat.webp'
+    sheet.src = ORBIT_SPRITESHEET
     Promise.all([laptop, sheet.decode()].map((p) => p.catch(() => {}))).then(reveal)
     const cap = setTimeout(reveal, 2500)
     return () => {
@@ -144,6 +157,7 @@ export default function DesktopScene() {
       setWalkDir(null)
       setX(here)
       setMood(control.mood ?? 'idle')
+      setReplayKey((key) => key + 1)
       return
     }
 
@@ -155,6 +169,7 @@ export default function DesktopScene() {
       setWalkDir(null)
       setX(target)
       setMood('idle')
+      setReplayKey((key) => key + 1)
       return
     }
 
@@ -163,6 +178,7 @@ export default function DesktopScene() {
     setWalkMs(distance < 1 ? 0 : ms)
     setWalkDir(dir)
     setMood(walkMood(dir))
+    setReplayKey((key) => key + 1)
     setX(target)
     timers.current.push(
       setTimeout(() => {
@@ -188,7 +204,7 @@ export default function DesktopScene() {
       className="desk-wrap"
       data-ready={ready || undefined}
       role="group"
-      aria-label="Try Mischi: a pet living on a Mac desktop"
+      aria-label="Try Orbit: a pet living on a Mac desktop"
     >
       {/* Without JavaScript nothing would flip data-ready, so just show it. */}
       <noscript dangerouslySetInnerHTML={{ __html: '<style>.desk-wrap{opacity:1;transform:none}</style>' }} />
@@ -211,7 +227,10 @@ export default function DesktopScene() {
               ref={petRef}
               className="desk-pet"
               // Only a walk ever animates the pet's position.
-              style={{ left: `${x}%`, transition: moving ? `left ${walkMs}ms linear` : 'none' }}
+              style={{
+                left: `${x}%`,
+                transition: moving ? `left ${walkMs}ms cubic-bezier(0.33, 0, 0.2, 1)` : 'none',
+              }}
               onClick={() => act({ label: 'Wave', mood: 'wave' })}
               aria-hidden="true"
             >
@@ -219,10 +238,13 @@ export default function DesktopScene() {
               <PetCanvas
                 state={mood}
                 onStateChange={syncMood}
+                replayKey={replayKey}
                 interactive={false}
                 autoAnimate={false}
                 scale={0.46}
-                spritesheet="/spritesheet_cat.webp"
+                spritesheet={ORBIT_SPRITESHEET}
+                stateConfigOverrides={ORBIT_STATE_CONFIG_OVERRIDES}
+                pixelated={false}
                 className="desk-sprite"
               />
               {bubble && <span className="desk-bubble">Stretch break in 5 minutes?</span>}
@@ -252,7 +274,7 @@ export default function DesktopScene() {
 
       <style>{`
         /* Hidden (its space already reserved) until data-ready, then the
-           laptop, cat and controls fade up together in one motion. */
+           laptop, pet and controls fade up together in one motion. */
         .desk-wrap {
           width: 100%;
           display: flex;
@@ -288,10 +310,10 @@ export default function DesktopScene() {
         /* Measured from the mockup, inside the black bezel: the screen starts
            9% from the left and 2.131% from the top, and is 82% x 86.885% of
            the image, with top corners rounded by about 1% x 1.5%.
-           It's also a size container, so the cat can be sized as a share of
+           It's also a size container, so Orbit can be sized as a share of
            the screen and stay in proportion at any laptop size. */
         .desk-screen {
-          --cat: 15cqw;
+          --pet: 15cqw;
           position: absolute;
           left: 9%;
           top: 2.131%;
@@ -302,13 +324,13 @@ export default function DesktopScene() {
           border-radius: 0.98% 0.98% 0 0 / 1.51% 1.51% 0 0;
         }
 
-        /* The cat's size comes from --cat (its width). The sprite is 192x208,
+        /* The pet's size comes from --pet (its width). The sprite is 192x208,
            with empty space under its feet worth about a tenth of its width;
            the offsets below are in those proportions. PetCanvas sets pixel
            sizes inline, hence the !important. */
         .desk-sprite {
-          width: var(--cat) !important;
-          height: calc(var(--cat) * 1.0833) !important;
+          width: var(--pet) !important;
+          height: calc(var(--pet) * 1.0833) !important;
           background-size: 800% 900% !important;
         }
         .desk-sprite canvas { width: 100% !important; height: 100% !important; }
@@ -317,11 +339,11 @@ export default function DesktopScene() {
           left: 0;
           right: 0;
           bottom: 5%;
-          height: calc(var(--cat) * 0.98);
+          height: calc(var(--pet) * 0.98);
         }
         .desk-pet {
           position: absolute;
-          bottom: calc(var(--cat) * -0.102);
+          bottom: calc(var(--pet) * -0.102);
           transform: translateX(-50%);
           line-height: 0;
           cursor: pointer;
@@ -329,9 +351,9 @@ export default function DesktopScene() {
         .desk-shadow {
           position: absolute;
           left: 50%;
-          bottom: calc(var(--cat) * 0.08);
+          bottom: calc(var(--pet) * 0.08);
           width: 56%;
-          height: max(5px, calc(var(--cat) * 0.09));
+          height: max(5px, calc(var(--pet) * 0.09));
           border-radius: 50%;
           background: rgba(20, 8, 6, 0.35);
           filter: blur(3px);
@@ -342,12 +364,12 @@ export default function DesktopScene() {
         .desk-bubble {
           position: absolute;
           left: 60%;
-          bottom: calc(100% + var(--cat) * 0.03);
+          bottom: calc(100% + var(--pet) * 0.03);
           z-index: 2;
-          padding: 6px 11px;
-          border-radius: 13px;
+          padding: 5px 9px;
+          border-radius: 10px;
           background: #FFFFFF;
-          font-size: 12px;
+          font-size: 10.5px;
           line-height: 1.3;
           color: #1B211D;
           white-space: nowrap;
@@ -359,10 +381,10 @@ export default function DesktopScene() {
         .desk-bubble::after {
           content: '';
           position: absolute;
-          left: 20px;
-          bottom: -4px;
-          width: 9px;
-          height: 9px;
+          left: 18px;
+          bottom: -3px;
+          width: 7px;
+          height: 7px;
           background: #FFFFFF;
           transform: translateX(-50%) rotate(45deg);
         }
@@ -371,24 +393,28 @@ export default function DesktopScene() {
           position: relative;
           z-index: 1;
           display: flex;
-          flex-wrap: wrap;
-          justify-content: center;
+          flex-wrap: nowrap;
+          justify-content: flex-start;
           gap: 2px;
           width: max-content;
           max-width: 100%;
+          overflow-x: auto;
           padding: 4px;
           border: 1px solid var(--color-border);
           border-radius: 9999px;
           background: var(--color-surface-raised);
           box-shadow: 0 10px 24px -16px rgba(40, 15, 10, 0.35);
+          scrollbar-width: none;
         }
+        .desk-dock::-webkit-scrollbar { display: none; }
         .desk-ctl {
-          padding: 6px 10px;
+          flex: 0 0 auto;
+          padding: 5px 8px;
           border: 0;
           border-radius: 9999px;
           background: transparent;
           font: inherit;
-          font-size: 12px;
+          font-size: 11.5px;
           font-weight: 500;
           color: #3A3F3B;
           white-space: nowrap;
@@ -411,29 +437,25 @@ export default function DesktopScene() {
         /* Phones: the same laptop, sized so the whole hero still fits the first
            screen. About 567px of it goes to the hero copy, the gap and the
            dock; the laptop takes the height that's left (it's 0.61 as tall as
-           it is wide), but never narrower than 220px. The cat takes a larger
+           it is wide), but never narrower than 220px. Orbit takes a larger
            share of the smaller screen, the bubble centres over it, and the
            dock is one swipeable row. */
         @media (max-width: 600px) {
           .desk-wrap { gap: 12px; }
           .desk { width: max(220px, min(100%, calc((100svh - 567px) / 0.61))); }
-          .desk-screen { --cat: 20cqw; }
+          .desk-screen { --pet: 20cqw; }
           .desk-bubble {
             left: 50%;
-            padding: 4px 9px;
-            border-radius: 10px;
-            font-size: 10.5px;
+            padding: 4px 8px;
+            border-radius: 9px;
+            font-size: 9.5px;
             translate: -50% 0;
             transform-origin: bottom center;
           }
           .desk-bubble::after { left: 50%; bottom: -3px; width: 7px; height: 7px; }
           .desk-dock {
-            flex-wrap: nowrap;
-            justify-content: flex-start;
-            overflow-x: auto;
-            scrollbar-width: none;
+            gap: 2px;
           }
-          .desk-dock::-webkit-scrollbar { display: none; }
           .desk-ctl { padding: 5px 9px; font-size: 11.5px; }
         }
         @media (prefers-reduced-motion: reduce) {
