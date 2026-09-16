@@ -19,6 +19,18 @@ export const SITE_DESCRIPTION =
 
 export const SITE_TAGLINE = 'Your Mac deserves a companion.'
 
+export const SITE_OG_IMAGE = {
+  url: '/opengraph-image',
+  width: 1200,
+  height: 630,
+  alt: SITE_TITLE,
+}
+
+export const SITE_TWITTER_IMAGE = {
+  url: '/opengraph-image',
+  alt: SITE_TITLE,
+}
+
 /** X/Twitter handle for card attribution — the one the footer and the app's About pane link to. */
 export const TWITTER_HANDLE = '@ajjuism'
 

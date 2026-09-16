@@ -1,9 +1,11 @@
 'use client'
 
+import type { ReactNode } from 'react'
 import { useState } from 'react'
+import Link from 'next/link'
 import { Add, Sms } from 'iconsax-react'
 
-const QUESTIONS: { q: string; a: string }[] = [
+const QUESTIONS: { q: string; a: ReactNode }[] = [
   {
     q: 'Is Mischi free?',
     a: 'Yes. Mischi is free to download and use, with no accounts and no subscriptions. If you turn on the AI features with your own Groq API key, Groq’s pricing applies to that usage, and Groq has a free tier.',
@@ -22,7 +24,7 @@ const QUESTIONS: { q: string; a: string }[] = [
   },
   {
     q: 'Is Mischi the only pet I can use?',
-    a: 'No. Mischi, the cream cat, is the one pet that comes built in, but you can have as many as you like. Use Import Pet Folder… or Import Pet .zip… in the menu bar menu, click Scan Codex in Preferences to bring in pets from ~/.codex/pets, or draw your own. Switch between them anytime from Library in the menu bar menu.',
+    a: <>No. Mischi, the cream cat, is the one pet that comes built in, but you can have as many as you like. You can pick from a few ready-made pets on the <Link href="/pets">pets page</Link>, import a pet folder or .zip from the menu bar menu, scan <code>~/.codex/pets</code>, or draw your own. Switch between them anytime from Library.</>,
   },
   {
     q: 'Can I use my Codex pets?',
@@ -209,6 +211,22 @@ export default function FAQ() {
         .faq-item[data-open] .faq-a { grid-template-rows: 1fr; }
         .faq-a > div { overflow: hidden; }
         .faq-a p { max-width: 62ch; margin: 0; padding: 0 44px 20px 4px; font-size: 0.9375rem; line-height: 1.7; color: var(--color-text-muted); }
+        .faq-a a {
+          color: var(--sage-800);
+          font-weight: 600;
+          text-decoration-thickness: 1px;
+          text-underline-offset: 3px;
+        }
+        .faq-a a:hover { color: var(--sage-900); }
+        .faq-a code {
+          border: 1px solid var(--color-border);
+          border-radius: 6px;
+          padding: 1px 5px;
+          color: var(--color-text);
+          background: var(--color-surface-sunken);
+          font-family: var(--font-mono);
+          font-size: 0.8125rem;
+        }
         .faq-more {
           align-self: flex-start;
           margin-top: 18px;

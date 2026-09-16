@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { preload } from 'react-dom'
+import { SITE_OG_IMAGE, SITE_TWITTER_IMAGE, TWITTER_HANDLE } from '@/lib/seo'
 import Nav from '../components/nav/Nav'
 import Footer from '../components/footer/Footer'
 import ContactExperience from '../components/contact/ContactExperience'
@@ -17,6 +18,15 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     url: '/contact',
     type: 'website',
+    images: [SITE_OG_IMAGE],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Contact | Mischi',
+    description: DESCRIPTION,
+    creator: TWITTER_HANDLE,
+    site: TWITTER_HANDLE,
+    images: [SITE_TWITTER_IMAGE],
   },
 }
 

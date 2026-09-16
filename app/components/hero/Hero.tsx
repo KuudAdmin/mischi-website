@@ -1,6 +1,7 @@
 'use client'
 
 import { ArrowRight } from 'iconsax-react'
+import Link from 'next/link'
 import DesktopScene from './DesktopScene'
 import { RELEASE } from '@/lib/release'
 
@@ -36,10 +37,10 @@ export default function Hero() {
               </svg>
               Download for Mac
             </a>
-            <a href="#features" className="hero-secondary">
-              See it in action
+            <Link href="/pets" className="hero-secondary">
+              Discover more pets
               <ArrowRight size={16} color="currentColor" aria-hidden="true" />
-            </a>
+            </Link>
           </div>
 
           <p className="hero-meta hero-reveal" style={{ animationDelay: '0.35s' }}>

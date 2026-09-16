@@ -3,10 +3,11 @@ import path from 'node:path'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { preload } from 'react-dom'
-import { DocumentDownload } from 'iconsax-react'
+import { SITE_OG_IMAGE, SITE_TWITTER_IMAGE, TWITTER_HANDLE } from '@/lib/seo'
 import Nav from '../components/nav/Nav'
 import Footer from '../components/footer/Footer'
 import DraggablePet from '../components/demo/DraggablePet'
+import PetDownloadButton from '../components/pets/PetDownloadButton'
 import PetPreview from '../components/pets/PetPreview'
 
 const DESCRIPTION =
@@ -21,6 +22,15 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     url: '/pets',
     type: 'website',
+    images: [SITE_OG_IMAGE],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Pets | Mischi',
+    description: DESCRIPTION,
+    creator: TWITTER_HANDLE,
+    site: TWITTER_HANDLE,
+    images: [SITE_TWITTER_IMAGE],
   },
 }
 
@@ -47,6 +57,9 @@ const DOWNLOAD_ROOT = path.join(process.cwd(), 'public', 'pets', 'downloads')
 const FEATURED_ORDER = [
   'mischi',
   'finder-guy',
+  'orbit',
+  'moss',
+  'tung-tung',
   'mochi',
   'nugget',
   'mimi',
@@ -197,11 +210,7 @@ export default function PetsPage() {
                     </div>
                     <p>{pet.description}</p>
                     {pet.downloadSize ? (
-                      <a href={pet.downloadHref} download className="pet-download">
-                        <DocumentDownload size={17} variant="Bold" color="currentColor" aria-hidden="true" />
-                        Download
-                        <span>{pet.downloadSize}</span>
-                      </a>
+                      <PetDownloadButton href={pet.downloadHref} name={pet.name} size={pet.downloadSize} />
                     ) : (
                       <span className="pet-download pet-download-disabled">Package missing</span>
                     )}
@@ -440,6 +449,7 @@ export default function PetsPage() {
         }
         .pets-preview {
           display: flex;
+          position: relative;
           width: 150px;
           height: 164px;
           align-items: center;
@@ -449,6 +459,22 @@ export default function PetsPage() {
           width: 150px;
           height: auto;
           image-rendering: pixelated;
+          transition: opacity var(--dur-normal) var(--ease-expo);
+        }
+        .pets-preview-motion {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          opacity: 0;
+          transition: opacity var(--dur-normal) var(--ease-expo);
+        }
+        .pets-preview[data-animated='true'] .pets-preview-image {
+          opacity: 0;
+        }
+        .pets-preview[data-animated='true'] .pets-preview-motion {
+          opacity: 1;
         }
         .pet-card-body {
           display: flex;
@@ -496,11 +522,23 @@ export default function PetsPage() {
           background: var(--cta);
         }
         .pet-download:hover { background: var(--cta-hover); }
-        .pet-download span {
+        .pet-download[data-loading='true'] {
+          cursor: progress;
+          background: var(--cta-hover);
+        }
+        .pet-download-size {
           font-family: var(--font-mono);
           font-size: 0.6875rem;
           font-weight: 500;
           color: rgba(247, 243, 234, 0.78);
+        }
+        .pet-download-spinner {
+          width: 17px;
+          height: 17px;
+          border: 2px solid rgba(247, 243, 234, 0.34);
+          border-top-color: currentColor;
+          border-radius: 999px;
+          animation: pet-download-spin 0.7s linear infinite;
         }
         .pet-download-disabled {
           color: var(--color-text-dim);
@@ -622,7 +660,9 @@ export default function PetsPage() {
         @media (prefers-reduced-motion: reduce) {
           .pet-card,
           .pets-primary-action,
-          .pets-secondary-action {
+          .pets-secondary-action,
+          .pets-preview-image,
+          .pets-preview-motion {
             transition: none;
           }
           .pet-card:hover,
@@ -630,6 +670,12 @@ export default function PetsPage() {
           .pets-secondary-action:hover {
             transform: none;
           }
+          .pet-download-spinner {
+            animation: none;
+          }
+        }
+        @keyframes pet-download-spin {
+          to { transform: rotate(360deg); }
         }
       `}</style>
     </>

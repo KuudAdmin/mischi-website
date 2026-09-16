@@ -1,0 +1,6 @@
+{
+  "id": "orbit",
+  "displayName": "Orbit",
+  "description": "A tiny polished 3D robot with a glowing face screen, antenna light, and cute expressive emotions.",
+  "spritesheetPath": "spritesheet.webp"
+}
