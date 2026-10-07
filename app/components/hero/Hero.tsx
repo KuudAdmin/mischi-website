@@ -4,6 +4,7 @@ import { ArrowRight } from 'iconsax-react'
 import Link from 'next/link'
 import DesktopScene from './DesktopScene'
 import { RELEASE } from '@/lib/release'
+import DownloadLink from '../download/DownloadLink'
 
 export default function Hero() {
   return (
@@ -30,13 +31,13 @@ export default function Hero() {
           </p>
 
           <div className="hero-actions hero-reveal" style={{ animationDelay: '0.25s' }}>
-            <a href={RELEASE.dmgUrl} download className="hero-cta">
+            <DownloadLink className="hero-cta">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                 <path d="M8 2.5v7.5m0 0L4.75 6.75M8 10l3.25-3.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 <path d="M2.75 13h10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
               </svg>
               Download for Mac
-            </a>
+            </DownloadLink>
             <Link href="/pets" className="hero-secondary">
               Discover more pets
               <ArrowRight size={16} color="currentColor" aria-hidden="true" />

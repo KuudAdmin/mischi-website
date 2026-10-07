@@ -6,13 +6,19 @@
  * form spammer; swap in Upstash / Vercel KV if you ever need a hard limit.
  */
 export function createRateLimit({ windowMs, max }: { windowMs: number; max: number }) {
-  const hits = new Map<string, number[]>()
+  const hits = new Map<string, { timestamps: number[]; cleanup: ReturnType<typeof setTimeout> }>()
 
   return function limited(key: string): boolean {
     const now = Date.now()
-    const recent = (hits.get(key) ?? []).filter((t) => now - t < windowMs)
+    const previous = hits.get(key)
+    if (previous) clearTimeout(previous.cleanup)
+    const recent = (previous?.timestamps ?? []).filter((t) => now - t < windowMs)
     recent.push(now)
-    hits.set(key, recent)
+    // Remove the IP even if it never submits again. Pruning timestamps only on
+    // the next request leaves inactive visitors' IPs in memory indefinitely.
+    const cleanup = setTimeout(() => hits.delete(key), windowMs)
+    cleanup.unref()
+    hits.set(key, { timestamps: recent.slice(-(max + 1)), cleanup })
     return recent.length > max
   }
 }

@@ -16,7 +16,7 @@ const QUESTIONS: { q: string; a: ReactNode }[] = [
   },
   {
     q: 'Does Mischi need internet or a cloud account?',
-    a: 'No account, ever. Your pet, animations, reminders and settings all work offline. The only network traffic is optional: if you add a Groq API key, chat, voice and generated chatter go directly from your Mac to Groq.',
+    a: 'No account is needed. Your pet, animations, reminders and settings work offline. From version 0.9.12, the app checks mischi.app for new releases; turn off automatic checks in Preferences → About if you prefer. Optional AI features send requests directly from your Mac to Groq using your own API key.',
   },
   {
     q: 'How does the AI chat work?',
@@ -32,7 +32,7 @@ const QUESTIONS: { q: string; a: ReactNode }[] = [
   },
   {
     q: 'Does Mischi collect any data about me?',
-    a: 'Not from the app: it has no analytics, crash reporting or usage telemetry, and it never phones home. This website uses cookieless, anonymous analytics to count things like downloads, and we only get your email if you subscribe to the newsletter or write to us. See the Privacy Policy for the full picture.',
+    a: 'The app has no analytics, crash reporting or usage telemetry. It stores pets, notes and settings locally; optional AI features may send relevant content to Groq. Release checks expose connection information to our hosting provider and can be disabled in Preferences → About. Website analytics run only after you allow them, and you can turn them off in Privacy settings. We also process information you send through our forms. See the Privacy Policy for details.',
   },
   {
     q: 'Mischi is in beta. What does that mean?',

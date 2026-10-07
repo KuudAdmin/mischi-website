@@ -495,6 +495,9 @@ export default function ContactExperience() {
                 </InlineAlert>
               )}
 
+              <p style={{ padding: '12px 20px', fontSize: '0.75rem', lineHeight: 1.6, color: 'var(--color-text-muted)' }}>
+                We use your details to respond and handle your enquiry. Unsent drafts are saved in this browser. <a href="/privacy" style={{ textDecoration: 'underline' }}>Privacy Policy</a>.
+              </p>
               <ComposeToolbar
                 sending={status === 'sending'}
                 hint={

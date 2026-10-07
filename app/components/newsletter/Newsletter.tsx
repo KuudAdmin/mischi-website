@@ -119,7 +119,7 @@ export default function Newsletter() {
               <p role={status === 'error' ? 'alert' : undefined} className="nl-note" data-error={status === 'error' || undefined}>
                 {status === 'error'
                   ? error || 'Something went wrong. Please try again in a moment.'
-                  : 'Unsubscribe with one click, anytime.'}
+                  : <>By selecting Subscribe, you ask to receive Mischi news by email. Unsubscribe anytime. <a href="/privacy">Privacy Policy</a>.</>}
               </p>
             </>
           )}

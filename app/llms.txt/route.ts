@@ -36,7 +36,7 @@ export function GET() {
 ## Product
 
 - [Home](${SITE_URL}/): overview and features
-- [Download](${SITE_URL}${RELEASE.dmgUrl}): ${RELEASE.dmgFileName}, ${RELEASE.size}, SHA-256 ${RELEASE.sha256}
+- [Download](${SITE_URL}/download): review terms and download ${RELEASE.dmgFileName}, ${RELEASE.size}, SHA-256 ${RELEASE.sha256}
 - [FAQ](${SITE_URL}/#faq): common questions
 
 ## Support

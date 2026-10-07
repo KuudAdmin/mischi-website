@@ -142,11 +142,12 @@ export async function POST(request: Request) {
       }),
     })
     if (!res.ok) {
-      console.error('[contact] Resend error', res.status, await res.text().catch(() => ''))
+      // Provider responses can echo submitted personal data. Log only status.
+      console.error('[contact] Resend error', res.status)
       return fail(502, 'We couldn’t send your message just now.', true)
     }
-  } catch (err) {
-    console.error('[contact] Resend request failed', err)
+  } catch {
+    console.error('[contact] Resend request failed')
     return fail(502, 'We couldn’t send your message just now.', true)
   }
 

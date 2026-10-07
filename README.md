@@ -42,8 +42,10 @@ download metadata, SEO assets, analytics wiring, and the newsletter endpoint.
 
 ## Recent changes reflected here
 
-- Current public app release is **Mischi 0.9.11 Beta**, released September 14,
-  2026, with a 5.9 MB Universal DMG for macOS 13 Ventura and later.
+- Current public app release is **Mischi 0.9.12 Beta**, released October 7,
+  2026, with a 6.0 MB Universal DMG for macOS 13 Ventura and later.
+- Version 0.9.12 adds in-app update notices, manual update checks, and hidden
+  scrollbars throughout Preferences while preserving scrolling.
 - The homepage hero now uses the MacBook mockup scene and coordinated reveal for
   the laptop, cat, and controls.
 - The feature showcase is now a single accessible tabbed player covering
@@ -85,7 +87,8 @@ the sections below.
 1. Build the signed and notarised DMG in the app repo.
 2. Copy it into `public/downloads/`.
 3. Update `lib/release.ts`: version, channel, date, file name, size, minimum
-   macOS version, and SHA-256.
+   macOS version (both `minMacOS` and numeric `minMacOSVersion`), SHA-256,
+   and the short `updateMessage` shown inside the app.
 
 ```bash
 shasum -a 256 public/downloads/Mischi-x.y.z.dmg
@@ -96,6 +99,31 @@ from `lib/release.ts`, so a release bump should happen there first. If the
 homepage visuals change, refresh `docs/og.png` too; it is the social-card
 snapshot shown at the top of this README.
 
+## In-app update checks
+
+`GET /updates/latest.json` is the public update feed for Mischi 0.9.12 and later.
+It reads `lib/release.ts`, so updating that record and deploying the website
+updates the download page and the app's announcement together. Upload and verify
+the signed, notarised DMG before advertising its version. The feed currently
+advertises 0.9.12, matching `public/downloads/Mischi-0.9.12.dmg`.
+
+The JSON contract is `version`, `minimumMacOS` (numeric, such as `13.0`),
+`downloadURL` (the HTTPS website download section), and `message`. Use stable
+numeric release versions such as `0.9.12`; prerelease suffixes are not accepted
+by the app. Shared caches expire within five minutes. This route serves JSON
+directly without running browser analytics or requiring an account.
+
+Verify after deploying:
+
+```bash
+curl -i https://mischi.app/updates/latest.json
+```
+
+The app checks daily while running, retries failed checks after an hour, and
+provides **Check for Updates…** in its menu and **Preferences → About**. It opens
+the website when the user chooses to download; it does not install updates.
+Users on older builds must manually install the first version with the checker.
+
 ## Environment variables
 
 Server-only:
@@ -103,8 +131,8 @@ Server-only:
 - `RESEND_API_KEY`: required for the contact form in production.
 - `CONTACT_FROM_EMAIL`: sender address on a Resend-verified domain, for example
   `Mischi <contact@mail.mischi.app>`.
-- `CONTACT_TO_EMAIL`: optional recipient override; defaults to `CONTACT_EMAIL`
-  in `lib/release.ts`.
+- `CONTACT_TO_EMAIL`: optional recipient override; defaults to `hello@kuud.in`
+  via `CONTACT_EMAIL` in `lib/release.ts`.
 - `KIT_API_KEY` and `KIT_FORM_ID`: optional Kit newsletter backend.
 - `NEWSLETTER_SHEET_ENDPOINT`: optional Google Sheet/Web App mirror for
   newsletter signups.
@@ -114,7 +142,8 @@ Public:
 
 - `NEXT_PUBLIC_SITE_URL`: canonical base URL for previews/staging; production
   defaults to `https://mischi.app`.
-- `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN`: enables analytics when set.
+- `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN`: enables the analytics consent prompt;
+  analytics start only after an explicit opt-in.
 - `NEXT_PUBLIC_POSTHOG_REGION`: `eu` by default, or `us` for a US PostHog
   project.
 
@@ -147,17 +176,53 @@ the UI can be tested locally.
 
 ## Analytics
 
-`instrumentation-client.ts` starts PostHog only when
-`NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` is present and the visitor has not enabled
-Do Not Track or Global Privacy Control.
+`instrumentation-client.ts` observes privacy choices. `lib/analytics.ts` loads
+PostHog only when `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` is present, the visitor has
+explicitly opted in, and neither Do Not Track nor Global Privacy Control is on.
 
-- PostHog uses memory persistence, no autocapture, no session recording, no
-  heatmaps, no surveys, and no exception capture.
+- Visitors can allow or reject with equally prominent buttons, and withdraw
+  through **Privacy settings** in the footer or privacy policy. A versioned
+  browser-local choice is valid for 180 days. Blocked storage falls back to a
+  page-session choice; no analytics events are queued before consent.
+- PostHog uses memory-only identifiers, with person profiles, autocapture,
+  session recording, heatmaps, surveys, flags and exception capture disabled.
+  Its consent flag may use local storage. Requests are not batched; withdrawal
+  stops capture, and the outgoing-event filter also checks current consent.
+- An allowlist removes full URLs, referrers, query strings, campaign fields and
+  person fields. Docs search text and contact/newsletter fields are not sent.
 - Link tracking in `lib/analytics.ts` classifies downloads, docs links,
   outbound links, email links, contact fallback use, docs-search result opens,
   and successful newsletter/contact submissions.
 - Events go through `/relay/*` on this domain using the rewrites in
   `next.config.ts`.
+
+## Download agreement and privacy operations
+
+App download links open an accessible native dialog. The unchecked box agrees
+to the Terms of Use and acknowledges the Privacy Policy; it does not grant
+analytics or newsletter consent. `/download` provides the same form without
+requiring JavaScript. `POST /api/download` validates the acknowledgement and
+document versions from `lib/legal.ts`, then redirects to the current DMG.
+The public versioned DMG is still directly addressable. There is no separate
+acceptance database or identity-linked proof of agreement.
+
+The operator is ARJUN NV, publishing under the project name Mischi. Privacy and
+terms use `lib/legal.ts` for the operator and revision details. Update document
+versions when changing them so stale download forms require another review.
+
+Repository checks cover consent gating, event minimisation, rate-limit expiry,
+and form validation. Run `node --test tests/privacy.test.mjs`, `npm run lint`,
+and `npx tsc --noEmit` after changing these behaviours.
+
+Production account facts are not stored in this repository. Before relying on
+the notice as a complete operational record, check the actual Vercel/PostHog
+plans and retention settings, the enabled newsletter/contact backends, the
+email inbox provider, and the applicable provider data-processing and transfer
+agreements. For PostHog, verify the project's IP-data setting and deletion
+process; memory persistence does not control server-side IP storage. Public
+provider documentation or a configured API key does not prove an account's
+settings or that a required agreement has been completed. Keep actual periods
+and transfer mechanisms in the policy aligned with those records.
 
 ## Project structure
 

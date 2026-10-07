@@ -9,6 +9,7 @@ import {
   TWITTER_HANDLE,
 } from '@/lib/seo'
 import { RELEASE } from '@/lib/release'
+import PrivacyControls from './components/legal/PrivacyControls'
 import './globals.css'
 
 const inter = Inter({
@@ -117,7 +118,7 @@ const jsonLd = {
       applicationCategory: 'UtilitiesApplication',
       operatingSystem: 'macOS 13.0 or later',
       softwareVersion: RELEASE.version,
-      downloadUrl: `${SITE_URL}${RELEASE.dmgUrl}`,
+      downloadUrl: `${SITE_URL}/download`,
       fileSize: RELEASE.size,
       offers: {
         '@type': 'Offer',
@@ -147,6 +148,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         {children}
+        <PrivacyControls />
       </body>
     </html>
   );

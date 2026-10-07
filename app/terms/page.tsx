@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import LegalPage from '../components/legal/LegalPage'
 import { CONTACT_EMAIL } from '@/lib/release'
+import { LEGAL_UPDATED, OPERATOR_NAME } from '@/lib/legal'
 
 const DESCRIPTION = 'The terms that govern your use of the Mischi macOS app and the mischi.app website.'
 
@@ -21,15 +22,15 @@ export default function TermsPage() {
   return (
     <LegalPage
       title="Terms of Use"
-      updated="September 14, 2026"
+      updated={LEGAL_UPDATED}
       intro="These terms cover the Mischi app for macOS and the mischi.app website. They’re written to be read, but they are a binding agreement, so please take a few minutes with them."
     >
       <h2>1. Agreement</h2>
       <p>
-        By downloading, installing or using Mischi (the <strong>app</strong>), or by using mischi.app (the <strong>website</strong>), you agree to these terms and to our <Link href="/privacy">Privacy Policy</Link>. If you don’t agree, don’t use the app or the website. If you use Mischi on behalf of an organisation, you confirm you’re allowed to accept these terms for it.
+        These terms govern Mischi (the <strong>app</strong>) and mischi.app (the <strong>website</strong>). The website download form asks you to expressly agree to these terms before downloading. If you do not agree, do not download, install or use the app. If you use Mischi on behalf of an organisation, you confirm you are authorised to accept these terms for it. Our <Link href="/privacy">Privacy Policy</Link> explains how we handle personal data; acknowledging it is not consent to optional analytics or marketing.
       </p>
       <p>
-        Mischi is made by Kuud, based in Kerala, India (<strong>we</strong>, <strong>us</strong>).
+        Mischi is an independent project operated by <strong>{OPERATOR_NAME}</strong> (<a href="https://x.com/ajjuism" target="_blank" rel="noopener noreferrer">@ajjuism</a>), based in Kerala, India (<strong>we</strong>, <strong>us</strong>). Mischi is a project name, not an incorporated company.
       </p>
 
       <h2>2. Beta software</h2>

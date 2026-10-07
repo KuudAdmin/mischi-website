@@ -22,12 +22,13 @@ async function subscribeKit(email: string): Promise<boolean> {
       body: JSON.stringify({ api_key: apiKey, email }),
     })
     if (!res.ok) {
-      console.error('[subscribe] Kit error', res.status, await res.text().catch(() => ''))
+      // Provider responses can echo a subscriber's email. Log only status.
+      console.error('[subscribe] Kit error', res.status)
       return false
     }
     return true
-  } catch (err) {
-    console.error('[subscribe] Kit request failed', err)
+  } catch {
+    console.error('[subscribe] Kit request failed')
     return false
   }
 }
@@ -45,8 +46,8 @@ async function mirrorToSheet(email: string, source: string): Promise<boolean> {
       body: new URLSearchParams({ email, source }),
     })
     return res.ok
-  } catch (err) {
-    console.error('[subscribe] Sheet request failed', err)
+  } catch {
+    console.error('[subscribe] Sheet request failed')
     return false
   }
 }

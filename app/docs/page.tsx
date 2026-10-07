@@ -4,6 +4,7 @@ import Nav from '../components/nav/Nav'
 import Footer from '../components/footer/Footer'
 import DocsSearch from '../components/docs/DocsSearch'
 import { RELEASE } from '@/lib/release'
+import DownloadLink from '../components/download/DownloadLink'
 
 const DESCRIPTION =
   'Install Mischi, learn every setting, set up AI with Groq, and create your own Codex-compatible desktop pets.'
@@ -92,7 +93,7 @@ export default function DocsPage() {
               <h3>Download and install</h3>
               <ol className="docs-steps">
                 <li>
-                  <a href={RELEASE.dmgUrl} download>Download {RELEASE.dmgFileName}</a> ({RELEASE.size}).
+                  <DownloadLink>Download {RELEASE.dmgFileName}</DownloadLink> ({RELEASE.size}).
                 </li>
                 <li>Open it from your Downloads folder. A window shows Mischi next to your Applications folder.</li>
                 <li>Drag <strong>Mischi</strong> onto <strong>Applications</strong>.</li>
@@ -116,6 +117,13 @@ export default function DocsPage() {
               </p>
 
               <h3>Updating</h3>
+              <p>
+                From Mischi 0.9.12, choose <strong>Check for Updates…</strong> from the app menu or
+                <strong> Preferences → About</strong>. Mischi also checks daily while running and shows
+                a notice when a compatible release is available. <strong>Download update</strong> opens
+                the website. You can turn automatic checks off in <strong>Preferences → About</strong>.
+                Earlier versions need a manual download to get this feature.
+              </p>
               <p>
                 Download the latest version from the <Link href="/#download">download page</Link>, quit Mischi,
                 and drag the new copy into Applications, replacing the old one. Your pets, settings, reminders

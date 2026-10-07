@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { ArrowRight2, Coffee, DocumentDownload } from 'iconsax-react'
 import { RELEASE } from '@/lib/release'
+import DownloadLink from './DownloadLink'
 
 /** The closing band, in the same warm wallpaper as the hero's desktop. */
 export default function Download() {
@@ -21,10 +22,10 @@ export default function Download() {
           <p className="dl-sub">Signed and notarised by Apple, so it installs like any other Mac app.</p>
 
           <div className="dl-actions">
-            <a href={RELEASE.dmgUrl} download className="dl-btn">
+            <DownloadLink className="dl-btn">
               <DocumentDownload size={18} variant="Bold" color="currentColor" aria-hidden="true" />
               Download for Mac
-            </a>
+            </DownloadLink>
             <span className="dl-meta">v{RELEASE.version} · {RELEASE.size} · macOS 13+ · Universal</span>
           </div>
 

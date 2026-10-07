@@ -6,7 +6,7 @@ import { CloudCross, Command, Cpu, EyeSlash, Gift, MagicStar, Microphone2, Notif
 const FACTS = [
   { Icon: ShieldTick, text: 'Signed & notarised by Apple' },
   { Icon: Pet, text: 'Works with Codex pets' },
-  { Icon: EyeSlash, text: 'No account, no tracking' },
+  { Icon: EyeSlash, text: 'No account, no app telemetry' },
   { Icon: Cpu, text: 'Apple Silicon & Intel' },
   { Icon: Gift, text: 'Free to use' },
   { Icon: CloudCross, text: 'Works offline' },

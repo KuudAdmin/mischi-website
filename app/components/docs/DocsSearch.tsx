@@ -191,9 +191,8 @@ export default function DocsSearch() {
 
   function go(result: Result) {
     const { el, sectionId } = result.entry
-    // The search words show what people look for and whether the docs cover it.
+    // Count useful results without sending free text that may contain personal data.
     track('docs_search_result_opened', {
-      query: query.trim().slice(0, 60),
       result: result.entry.heading,
       section: result.entry.section,
       position: results.indexOf(result) + 1,

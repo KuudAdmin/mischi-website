@@ -6,8 +6,8 @@ export default function ContactIntro() {
       <p className="ct-eyebrow">Contact</p>
       <h1 className="ct-title">Talk to the people who make Mischi</h1>
       <p className="ct-lede">
-        Bug reports, ideas, questions, or a pet you’re proud of. Every message is read by a real person, and
-        replies come from <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+        Bug reports, ideas, questions, or a pet you’re proud of. Every message is read by a real person.
+        You can also email us at <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
       </p>
     </div>
   )
