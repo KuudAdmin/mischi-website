@@ -200,8 +200,15 @@ of the download agreement, newsletter subscription and native app settings.
   page-session choice; no analytics events are queued before consent.
 - PostHog uses memory-only identifiers, with person profiles, autocapture,
   session recording, heatmaps, surveys, flags and exception capture disabled.
-  Its consent flag may use local storage. Requests are not batched; withdrawal
-  stops capture, and the outgoing-event filter also checks current consent.
+  Its consent flag may use local storage. Requests are not batched or retried.
+  Withdrawal stops new capture and requests; it cannot recall an in-flight
+  request or delete events already received by PostHog.
+- `lib/analytics-transport.ts` checks consent at dispatch and bypasses the SDK's
+  retry queue. This deliberately makes delivery best-effort: network failures
+  lose events, including while consent remains enabled. Async compression and
+  external extension loading are disabled to avoid deferred dispatch.
+  PostHog is pinned to `1.431.4` because the adapter uses internal methods;
+  review those methods and run the real-SDK tests before any SDK upgrade.
 - An allowlist removes full URLs, referrers, query strings, campaign fields and
   person fields. Docs search text and contact/newsletter fields are not sent.
 - Link tracking in `lib/analytics.ts` classifies downloads, docs links,
@@ -225,18 +232,47 @@ terms use `lib/legal.ts` for the operator and revision details. Update document
 versions when changing them so stale download forms require another review.
 
 Repository checks cover consent gating, event minimisation, rate-limit expiry,
-and form validation. Run `node --test tests/privacy.test.mjs`, `npm run lint`,
-and `npx tsc --noEmit` after changing these behaviours.
+and form validation. Tests using the installed PostHog SDK exercise HTTP/network
+failures, late responses after withdrawal, re-consent, and unload; only the final
+HTTP transport is replaced, so no test sends data to a provider. Run
+`node --test tests/privacy.test.mjs`, `npm run lint`, and `npx tsc --noEmit` after
+changing these behaviours.
 
-Production account facts are not stored in this repository. Before relying on
-the notice as a complete operational record, check the actual Vercel/PostHog
+PostHog account review on **October 8, 2026** confirmed the EU project, free plan,
+**Discard client IP data** enabled, and **Enable cookieless tracking** disabled.
+The integration uses memory-only identifiers, not PostHog's server-hash mode;
+keep explicit opt-in. The Legal documents page showed no generated DPA. The
+operator must complete and sign a DPA unless a separate signed copy exists;
+do not treat a public policy or API key as proof of an agreement.
+
+The free plan provides a one-year event-reporting window, **not automatic
+deletion after one year**. PostHog does not offer a shorter event-retention
+setting as a deletion tool. No scheduled event-deletion job is configured here.
+See [PostHog retention](https://posthog.com/docs/data/events-retention) and
+[data deletion](https://posthog.com/docs/privacy/data-storage).
+
+For retention and deletion operations:
+
+1. Recheck the plan, settings and continued need for event-level history when
+   reviewing analytics, and before changing this policy. Keep signed provider
+   agreements and review records privately; do not commit addresses or signatures.
+2. For a deletion request, determine whether available information can locate
+   the events. Temporary IDs and disabled person profiles may prevent matching
+   a name or email to a visit; do not start collecting identifying data merely
+   to make that match, or claim that withdrawing consent deleted old events.
+3. Use the provider's supported deletion process for locatable records and
+   verify completion. If self-service deletion cannot address the request,
+   obtain PostHog's assistance. A reporting filter or an empty report is not
+   proof of deletion. Document the outcome and respond within applicable deadlines.
+4. Before promising a fixed deletion deadline, establish and verify a deletion
+   mechanism that can meet it. The current notice makes no such guarantee.
+
+Before relying on the notice as a complete operational record, check Vercel
 plans and retention settings, the enabled newsletter/contact backends, the
 email inbox provider, and the applicable provider data-processing and transfer
-agreements. For PostHog, verify the project's IP-data setting and deletion
-process; memory persistence does not control server-side IP storage. Public
-provider documentation or a configured API key does not prove an account's
-settings or that a required agreement has been completed. Keep actual periods
-and transfer mechanisms in the policy aligned with those records.
+agreements. Recheck PostHog settings if its plan or configuration changes;
+memory persistence does not control server-side IP storage. Keep actual periods
+and transfer mechanisms in the policy aligned with private operational records.
 
 ## Project structure
 

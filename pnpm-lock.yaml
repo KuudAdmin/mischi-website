@@ -15,7 +15,7 @@ importers:
         specifier: 16.2.6
         version: 16.2.6(@babel/core@7.29.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       posthog-js:
-        specifier: ^1.431.4
+        specifier: 1.431.4
         version: 1.431.4(@types/react@19.2.15)(react@19.2.4)
       react:
         specifier: 19.2.4

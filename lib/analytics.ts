@@ -1,5 +1,6 @@
 import type { PostHog, CaptureResult } from 'posthog-js'
 import { analyticsAllowed, subscribePrivacyChanges } from './privacy-preferences'
+import { installAnalyticsTransport } from './analytics-transport'
 
 /**
  * Privacy-friendly usage analytics (PostHog): counts downloads, docs visits and
@@ -50,6 +51,7 @@ async function syncAnalytics(): Promise<void> {
     loading = import('posthog-js').then(({ default: sdk }) => {
       // Consent may have been withdrawn while the module was loading.
       if (!analyticsAllowed()) return
+      installAnalyticsTransport(sdk)
       const region = process.env.NEXT_PUBLIC_POSTHOG_REGION === 'us' ? 'us' : 'eu'
       sdk.init(process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN!, {
         api_host: '/relay',
@@ -72,7 +74,10 @@ async function syncAnalytics(): Promise<void> {
         capture_heatmaps: false,
         capture_exceptions: false,
         advanced_disable_flags: true,
-        // No buffered events to flush after consent is withdrawn.
+        disable_external_dependency_loading: true,
+        // Dispatch synchronously: async compression could outlive consent.
+        disable_compression: true,
+        // Batching and retries are separate; the transport adapter removes retries.
         request_batching: false,
         before_send: filterAnalyticsEvent,
       })

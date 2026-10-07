@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import LegalPage from '../components/legal/LegalPage'
 import { CONTACT_EMAIL } from '@/lib/release'
-import { LEGAL_UPDATED, OPERATOR_NAME } from '@/lib/legal'
+import { PRIVACY_UPDATED, OPERATOR_NAME } from '@/lib/legal'
 import { ANALYTICS_CONFIGURED } from '@/lib/privacy-preferences'
 import { PrivacySettingsButton } from '../components/legal/PrivacyControls'
 
@@ -27,7 +27,7 @@ export default function PrivacyPage() {
   return (
     <LegalPage
       title="Privacy Policy"
-      updated={LEGAL_UPDATED}
+      updated={PRIVACY_UPDATED}
       intro="Mischi is built offline-first. The app runs on your Mac with no account and no telemetry. This policy explains what stays on your Mac, what goes to Groq if you choose to use AI, how release checks work, and the data this website handles."
     >
       <h2>The short version</h2>
@@ -122,7 +122,7 @@ export default function PrivacyPage() {
         Events are sent through our own domain to PostHog for processing on our behalf. Using memory-only identifiers does not make all event or connection information anonymous. See <a href="https://posthog.com/privacy" target="_blank" rel="noopener noreferrer">PostHog’s privacy policy</a>. Our own analytics configuration does not control the separate hosting and security logs described above.
       </p>
       <p>
-        We store your analytics choice, the choice version and its date in your browser’s local storage. A choice is valid for up to 180 days, after which analytics require a new opt-in. PostHog may also store a consent flag in local storage; this is a preference, not a persistent visitor identifier. Clearing site data removes these preferences. If storage is unavailable, your choice applies only to the current page session. Withdrawing consent stops future analytics events; it does not recall events already sent.
+        We store your analytics choice, the choice version and its date in your browser’s local storage. A choice is valid for up to 180 days, after which analytics require a new opt-in. PostHog may also store a consent flag in local storage; this is a preference, not a persistent visitor identifier. Clearing site data removes these preferences. If storage is unavailable, your choice applies only to the current page session. Withdrawing consent stops new analytics capture and requests. We do not automatically retry failed analytics requests. Withdrawal cannot recall a request already in flight or erase events already received by the provider.
       </p>
 
       <h3>Download acknowledgement</h3>
@@ -179,7 +179,7 @@ export default function PrivacyPage() {
         <li><strong>Newsletter:</strong> while you remain subscribed, with limited records afterwards where needed to record consent, respect an unsubscribe request or comply with law. Unsubscribing stops newsletters; it does not necessarily erase every provider record or backup immediately.</li>
         <li><strong>Support correspondence:</strong> for handling the enquiry and related follow-up, and where necessary to investigate an unresolved issue or meet legal obligations.</li>
         <li><strong>Hosting and security logs:</strong> according to the provider’s applicable retention settings and any need to investigate security incidents.</li>
-        <li><strong>Analytics:</strong> according to the analytics service’s retention settings, with retention assessed against the need to compare website usage over time and evaluate improvements.</li>
+        <li><strong>Analytics:</strong> we use event history to compare website usage and evaluate improvements over time. Our current PostHog plan provides a one-year reporting window. This limits which events are available in reports; it is not a guarantee that older events are deleted. Deletion is handled separately through the provider’s deletion processes, subject to the ability to locate the relevant records and any applicable legal exceptions. See <a href="https://posthog.com/docs/data/events-retention" target="_blank" rel="noopener noreferrer">PostHog’s event-retention explanation</a>. You can contact us about retention or deletion of your data.</li>
         <li><strong>Contact drafts and app data:</strong> on your device until removed as described above. Device backups may retain separate copies.</li>
         <li><strong>Analytics choices:</strong> we rely on a stored choice for up to 180 days. Stored preference records remain in your browser until replaced or cleared; an expired choice does not permit analytics.</li>
       </ul>

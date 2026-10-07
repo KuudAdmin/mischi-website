@@ -42,10 +42,12 @@ function browser({ configured = true, navigator = {} } = {}) {
   return { globals, preferences, storage, window, navigator }
 }
 
-function analytics(environment = browser()) {
+function analytics(environment = browser(), suppliedSdk) {
   const calls = { imports: 0, init: 0, optIn: 0, optOut: 0, events: [] }
   let config
-  const sdk = {
+  const sdk = suppliedSdk ?? {
+    _send_request() {},
+    _send_retriable_request() {},
     init(_token, options) { calls.init++; config = options },
     opt_in_capturing() { calls.optIn++ },
     opt_out_capturing() { calls.optOut++ },
@@ -54,11 +56,15 @@ function analytics(environment = browser()) {
       if (filtered) calls.events.push(filtered)
     },
   }
+  const transport = load('lib/analytics-transport.ts', environment.globals, {
+    './privacy-preferences': environment.preferences,
+  })
   const api = load('lib/analytics.ts', environment.globals, {
     './privacy-preferences': environment.preferences,
+    './analytics-transport': transport,
     'posthog-js': () => { calls.imports++; return { default: sdk } },
   })
-  return { ...environment, api, calls, config: () => config }
+  return { ...environment, api, calls, sdk, config: () => config }
 }
 
 const settled = () => new Promise(resolve => setImmediate(resolve))
@@ -73,7 +79,7 @@ test('analytics stays unloaded before consent; refusal does not queue events', a
   assert.equal(calls.events.length, 0)
 })
 
-test('opt-in starts a pageview; withdrawal stops capture and drops unsent events', async () => {
+test('opt-in starts a pageview; withdrawal stops new capture', async () => {
   const { api, preferences, calls, config } = analytics()
   api.startAnalytics()
   preferences.saveAnalyticsChoice('accepted')
@@ -85,6 +91,8 @@ test('opt-in starts a pageview; withdrawal stops capture and drops unsent events
   assert.equal(config().autocapture, false)
   assert.equal(config().disable_session_recording, true)
   assert.equal(config().request_batching, false)
+  assert.equal(config().disable_compression, true)
+  assert.equal(config().disable_external_dependency_loading, true)
   const beforeWithdrawal = calls.events.length
   preferences.saveAnalyticsChoice('rejected')
   api.track('download_clicked')
@@ -93,6 +101,81 @@ test('opt-in starts a pageview; withdrawal stops capture and drops unsent events
   assert.equal(calls.events.length, beforeWithdrawal)
   assert.equal(api.filterAnalyticsEvent({ event: 'late', properties: {} }), null)
 })
+
+// Exercise actual capture, consent, request dispatch and RetryQueue. Only the
+// final HTTP transport is replaced; no test contacts a live PostHog project.
+function realAnalytics(t) {
+  t.mock.timers.enable({ apis: ['setTimeout', 'setInterval'] })
+  const originalNavigator = Object.getOwnPropertyDescriptor(globalThis, 'navigator')
+  Object.defineProperty(globalThis, 'navigator', { configurable: true, value: { onLine: true } })
+  t.after(() => {
+    if (originalNavigator) Object.defineProperty(globalThis, 'navigator', originalNavigator)
+    else delete globalThis.navigator
+  })
+  const { PostHog } = require('posthog-js/lib/src/posthog-core.js')
+  const requests = []
+  t.mock.method(require('posthog-js/lib/src/request.js'), 'request', options => {
+    requests.push(options)
+    if (options.data?.event === '$pageview') options.callback?.({ statusCode: 200 })
+  })
+  const sdk = new PostHog()
+  t.after(() => sdk.shutdown())
+  return { ...analytics(browser(), sdk), requests }
+}
+
+test('real SDK sends opted-in events but never queues failed requests for retry', async t => {
+  const { api, preferences, sdk, requests } = realAnalytics(t)
+  api.startAnalytics()
+  await settled()
+  assert.equal(requests.length, 0)
+  preferences.saveAnalyticsChoice('accepted')
+  await settled()
+  assert.equal(requests[0].data.event, '$pageview')
+  for (const statusCode of [0, 500]) {
+    api.track('download_clicked')
+    assert.equal(requests.at(-1).data.event, 'download_clicked')
+    requests.at(-1).callback({ statusCode })
+    assert.equal(sdk._retryQueue.length, 0)
+  }
+  const count = requests.length
+  t.mock.timers.tick(60_000)
+  assert.equal(requests.length, count)
+  preferences.saveAnalyticsChoice('rejected')
+  // Exercise both capture-time and final dispatch guards, including unload.
+  api.track('download_clicked')
+  sdk._send_request({ method: 'POST', url: '/relay/e/', data: { event: 'late' } })
+  sdk._handle_unload()
+  assert.equal(requests.length, count)
+})
+
+for (const regrantBeforeFailure of [false, true]) {
+  test(`real SDK drops late failures after withdrawal (regrant first: ${regrantBeforeFailure})`, async t => {
+    const { api, preferences, sdk, requests } = realAnalytics(t)
+    api.startAnalytics()
+    preferences.saveAnalyticsChoice('accepted')
+    await settled()
+    api.track('download_clicked')
+    const pending = requests.at(-1)
+    preferences.saveAnalyticsChoice('rejected')
+    if (regrantBeforeFailure) {
+      preferences.saveAnalyticsChoice('accepted')
+      await settled()
+    }
+    const count = requests.length
+    pending.callback({ statusCode: 500 })
+    assert.equal(sdk._retryQueue.length, 0)
+    t.mock.timers.tick(60_000)
+    sdk._retryQueue.unload()
+    assert.equal(requests.length, count)
+    if (!regrantBeforeFailure) {
+      preferences.saveAnalyticsChoice('accepted')
+      await settled()
+    }
+    api.track('docs_link_clicked')
+    assert.equal(requests.at(-1).data.event, 'docs_link_clicked')
+    assert.equal(requests.filter(request => request.data?.event === 'download_clicked').length, 1)
+  })
+}
 
 test('withdrawing while the SDK imports prevents initialisation', async () => {
   const { api, preferences, calls } = analytics()
