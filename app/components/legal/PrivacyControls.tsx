@@ -3,17 +3,22 @@
 import { useEffect, useState, useSyncExternalStore } from 'react'
 import { usePathname } from 'next/navigation'
 import { trackPageview } from '@/lib/analytics'
-import { privacyStatus, saveAnalyticsChoice, subscribePrivacyChanges, PRIVACY_SETTINGS_EVENT, type PrivacyStatus } from '@/lib/privacy-preferences'
+import { ANALYTICS_CONFIGURED, privacyStatus, saveAnalyticsChoice, subscribePrivacyChanges, PRIVACY_SETTINGS_EVENT, type PrivacyStatus } from '@/lib/privacy-preferences'
 import LegalDialog from './LegalDialog'
 import styles from './legal-controls.module.css'
 
 const serverStatus = (): PrivacyStatus => 'loading'
 
 export function PrivacySettingsButton() {
+  if (!ANALYTICS_CONFIGURED) return null
   return <button type="button" className={styles.settings} onClick={() => window.dispatchEvent(new Event(PRIVACY_SETTINGS_EVENT))}>Privacy settings</button>
 }
 
 export default function PrivacyControls() {
+  return ANALYTICS_CONFIGURED ? <ConfiguredPrivacyControls /> : null
+}
+
+function ConfiguredPrivacyControls() {
   const status = useSyncExternalStore(subscribePrivacyChanges, privacyStatus, serverStatus)
   const [open, setOpen] = useState(false)
   const pathname = usePathname()

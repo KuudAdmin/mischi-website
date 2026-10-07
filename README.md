@@ -179,6 +179,8 @@ the UI can be tested locally.
 `instrumentation-client.ts` observes privacy choices. `lib/analytics.ts` loads
 PostHog only when `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` is present, the visitor has
 explicitly opted in, and neither Do Not Track nor Global Privacy Control is on.
+The consent prompt, settings links and dialog are hidden when no token is
+configured. They become available when a token is configured and the site is rebuilt.
 
 - Visitors can allow or reject with equally prominent buttons, and withdraw
   through **Privacy settings** in the footer or privacy policy. A versioned

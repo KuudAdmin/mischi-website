@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { Coffee } from 'iconsax-react'
 import { RELEASE } from '@/lib/release'
+import { ANALYTICS_CONFIGURED } from '@/lib/privacy-preferences'
 import { PrivacySettingsButton } from '../legal/PrivacyControls'
 
 // `soon: true` marks something not ready until launch — rendered greyed-out and
@@ -145,7 +146,7 @@ export default function Footer() {
         <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
           <p style={{ flex: '1 1 auto', minWidth: 0, fontSize: '0.75rem', lineHeight: 1.6, color: 'var(--color-text-dim)' }}>
             © 2026 Mischi. A tiny desktop companion with an opinion.
-            <span style={{ display: 'block', marginTop: '10px' }}><PrivacySettingsButton /></span>
+            {ANALYTICS_CONFIGURED && <span style={{ display: 'block', marginTop: '10px' }}><PrivacySettingsButton /></span>}
           </p>
           <div style={{ display: 'flex', flex: 'none', gap: '16px' }}>
             <SocialLink href="https://x.com/ajjuism" label="Follow Mischi’s maker on X">

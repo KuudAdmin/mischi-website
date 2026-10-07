@@ -3,6 +3,7 @@ import Link from 'next/link'
 import LegalPage from '../components/legal/LegalPage'
 import { CONTACT_EMAIL } from '@/lib/release'
 import { LEGAL_UPDATED, OPERATOR_NAME } from '@/lib/legal'
+import { ANALYTICS_CONFIGURED } from '@/lib/privacy-preferences'
 import { PrivacySettingsButton } from '../components/legal/PrivacyControls'
 
 const DESCRIPTION =
@@ -107,7 +108,9 @@ export default function PrivacyPage() {
 
       <h3 id="analytics">Usage analytics and your choice</h3>
       <p>
-        PostHog helps us understand use of the website, such as visits, downloads, docs usage and successful form submissions. It is optional: we do not initialise PostHog or send analytics events before you choose Allow analytics. Choosing No thanks, ignoring the prompt or withdrawing consent leaves analytics off without affecting downloads or use of the website. You can change your choice at any time using <PrivacySettingsButton /> in the footer or here.
+        PostHog helps us understand use of the website, such as visits, downloads, docs usage and successful form submissions. It is optional: we do not initialise PostHog or send analytics events before you choose Allow analytics. Choosing No thanks, ignoring the prompt or withdrawing consent leaves analytics off without affecting downloads or use of the website. {ANALYTICS_CONFIGURED
+          ? <>You can change your choice at any time using <PrivacySettingsButton /> in the footer or here.</>
+          : 'Optional website analytics are currently disabled.'}
       </p>
       <ul>
         <li><strong>Memory-only identifiers.</strong> The analytics integration keeps temporary identifiers in memory rather than saving them in cookies or browser storage. These identifiers can associate events during a visit. Person profiles and session recording are disabled.</li>
