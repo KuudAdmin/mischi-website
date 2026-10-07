@@ -19,7 +19,8 @@
 
 This repo is the public Mischi website, built with the Next.js App Router. It
 ships the landing page, product docs, support/contact flow, legal pages,
-download metadata, SEO assets, analytics wiring, and the newsletter endpoint.
+app and pet downloads, the update feed, SEO assets, optional analytics, and
+the newsletter endpoint. The native macOS app is maintained separately.
 
 - **Next.js 16 App Router**, React 19, TypeScript, and Tailwind v4.
 - A refreshed homepage with a MacBook desktop-scene hero, trust band, animated
@@ -29,6 +30,7 @@ download metadata, SEO assets, analytics wiring, and the newsletter endpoint.
 - A full `/docs` manual with client-side search, sections for install/update,
   everyday use, pets, behavior, reminders, window settings, Groq AI, Ask
   Mischi, pet creation, troubleshooting, uninstall/reset, and support.
+- A `/pets` library with animated previews and downloadable pet packages.
 - A redesigned `/contact` experience for bug reports, feature ideas, questions,
   and pet showcases. App links can prefill `?v=<version>&os=<macOS build>`,
   drafts are restored locally, and failed sends fall back to email/copy.
@@ -37,8 +39,11 @@ download metadata, SEO assets, analytics wiring, and the newsletter endpoint.
 - Server routes for newsletter signups and contact messages, with honeypots,
   validation, rate limits, same-origin checks where appropriate, and provider
   keys kept server-side.
-- Cookieless PostHog analytics, proxied through `/relay/*`, disabled unless a
-  public project token is configured and skipped for DNT/GPC visitors.
+- A terms-and-privacy acknowledgement before app downloads, with a dialog and
+  a standalone `/download` form that also works without JavaScript.
+- Optional PostHog analytics through `/relay/*`, using temporary in-memory
+  identifiers. Capture requires a configured token and explicit consent, and
+  respects DNT/GPC. Privacy controls are hidden when analytics is unconfigured.
 
 ## Recent changes reflected here
 
@@ -46,22 +51,17 @@ download metadata, SEO assets, analytics wiring, and the newsletter endpoint.
   2026, with a 6.0 MB Universal DMG for macOS 13 Ventura and later.
 - Version 0.9.12 adds in-app update notices, manual update checks, and hidden
   scrollbars throughout Preferences while preserving scrolling.
-- The homepage hero now uses the MacBook mockup scene and coordinated reveal for
-  the laptop, cat, and controls.
-- The feature showcase is now a single accessible tabbed player covering
-  desktop chat, bring-your-own Groq AI, scripted animations/chat lines, and pet
-  switching.
-- New product sections cover offline behavior, reminders, voice mode, no app
-  telemetry, Codex-compatible pets, and native Universal Mac builds.
-- The creator section now explains the Codex pet format and links to both the
-  local creator guide and the Codex pets guide.
-- The download section now includes install steps, a SHA-256 reveal, signed and
-  notarised DMG messaging, and a Buy Me a Coffee link.
-- FAQ and footer were expanded with more product/support links, clearer beta
-  answers, and the refreshed coffee/support affordance.
-- Docs and contact are now product-grade flows rather than placeholder pages:
-  docs search is built from the rendered manual, and contact messages can be
-  sent through Resend or recovered as pre-filled email text.
+- `/updates/latest.json` advertises the current release, and the docs, FAQ and
+  privacy policy explain automatic and manual update checks.
+- Privacy and terms identify **ARJUN NV** as the independent operator of
+  Mischi. The public contact address remains **hello@kuud.in**.
+- The app download form starts with an unchecked box for accepting the terms
+  and acknowledging the privacy policy. Visitors must check it to submit;
+  this does not enable analytics or subscribe them to the newsletter.
+- Optional analytics require consent. The footer settings link, policy-page
+  control and preference dialog appear only when PostHog is configured.
+- Docs search text is excluded from analytics, provider failures no longer log
+  response bodies or raw exceptions, and inactive IP rate-limit records expire.
 
 ## Getting started
 
@@ -76,11 +76,15 @@ Useful checks:
 
 ```bash
 npm run lint
+npx tsc --noEmit
+node --test tests/privacy.test.mjs
 npm run build
 ```
 
 Local secrets live in `.env.local`; create it with the variables you need from
-the sections below.
+the sections below. Without a PostHog token, local development sends no
+analytics and shows no analytics preference controls. The privacy tests use
+isolated browser/provider dependencies and do not send data to external services.
 
 ## Shipping a new app version
 
@@ -148,7 +152,8 @@ Public:
   project.
 
 Never send personal data such as names, emails, or message text in analytics
-event properties. The privacy policy promises the site does not collect that.
+event properties. The privacy policy promises the site does not include those
+fields in analytics events; contact and newsletter submissions are separate.
 
 ## Contact flow
 
@@ -160,6 +165,11 @@ The form posts to `app/api/contact/route.ts`, which validates the message,
 drops honeypot submissions, checks same-origin requests, rate-limits by IP, and
 sends through Resend with the sender as Reply-To. If Resend is unavailable, the
 UI offers the same message as a mailto link or clipboard copy.
+
+The public email address is centralised in `lib/release.ts`. Contact links,
+email/copy fallbacks, legal pages, `/llms.txt`, and `/.well-known/security.txt`
+use that value. A deployment's `CONTACT_TO_EMAIL` can override where form
+messages are delivered; it does not change the public address.
 
 ## Newsletter flow
 
@@ -180,7 +190,9 @@ the UI can be tested locally.
 PostHog only when `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` is present, the visitor has
 explicitly opted in, and neither Do Not Track nor Global Privacy Control is on.
 The consent prompt, settings links and dialog are hidden when no token is
-configured. They become available when a token is configured and the site is rebuilt.
+configured. They become available when a token is configured and the site is
+rebuilt and deployed. These controls govern website analytics, independently
+of the download agreement, newsletter subscription and native app settings.
 
 - Visitors can allow or reject with equally prominent buttons, and withdraw
   through **Privacy settings** in the footer or privacy policy. A versioned
@@ -233,19 +245,26 @@ app/
   page.tsx                  Home page composition
   layout.tsx                Metadata, fonts, JSON-LD
   api/contact/              Resend-backed contact endpoint
+  api/download/             Versioned agreement validation and DMG redirect
   api/subscribe/            Newsletter endpoint for Kit/Sheets
   components/
     hero/                   MacBook scene and hero copy
     demo/                   Sprite-sheet pet canvas and draggable pet
     features/               Feature tabs and under-the-hood grid
     creator/                Codex-compatible pet creator section
-    download/               DMG CTA, install steps, checksum reveal
+    download/               DMG CTA, agreement dialog/form, install steps, checksum
     docs/                   Client-side docs search
     contact/                Compose-style contact experience
+    legal/                  Legal layout, shared dialog and privacy controls
+    pets/                   Pet previews and download controls
     faq/, footer/, nav/     Shared product chrome
   docs/                     Product manual
   contact/                  Support page and contact styling
+  download/                 Standalone app download agreement
+  pets/                     Downloadable pet library
   privacy/, terms/          Legal pages
+  updates/latest.json/      App update feed
+  .well-known/security.txt/ Security contact information
   llms.txt/                 Plain-text site map for language models
   opengraph-image.tsx       Dynamic social card
   manifest.ts, sitemap.ts,
@@ -254,21 +273,34 @@ lib/
   release.ts                Current app version and download details
   seo.ts                    Canonical site metadata/config
   analytics.ts              Privacy-friendly event helpers
+  privacy-preferences.ts    Consent storage, expiry and browser privacy signals
+  legal.ts                  Operator name and legal document versions
   rate-limit.ts             In-memory route rate limiter
 public/
   downloads/                Versioned DMGs
+  pets/                     Pet previews and downloadable packages
   features/                 Feature recordings and posters
   hero/                     Hero mockup assets
   *.png, *.svg, *.webp      Brand marks, pet sheets, illustrations
 docs/
   og.png                    README/social snapshot
+tests/
+  privacy.test.mjs           Consent, event filtering, downloads and IP expiry
+instrumentation-client.ts   Starts consent-aware analytics observation
 ```
 
 ## Deploying
 
-Deploys to [Vercel](https://vercel.com). Before shipping, run `npm run lint` and
-`npm run build`, then add the server-only and public environment variables under
-**Project > Settings > Environment Variables**.
+Deploys to [Vercel](https://vercel.com). Configure the required variables under
+**Project > Settings > Environment Variables** before building. Public
+`NEXT_PUBLIC_*` values are part of the browser build, so changing the analytics
+token or region requires a new deployment.
+
+Run the checks in Getting started before shipping code changes. After deployment,
+verify the contact address, `/download`, `/privacy`, and `/updates/latest.json`.
+Leave `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` unset to keep optional analytics and
+its controls disabled. With analytics configured, confirm that the prompt
+offers both choices and Privacy settings allows withdrawal.
 
 ---
 
