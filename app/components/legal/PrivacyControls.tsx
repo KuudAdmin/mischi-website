@@ -40,7 +40,7 @@ function ConfiguredPrivacyControls() {
       {status === 'unknown' && !open && (
         <aside className={styles.banner} aria-labelledby="analytics-choice-title">
           <h2 id="analytics-choice-title" className={styles.title}>Help improve Mischi?</h2>
-          <p className={styles.copy}>Allow optional website analytics from PostHog to help us understand visits and downloads. We use temporary identifiers and device information. Your choice won’t affect downloads. <a href="/privacy#analytics">Privacy details</a></p>
+          <p className={styles.copy}>Allow optional analytics to help us improve the website. We measure visits, clicks and downloads using temporary identifiers and device information. Your choice won’t affect downloads. <a href="/privacy#analytics">Privacy and provider details</a></p>
           <div className={styles.actions}>
             <button type="button" className={styles.button} onClick={() => choose('rejected')}>No thanks</button>
             <button type="button" className={styles.button} onClick={() => choose('accepted')}>Allow analytics</button>
