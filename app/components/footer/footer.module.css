@@ -1,0 +1,32 @@
+.bottom {
+  border-top: 1px solid var(--color-border);
+  padding-top: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.copyright {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: .75rem;
+  line-height: 1.6;
+  color: var(--color-text-dim);
+}
+
+.privacy {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.privacy button {
+  font-size: inherit;
+}
+
+@media (max-width: 640px) {
+  .bottom {
+    flex-direction: column;
+    text-align: center;
+  }
+}
